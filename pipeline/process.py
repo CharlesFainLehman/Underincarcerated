@@ -24,7 +24,7 @@ import json
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import anthropic
@@ -80,6 +80,10 @@ class DecisionLog:
             return
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+
+
+def _date_horizon() -> str:
+    return (date.today() + timedelta(days=2)).isoformat()
 
 
 def default_decision_log() -> Path:
@@ -251,6 +255,10 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                 problem = check_evidence(cls, text)
                 if not problem and cls.state and cls.state.upper() not in US_STATES:
                     problem = f"state {cls.state!r} is not a US state"
+                if cls.incident_date and cls.incident_date[:10] > _date_horizon():
+                    # A misread date, not a reason to drop the story.
+                    print(f"  future incident_date {cls.incident_date!r} blanked")
+                    cls.incident_date = None
                 if problem:
                     log.write(stage="verify", url=url, qualifies=False, reason=problem,
                               classification=cls.model_dump())

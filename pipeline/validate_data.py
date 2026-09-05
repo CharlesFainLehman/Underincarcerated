@@ -29,6 +29,41 @@ def _int(v: str) -> int | None:
     return int(v) if v else None
 
 
+def row_problems(r: dict, horizon: str | None = None) -> list[str]:
+    """Every rule a single story row can break. Shared with quarantine.py."""
+    horizon = horizon or (date.today() + timedelta(days=2)).isoformat()
+    out = []
+    v = r.get("incident_date") or ""
+    if v and v[:10] > horizon:
+        out.append(f"incident_date {v!r} is in the future")
+    if v and v[:4] < "2000":
+        out.append(f"incident_date {v!r} is implausibly old")
+    if r.get("state") and r["state"] not in US_STATES:
+        out.append(f"state {r['state']!r} is not a US state")
+    if r.get("new_offense_type") and r["new_offense_type"] not in NEW_OFFENSE_TYPES:
+        out.append(f"new_offense_type {r['new_offense_type']!r} outside vocabulary")
+    if r.get("new_offense_severity") and r["new_offense_severity"] not in OFFENSE_SEVERITIES:
+        out.append(f"new_offense_severity {r['new_offense_severity']!r} outside vocabulary")
+    if r.get("release_status") not in RELEASE_STATUSES:
+        out.append(f"release_status {r.get('release_status')!r} outside vocabulary")
+    else:
+        if r["release_status"] != "none stated" and not r.get("release_evidence_quote"):
+            out.append("release_status set without release_evidence_quote")
+        if not r.get("prior_evidence_quote") and r["release_status"] == "none stated":
+            out.append("no prior_evidence_quote and no release status")
+    try:
+        strict = qualifies_strict(_int(r.get("prior_count_arrests", "")),
+                                  _int(r.get("prior_count_convictions", "")),
+                                  _int(r.get("prior_count_felony_convictions", "")))
+        if (r.get("qualifies_strict") == "yes") != strict:
+            out.append(f"qualifies_strict {r.get('qualifies_strict')!r} disagrees with counts")
+    except ValueError:
+        out.append("non-integer prior count")
+    if BAD_SOURCE.search(r.get("source_url", "")):
+        out.append("wire/blotter primary source")
+    return out
+
+
 def main() -> None:
     for p in DATA_DIR.glob("*.json"):
         try:
@@ -37,6 +72,8 @@ def main() -> None:
             fail(f"{p.name} is not valid JSON: {e}")
 
     for p in list(DATA_DIR.glob("*.csv")) + list(DATA_DIR.glob("backfill/*.csv")):
+        if p.name == "quarantine.csv":
+            continue
         text = p.read_text(encoding="utf-8")
         for m in MARKERS:
             if any(line.startswith(m) for line in text.splitlines()):
@@ -66,36 +103,9 @@ def main() -> None:
     if not rows:
         print("data validation OK (no stories yet)")
         return
-    horizon = (date.today() + timedelta(days=2)).isoformat()
     for r in rows:
-        rid = r.get("id")
-        v = r.get("incident_date") or ""
-        if v and v[:10] > horizon:
-            fail(f"id {rid}: incident_date {v!r} is in the future")
-        if v and v[:4] < "2000":
-            fail(f"id {rid}: incident_date {v!r} is implausibly old")
-        if r.get("state") and r["state"] not in US_STATES:
-            fail(f"id {rid}: state {r['state']!r} is not a US state")
-        if r.get("new_offense_type") and r["new_offense_type"] not in NEW_OFFENSE_TYPES:
-            fail(f"id {rid}: new_offense_type {r['new_offense_type']!r} outside vocabulary")
-        if r.get("new_offense_severity") and r["new_offense_severity"] not in OFFENSE_SEVERITIES:
-            fail(f"id {rid}: new_offense_severity {r['new_offense_severity']!r} outside vocabulary")
-        if r.get("release_status") not in RELEASE_STATUSES:
-            fail(f"id {rid}: release_status {r.get('release_status')!r} outside vocabulary")
-        if r["release_status"] != "none stated" and not r.get("release_evidence_quote"):
-            fail(f"id {rid}: release_status set without release_evidence_quote")
-        if not r.get("prior_evidence_quote") and r["release_status"] == "none stated":
-            fail(f"id {rid}: no prior_evidence_quote and no release status")
-        try:
-            strict = qualifies_strict(_int(r["prior_count_arrests"]),
-                                      _int(r["prior_count_convictions"]),
-                                      _int(r["prior_count_felony_convictions"]))
-        except ValueError:
-            fail(f"id {rid}: non-integer prior count")
-        if (r.get("qualifies_strict") == "yes") != strict:
-            fail(f"id {rid}: qualifies_strict {r.get('qualifies_strict')!r} disagrees with counts")
-        if BAD_SOURCE.search(r.get("source_url", "")):
-            fail(f"id {rid}: wire/blotter primary source; re-source or remove")
+        for problem in row_problems(r):
+            fail(f"id {r.get('id')}: {problem}")
 
     print(f"data validation OK ({len(rows)} stories)")
 

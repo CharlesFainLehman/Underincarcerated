@@ -477,3 +477,31 @@ def test_backfill_skips_done_weeks(monkeypatch, tmp_path):
     monkeypatch.setattr(backfill, "BACKFILL_DONE_WEEKS_JSON", tmp_path / "done.json")
     backfill.save_done_weeks({"2017-01-01"})
     assert backfill.load_done_weeks() == {"2017-01-01"}
+
+
+def test_quarantine_moves_bad_rows(monkeypatch, tmp_path):
+    import quarantine
+    data = tmp_path / "data"
+    data.mkdir()
+    for mod in (store, validate_data, quarantine):
+        monkeypatch.setattr(mod, "STORIES_CSV", data / "stories.csv")
+        monkeypatch.setattr(mod, "BACKFILL_STORIES_CSV", data / "backfill.csv")
+    monkeypatch.setattr(quarantine, "QUARANTINE_CSV", data / "quarantine.csv")
+    monkeypatch.setattr(validate_data, "DATA_DIR", data)
+    good = make_row(1, _cls(), {"url": "https://x.com/a", "source": "x"})
+    bad = make_row(2, _cls(incident_date="2099-01-01"), {"url": "https://x.com/b", "source": "x"})
+    store.save_stories([good, bad])
+    with pytest.raises(SystemExit):
+        validate_data.main()
+    quarantine.main()
+    validate_data.main()
+    assert [r["id"] for r in store.load_stories()] == ["1"]
+    q = list(csv.DictReader(open(data / "quarantine.csv", newline="", encoding="utf-8")))
+    assert q[0]["id"] == "2" and "future" in q[0]["reason"]
+
+
+def test_future_incident_date_blanked_at_ingest(monkeypatch, tmp_path):
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    counts, _ = _run(monkeypatch, tmp_path, cands, stories, _cls(incident_date="2099-01-01"))
+    assert counts["new"] == 1 and stories[0]["incident_date"] == ""

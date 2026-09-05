@@ -65,7 +65,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git checkout -- site || true
           git pull --rebase --autostash origin main
-          python pipeline/validate_data.py
+          python pipeline/validate_data.py || { python pipeline/quarantine.py && python pipeline/validate_data.py; }
           python pipeline/build_exports.py
           python pipeline/pack_decisions.py
           git add data site
