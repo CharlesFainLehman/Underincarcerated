@@ -1,1 +1,76 @@
 offender_key,offender_name,state,story_ids,incident_count,first_incident_date,last_incident_date,max_prior_arrests,max_prior_convictions,qualifies_strict
+lopez_joshua_NV,Joshua Sanchez-Lopez,NV,26 35,2,2026-01,2026-03-18,35,,yes
+adkins_cody_IA,Cody Michael Adkins,IA,38,1,2025-03-16,2025-03-16,,2,no
+asare_jeff_OK,Jeff Kufi Asare,OK,11,1,2026-08-12,2026-08-12,,7,yes
+barber_stephen_KY,Stephen Barber,KY,47,1,2025-08,2025-08,2,,no
+batchigari_varun_AZ,Varun Batchigari,AZ,52,1,2026-08-08,2026-08-08,1,,no
+bogan_richard_AR,Richard Alton Bogan,AR,20,1,2026-06-14,2026-06-14,13,,yes
+bradford_charles_OK,Charles Bradford,OK,78,1,2026-03-14,2026-03-14,,,no
+brulewicz_anthony_FL,Anthony Joseph Brulewicz,FL,73,1,2025-12-19,2025-12-19,,,no
+butler_michael_LA,Michael Butler,LA,36,1,2026-05-26,2026-05-26,37,,yes
+camacho_ryan_NC,Ryan Camacho,NC,49,1,2026-01-03,2026-01-03,6,2,yes
+canaday_gabriel_CA,Gabriel Canaday,CA,7,1,2026-04-01,2026-04-01,,,no
+caron_melysia_NH,Melysia Caron,NH,65,1,2026-03-06,2026-03-06,,,no
+carter_tyler_MA,Tyler Carter,MA,33,1,2026-06-03,2026-06-03,,2,no
+chiles_tommy_HI,Tommy J. Chiles,HI,59,1,2025-11-27,2025-11-27,300,78,yes
+clark_jason_CA,Jason Nathaniel Clark,CA,23,1,2026-07-07,2026-07-07,,,no
+crowder_calese_CA,Calese Crowder,CA,1,1,2026-09-01,2026-09-01,,,no
+delsid_michael_CA,Michael Delsid,CA,69,1,2026-02-19,2026-02-19,35,,yes
+deweese_robert_OH,Robert Deweese,OH,16,1,2026-03-02,2026-03-02,,,no
+diamond_kerry_OR,Kerry Michael Diamond,OR,6,1,2026-07-14,2026-07-14,1,,no
+dickey_alexander_SC,Alexander Dickey,SC,75,1,2025-05-02,2025-05-02,40,,yes
+farnham_theodore_VT,"Theodore ""Teddy"" Farnham",VT,74,1,2024-07-23,2024-07-23,,78,yes
+farthing_james_KY,James Farthing,KY,70,1,2026-03-29,2026-03-29,,,no
+faux_kevin_TX,Kevin Faux,TX,37,1,2026-04-16,2026-04-16,,3,no
+ferrer_william_NY,William Ferrer,NY,68,1,2026-07-25,2026-07-25,6,,yes
+hall_keylin_MA,Keylin Hall,MA,3,1,2026-07-11,2026-07-11,,3,no
+herrera_abraham_TX,Abraham Herrera,TX,19,1,2025-11-03,2025-11-03,,,no
+hunt_di_NC,Di-Quan Hunt,NC,21,1,2026-07-30,2026-07-30,9,6,yes
+hunter_dwight_GA,Dwight Hunter,GA,55,1,2026-02-12,2026-02-12,,,no
+jalloh_abdul_VA,Abdul Jalloh,VA,45,1,2026-02-23,2026-02-23,30,,yes
+johnson_damon_NY,Damon Johnson,NY,67,1,2026-03-03,2026-03-03,88,,yes
+jones_sean_NY,Sean Jones,NY,77,1,2026-01-06,2026-01-06,15,1,yes
+keiffer_john_AR,John Thomas Keiffer,AR,42,1,2026-08-02,2026-08-02,,,no
+kessler_william_WV,William Joseph Kessler III,WV,39,1,2024-06-26,2024-06-26,,2,no
+kilgore_gregory_FL,Gregory Lee Kilgore,FL,17,1,2026-04-11,2026-04-11,,,no
+kirkus_jarrod_TX,Jarrod Kirkus,TX,46,1,2026-02-17,2026-02-17,8,,yes
+lambeth_herman_AL,Herman Lambeth,AL,14,1,2026-03-23,2026-03-23,14,,yes
+levendoski_laura_WI,Laura L. Levendoski,WI,41,1,2026-08-19,2026-08-19,,,no
+lindenau_alyna_NY,Alyna Lindenau,NY,4,1,2026-08-17,2026-08-17,3,,no
+littlejohn_trae_MD,Trae Littlejohn,MD,24,1,2026-05-18,2026-05-18,,1,no
+long_jermaine_FL,Jermaine Lynn Long,FL,53,1,2026-02-14,2026-02-14,,,no
+loving_michael_TX,Michael Allen Loving,TX,63,1,2025-12-17,2025-12-17,37,,yes
+lunn_raymond_MD,Raymond Willis Lunn,MD,34,1,2025-10-18,2025-10-18,,,no
+maldonado_margarita_FL,Margarita Maldonado,FL,60,1,2025-12-26,2025-12-26,,,no
+manney_terry_MI,Terry David Manney,MI,57,1,2026-04-08,2026-04-08,,21,yes
+markante_justin_SC,Justin Edward Markante,SC,29,1,2026-01-29,2026-01-29,,,no
+medina_charles_TX,Charles Eric Medina,TX,76,1,2026-07-19,2026-07-19,13,,yes
+miculka_lisa_TX,Lisa Miculka,TX,56,1,2026,2026,13,,yes
+milton_dwayne_IL,Dwayne Cortez Milton,IL,9,1,2026-07-04,2026-07-04,,10,yes
+mitchell_taiwan_MD,Taiwan Mitchell,MD,40,1,2021-11-13,2021-11-13,,,no
+moore_jessica_FL,Jessica Moore,FL,22,1,2026-07-15,2026-07-15,,,no
+myers_james_FL,James Myers,FL,66,1,2026-03-03,2026-03-03,,,no
+nealy_joshua_OR,Joshua Cory Nealy,OR,61,1,2023-01,2023-01,166,55,yes
+negron_randy_NY,Randy Negron,NY,72,1,2026-04-25,2026-04-25,11,,yes
+padron_nestor_TX,Nestor Padron,TX,5,1,2026-08-18,2026-08-18,,,no
+parham_germaine_NY,Germaine Parham,NY,64,1,2026-01-29,2026-01-29,26,,yes
+pea_fale_WA,Fale Vaigalepa Pea,WA,44,1,2025-12-03,2025-12-03,,,no
+polk_thomas_FL,Thomas Polk,FL,79,1,2024-10-29,2024-10-29,,,no
+quaweay_jehvine_RI,Jehvine Quaweay,RI,48,1,2026-04-01,2026-04-01,2,,no
+ragg_aaron_PA,Aaron Scott Ragg,PA,8,1,2026-02-26,2026-02-26,,1,no
+reed_lawrence_IL,Lawrence Reed,IL,71,1,2025-11-17,2025-11-17,72,15,yes
+roberts_portia_FL,Portia Renee Roberts,FL,10,1,2026-03-31,2026-03-31,1,,no
+rojas_arron_AZ,Arron Rojas,AZ,43,1,2026-03-07,2026-03-07,,,yes
+russell_justin_MA,Justin Russell,MA,28,1,2026-07-27,2026-07-27,,1,no
+seals_nasir_NY,Nasir Seals,NY,27,1,2026-03-18,2026-03-18,2,2,no
+sheasley_jason_PA,Jason Sheasley,PA,13,1,2026-01,2026-01,,1,no
+simpson_david_NC,David Simpson,NC,31,1,2026-07-29,2026-07-29,,1,no
+smith_donte_VA,Donte Smith,VA,30,1,2026-04-27,2026-04-27,5,2,yes
+straw_marlon_MA,Marlon Straw,MA,54,1,2026-05-12,2026-05-12,,2,no
+talley_alphanso_IL,Alphanso Talley,IL,32,1,2026-04-29,2026-04-29,,,no
+telemacque_tyroan_TX,Tyroan Jakeil Telemacque,TX,12,1,2026-05-18,2026-05-18,35,10,yes
+torres_jose_CT,Jose Torres,CT,50,1,2025-07-20,2025-07-20,25,,yes
+weldon_jeffery_SC,Jeffery Weldon,SC,2,1,2026-08-15,2026-08-15,1,1,no
+wiley_andre_CA,Andre Wiley,CA,25,1,2026-07-20,2026-07-20,,,no
+williams_delmar_MI,Delmar Williams,MI,58,1,2026-07-26,2026-07-26,,,no
+williams_joequarius_TN,Joequarius Williams,TN,51,1,,,,1,no
