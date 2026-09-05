@@ -64,6 +64,7 @@ Open decisions for you (section 8) affect the exact wording.
 | `new_offense_severity` | enum: violent, property, drug, weapons, other |
 | `prior_count_arrests` | integer if stated, else blank |
 | `prior_count_convictions` | integer if stated, else blank |
+| `prior_count_felony_convictions` | integer if stated, else blank |
 | `prior_offenses` | short free text: "burglary; assault; two drug felonies" |
 | `prior_evidence_quote` | verbatim sentence from the article; validated against fetched text |
 | `release_status` | enum: pretrial release, bail/bond, probation, parole, supervised release, early release, charges dropped, diversion, none stated |
@@ -73,6 +74,7 @@ Open decisions for you (section 8) affect the exact wording.
 | `summary` | 1-2 factual sentences |
 | `source_name`, `source_url`, `additional_sources` | as Flock |
 | `confidence` | high/medium/low |
+| `qualifies_strict` | yes/no; computed from the counts (section 8b) |
 
 `data/offenders.csv` is derived, not edited: one row per `offender_key` with story ids, first/last seen, incident count. Rebuilt by `build_exports.py`.
 
@@ -90,7 +92,7 @@ Copied from flock-crime-tracker with changes noted.
 | `process.py` | Same loop plus triage stage and quote validation |
 | `store.py` | Same, new columns |
 | `validate_data.py` | Same checks plus: enum vocabularies, quote fields non-empty when status is stated, no future dates |
-| `build_exports.py` | Replaces `build_site.py`. Writes `site/stories.csv`, `site/stories.json`, `site/offenders.csv`, `site/stats.json` (counts by state, by month, by release status, by offense type). No HTML |
+| `build_exports.py` | Replaces `build_site.py`. Writes `site/stories.csv`, `site/stories.json`, `site/offenders.csv`, `site/offenders.json`, `site/stats.json`, and a placeholder `site/index.html` |
 | `run_daily.py`, `backfill.py`, `daily_adds.py`, `review_feedback.py` | Same, renamed strings |
 
 Model: `claude-haiku-4-5` for triage, classify, dedupe. `claude-sonnet-5` for feedback triage and review sweeps. Verify current ids and pricing against the API docs at build time.
@@ -129,11 +131,21 @@ Backfill to 2017 is the expensive step: GDELT's cap means weekly windows and nar
 5. **Backfill.** 2024 first, then earlier years in monthly chunks. Review again after each year.
 6. **Front end hand-off.** Freeze the export format. Document it in `docs/exports.md`.
 
-## 8. Decisions needed from you
+## 8. Decisions (settled 2026-09-05)
 
-a. **Names.** Store `offender_name` (needed for person linking and dedupe) or hash it and keep only `offender_key`? Names of adult arrestees are public in the source articles either way.
-b. **Threshold.** Is one prior conviction enough, or require two or more, or any release-status condition? Draft above accepts one concrete prior. Field-level counts let the front end filter later, so a loose rule at ingest is safer than a tight one.
-c. **Scope.** US only? English-language only?
-d. **Backfill depth.** 2017 like Flock, or start at 2020 (bail-reform era) to cut cost?
-e. **Person linking.** Build `offenders.csv` in phase 1, or defer?
-f. **Repo layout.** Pipeline lives in this repo under `pipeline/`; front end in its own repo reading `site/*.json` from GitHub Pages or raw.githubusercontent. Confirm.
+a. **Names.** Stored as printed.
+b. **Threshold.** Ingest every story with at least one concrete prior or a release-status
+   condition. A `qualifies_strict` flag marks 5+ prior arrests, or 5+ prior convictions, or 3+
+   prior felony convictions, as stated in the article. The front end filters on the flag.
+c. **Scope.** US only. Non-US stories rejected at triage and again at classification.
+d. **Backfill depth.** 2017.
+e. **Person linking.** `offenders.csv` built from phase 1.
+f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `data/`, front
+   end and exports in `site/`.
+
+## 9. Status
+
+Phase 1 scaffold is done: all modules, workflows, tests, and README. Not yet run against live
+news: the build environment had no API key and no route to GDELT. Next step is phase 2, a
+calibration run (`workflow_dispatch` on the daily job with `days_back=3`, or locally), then
+hand review of the decision log.

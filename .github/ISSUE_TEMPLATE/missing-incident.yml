@@ -1,0 +1,16 @@
+name: Submit a missing story
+description: A news story about a repeat offender that the database does not have.
+title: "[Missing story] "
+labels: ["feedback", "missing-incident"]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Article URL
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes (optional)
+      description: Anything the article says about the prior record or release status.

@@ -1,0 +1,79 @@
+name: Backfill (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Start month (YYYY-MM)"
+        required: true
+        default: "2024-01"
+      end:
+        description: "End month (YYYY-MM)"
+        required: true
+        default: "2024-03"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: data-update  # never alongside the daily job or another backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Configure git for progress pushes
+        run: |
+          git config user.name "underincarcerated-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Run backfill ${{ inputs.start }} .. ${{ inputs.end }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: python pipeline/backfill.py --start "${{ inputs.start }}" --end "${{ inputs.end }}" --push-progress
+
+      - name: Upload decision log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backfill-decisions-${{ inputs.start }}-${{ inputs.end }}
+          path: data/decisions/
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Commit updated data and exports
+        id: commit
+        if: always()  # keep checkpoint progress even if a late week errors
+        run: |
+          git checkout -- site || true
+          git pull --rebase --autostash origin main
+          python pipeline/validate_data.py
+          python pipeline/build_exports.py
+          git add data site
+          git diff --cached --quiet || git commit -m "Backfill ${{ inputs.start }}..${{ inputs.end }}"
+          git push
+
+      - if: always() && steps.commit.outcome == 'success'
+        uses: actions/configure-pages@v5
+      - if: always() && steps.commit.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - if: always() && steps.commit.outcome == 'success'
+        uses: actions/deploy-pages@v4
