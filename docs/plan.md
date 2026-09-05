@@ -157,5 +157,12 @@ classifying anything and taught two things, both fixed:
   bounds a calibration run.
 
 The first run found 2,579 candidate URLs over 3 days, roughly 860/day, in line with the
-estimate in section 6. Next: re-run with `days_back=3`, `max_classify=200`, review the
-decision log.
+estimate in section 6.
+
+Wall-clock design after the second run (which also ran long): everything network-bound is
+parallel. Redirect decoding runs on 6 threads, fetch + classify + verify on 8; only dedupe
+and append are serial, per chunk of 25, with a checkpoint after each chunk. Google News
+items whose headline matches a direct-URL candidate are dropped before decoding. Fetch
+timeout is 15s. Each stage prints its elapsed time.
+
+Next: review the decision log from the calibration run.

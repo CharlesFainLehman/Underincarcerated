@@ -23,6 +23,7 @@ import feedparser
 import requests
 import trafilatura
 from googlenewsdecoder import gnewsdecoder
+from trafilatura.settings import use_config
 
 from config import GDELT_QUERIES, GOOGLE_NEWS_QUERIES, QUERY_STATS_JSON
 
@@ -205,6 +206,7 @@ def discover_daily(days_back: int = 1) -> list[dict]:
     end = datetime.now(timezone.utc).replace(tzinfo=None)
     start = end - timedelta(days=days_back)
     candidates: dict[str, dict] = {}
+    t0 = time.monotonic()
     for q in GDELT_QUERIES:
         found = gdelt_search_split(q, start, end)
         for c in found:
@@ -218,6 +220,8 @@ def discover_daily(days_back: int = 1) -> list[dict]:
         time.sleep(1)
     print(f"  Google News: {sum(h['gnews'] for h in QUERY_HITS.values())} items "
           f"across {len(GOOGLE_NEWS_QUERIES)} queries")
+    print(f"  GDELT calls {GDELT_STATS['calls']}, retries {GDELT_STATS['retries']}, "
+          f"gave up {GDELT_STATS['gave_up']}; discovery took {int(time.monotonic() - t0)}s")
     return list(candidates.values())
 
 
@@ -253,6 +257,11 @@ def resolve_candidate(candidate: dict) -> None:
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 
+# A slow site must not stall a worker for trafilatura's default 30s.
+FETCH_TIMEOUT = 15
+_TRAFILATURA_CONFIG = use_config()
+_TRAFILATURA_CONFIG.set("DEFAULT", "DOWNLOAD_TIMEOUT", str(FETCH_TIMEOUT))
+
 
 def fetch_article_text(url: str, max_chars: int = 14000) -> str | None:
     """Download and extract the main text of an article. None on failure.
@@ -261,9 +270,9 @@ def fetch_article_text(url: str, max_chars: int = 14000) -> str | None:
     if "news.google.com" in url:
         return None
     try:
-        downloaded = trafilatura.fetch_url(url)
+        downloaded = trafilatura.fetch_url(url, config=_TRAFILATURA_CONFIG)
         if not downloaded:
-            resp = requests.get(url, timeout=30, headers={"User-Agent": BROWSER_UA})
+            resp = requests.get(url, timeout=FETCH_TIMEOUT, headers={"User-Agent": BROWSER_UA})
             if not resp.ok:
                 return None
             downloaded = resp.text

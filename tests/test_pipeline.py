@@ -274,7 +274,7 @@ def test_process_checkpoint_and_cap(monkeypatch, tmp_path):
     counts = process_candidates(FakeClient(), cands, stories, seen,
                                 checkpoint=lambda: calls.append(len(stories)), max_classify=35)
     assert counts["new"] == 35
-    assert calls == [10, 20, 30]          # after every 10 completed
+    assert calls == [10, 20, 30, 35]      # after every chunk, last one partial
     assert len(seen) == 35                # deferred candidates are not marked seen
 
 
@@ -322,3 +322,31 @@ def test_triage_runs_before_resolution(monkeypatch, tmp_path):
     assert stories[0]["source_url"] == "https://real.com/story"
     assert {"https://news.google.com/rss/articles/A", "https://news.google.com/rss/articles/B",
             "https://real.com/story"} <= seen
+
+
+def test_google_headline_duplicates_skip_resolution(monkeypatch):
+    """A Google News item whose headline matches a direct-URL candidate is a
+    duplicate of that article; it is dropped without decoding the redirect."""
+    resolved = []
+    stories: list[dict] = []
+    cands = [{"url": "https://direct.com/a", "title": "Man with 12 prior arrests charged", "source": "d"},
+             {"url": "https://news.google.com/rss/articles/X",
+              "title": "Man with 12 prior arrests charged - Direct News", "source": "Direct News"},
+             {"url": "https://news.google.com/rss/articles/Y", "title": "Different story", "source": "o"}]
+
+    def fake_resolve(cand):
+        resolved.append(cand["url"])
+        cand["google_url"] = cand["url"]
+        cand["url"] = "https://other.com/y"
+
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cs: [True] * len(cs))
+    monkeypatch.setattr(process, "resolve_candidate", fake_resolve)
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article",
+                        lambda c, cand, t: _cls(offender_name="A B" if "direct" in cand["url"] else "C D"))
+    monkeypatch.setattr(process, "check_duplicate", lambda c, r, s: DedupeResult(relation="unrelated"))
+    seen: set[str] = set()
+    counts = process_candidates(FakeClient(), cands, stories, seen)
+    assert resolved == ["https://news.google.com/rss/articles/Y"]
+    assert counts["duplicates"] == 1 and counts["new"] == 2
+    assert "https://news.google.com/rss/articles/X" in seen
