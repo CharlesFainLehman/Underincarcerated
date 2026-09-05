@@ -3,12 +3,12 @@
   "\"arrested\" \"times before\"": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 56
+   "gnews": 57
   },
   "\"arrests\" \"criminal history\" charged": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 39
+   "gnews": 85
   },
   "\"career criminal\" arrested": {
    "gdelt": 0,
@@ -18,12 +18,12 @@
   "\"cashless bail\" arrested": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 60
+   "gnews": 61
   },
   "\"charges dropped\" arrested again": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 67
+   "gnews": 66
   },
   "\"criminal record\" arrested again": {
    "gdelt": 0,
@@ -98,7 +98,7 @@
   "\"prior arrests\" charged": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 83
+   "gnews": 100
   },
   "\"prior convictions\" arrested": {
    "gdelt": 0,
@@ -118,7 +118,7 @@
   "\"released early\" arrested": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 100
+   "gnews": 69
   },
   "\"released on bond\" arrested": {
    "gdelt": 0,
@@ -145,18 +145,8 @@
    "gdelt_capped": false,
    "gnews": 100
   },
-  "(\"lengthy criminal history\" OR \"extensive criminal history\" OR \"long criminal history\" OR \"prior arrests\") arrested": {
-   "gdelt": 7,
-   "gdelt_capped": false,
-   "gnews": 0
-  },
   "(\"out on bail\" OR \"out on bond\" OR \"released on bond\" OR \"free on bond\" OR \"posted bond\") arrested": {
    "gdelt": 40,
-   "gdelt_capped": false,
-   "gnews": 0
-  },
-  "(\"repeat offender\" OR \"career criminal\" OR \"habitual offender\" OR \"prolific offender\") arrested": {
-   "gdelt": 11,
    "gdelt_capped": false,
    "gnews": 0
   }
