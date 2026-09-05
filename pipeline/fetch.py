@@ -14,6 +14,7 @@ window splitting when a GDELT query saturates the 250-record cap.
 
 import base64
 import json
+import os
 import re
 import time
 from datetime import date, datetime, timedelta, timezone
@@ -205,13 +206,20 @@ def google_news_search(query: str) -> list[dict]:
     return out
 
 
-def discover_daily(days_back: int = 1) -> list[dict]:
-    """All candidates from the last `days_back` days, both sources, deduped by URL."""
+def discover_daily(days_back: int = 1, use_gdelt: bool | None = None) -> list[dict]:
+    """All candidates from the last `days_back` days, deduped by URL.
+
+    GDELT is off by default on the daily run: from GitHub Actions' shared
+    egress IPs it 429s nearly every query and returned 47 of ~2,600
+    candidates across three live runs. Set USE_GDELT=1 to enable it (it
+    works from a normal residential or office IP)."""
+    if use_gdelt is None:
+        use_gdelt = os.environ.get("USE_GDELT", "0") == "1"
     end = datetime.now(timezone.utc).replace(tzinfo=None)
     start = end - timedelta(days=days_back)
     candidates: dict[str, dict] = {}
     t0 = time.monotonic()
-    for q in GDELT_QUERIES:
+    for q in GDELT_QUERIES if use_gdelt else []:
         found = gdelt_search_split(q, start, end)
         for c in found:
             candidates.setdefault(c["url"], c)
@@ -267,11 +275,17 @@ _TRAFILATURA_CONFIG = use_config()
 _TRAFILATURA_CONFIG.set("DEFAULT", "DOWNLOAD_TIMEOUT", str(FETCH_TIMEOUT))
 
 
+MIN_TEXT_CHARS = 500  # a video-page blurb is not an article
+VIDEO_PATH_FRAGMENTS = ("/video/", "/videos/", "/watch/", "/clip/")
+
+
 def fetch_article_text(url: str, max_chars: int = 14000) -> str | None:
     """Download and extract the main text of an article. None on failure.
     Tries trafilatura's fetch first, then a browser-UA request: many station
     sites 403 obvious non-browser agents."""
     if "news.google.com" in url:
+        return None
+    if any(f in url.lower() for f in VIDEO_PATH_FRAGMENTS):
         return None
     try:
         downloaded = trafilatura.fetch_url(url, config=_TRAFILATURA_CONFIG)
@@ -281,7 +295,7 @@ def fetch_article_text(url: str, max_chars: int = 14000) -> str | None:
                 return None
             downloaded = resp.text
         text = trafilatura.extract(downloaded, include_comments=False)
-        if text and len(text) > 200:
+        if text and len(text) >= MIN_TEXT_CHARS:
             return text[:max_chars]
     except Exception:
         pass

@@ -165,4 +165,33 @@ and append are serial, per chunk of 25, with a checkpoint after each chunk. Goog
 items whose headline matches a direct-URL candidate are dropped before decoding. Fetch
 timeout is 15s. Each stage prints its elapsed time.
 
-Next: review the decision log from the calibration run.
+## 10. Calibration run 1 (2026-09-05, 3-day window, 200 articles)
+
+Timings: discovery 6.5 min (5 wasted on GDELT), triage 2 min, redirect decoding 10 min,
+classification 5 min. 2,500 candidates; triage kept 75%; of 200 fetched, 42 had no text,
+31 rejected, 129 classified qualifying, 26 merged as duplicates, 103 stored, 32 strict.
+
+Row-level precision on the 103 rows, by hand review: about 93%. Errors found and fixed in
+the prompt or code:
+
+- **Bail confusion (systematic).** Bail set on the *new* charge was recorded as "out on
+  bail/bond" in about a quarter of bail/bond rows. Prompt now defines release status as
+  the status at the time of the new offense, from an earlier case.
+- **Label-only priors.** "Armed career criminal" charge, "several convictions," "repeat
+  offender" with nothing concrete: three rows. Prompt tightened; "Nth offense" charges are
+  the one accepted label, counted as N-1 priors.
+- **Not a new crime.** Failure-to-appear warrant arrest; ICE arrest after release with no
+  new offense: two rows. Prompt now excludes both.
+- **Several arrestees in one row.** Three rows. Prompt and code enforce one person per row.
+- **Dedupe misses.** A third syndicated copy and a video page with no state each got
+  their own row. Same person plus dates within 21 days now merges deterministically;
+  name-only matching when a state is missing.
+- **Video pages.** Minimum article text raised to 500 chars; /video/ paths skipped.
+
+Open policy question: juveniles. Two rows were 14- and 15-year-olds with detailed prior
+arrests. The criteria admit them when the article gives offense detail.
+
+GDELT is now off for the daily run (47 of 2,600 candidates over three runs, at 5 minutes
+of 429 backoff per run). The backfill still needs it and must run from a non-Actions IP.
+
+Calibration data was reset and the same window re-run on the fixed prompt.

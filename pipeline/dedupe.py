@@ -39,12 +39,37 @@ def _parse_date(value: str) -> date | None:
     return None
 
 
+def _name_part(key: str) -> str:
+    """offender_key without its state suffix, so a report that omits the
+    state still matches the same person."""
+    return key.rsplit("_", 1)[0] if key else ""
+
+
+def same_person(a: dict, b: dict) -> bool:
+    ka, kb = a.get("offender_key", ""), b.get("offender_key", "")
+    if not ka or not kb:
+        return False
+    if ka == kb:
+        return True
+    return _name_part(ka) == _name_part(kb) and (not a.get("state") or not b.get("state"))
+
+
+def obvious_same_incident(new_row: dict, s: dict) -> bool:
+    """Same person and incident dates within the window (or one missing):
+    merged without asking the model. The model missed a third syndicated copy
+    of one arrest story in calibration; this is cheaper and stricter."""
+    if not same_person(new_row, s):
+        return False
+    a, b = _parse_date(new_row.get("incident_date", "")), _parse_date(s.get("incident_date", ""))
+    return not a or not b or abs((a - b).days) <= DATE_WINDOW_DAYS
+
+
 def find_candidates(new_row: dict, stories: list[dict]) -> list[dict]:
     new_date = _parse_date(new_row.get("incident_date", ""))
     key = new_row.get("offender_key", "")
     out = []
     for s in stories:
-        if key and s.get("offender_key") == key:
+        if same_person(new_row, s):
             out.append(s)
             continue
         if not new_row.get("state") or s.get("state") != new_row.get("state"):
@@ -59,13 +84,13 @@ def find_candidates(new_row: dict, stories: list[dict]) -> list[dict]:
     # syndicated copies of one undated story must each find their just-added
     # twin at the end of the list.
     def _rank(s: dict):
-        same_person = 0 if (key and s.get("offender_key") == key) else 1
+        same_person_rank = 0 if same_person(new_row, s) else 1
         added = _parse_date(s.get("date_added", ""))
         recency = -(added.toordinal() if added else 0)
         old_date = _parse_date(s.get("incident_date", ""))
         if not new_date or not old_date:
-            return (same_person, 1, 0, recency)
-        return (same_person, 0, abs((new_date - old_date).days), recency)
+            return (same_person_rank, 1, 0, recency)
+        return (same_person_rank, 0, abs((new_date - old_date).days), recency)
     out.sort(key=_rank)
     return out[:MAX_CANDIDATES]
 
@@ -81,6 +106,9 @@ def check_duplicate(client: anthropic.Anthropic, new_row: dict,
     candidates = find_candidates(new_row, stories)
     if not candidates:
         return DedupeResult(relation="unrelated")
+    for s in candidates:
+        if obvious_same_incident(new_row, s):
+            return DedupeResult(relation="same_incident", matching_id=s["id"])
 
     existing = "\n".join(f"- id {s['id']}: {_describe(s)}" for s in candidates)
     response = client.messages.parse(
