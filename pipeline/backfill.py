@@ -20,7 +20,7 @@ import anthropic
 
 from build_exports import build_exports
 from config import BACKFILL_QUERIES, DECISIONS_DIR
-from fetch import GDELT_STATS, QUERY_HITS, gdelt_search
+from fetch import GDELT_SLEEP, GDELT_STATS, QUERY_HITS, gdelt_search_split
 from process import process_candidates
 from progress import push_progress
 from store import load_seen_urls, load_stories, save_seen_urls, save_stories
@@ -62,9 +62,9 @@ def main() -> None:
         stats_before = dict(GDELT_STATS)
         candidates: dict[str, dict] = {}
         for q in BACKFILL_QUERIES:
-            for c in gdelt_search(q, w_start, w_end):
+            for c in gdelt_search_split(q, w_start, w_end):
                 candidates.setdefault(c["url"], c)
-            time.sleep(6)
+            time.sleep(GDELT_SLEEP)
         capped = [q for q, h in QUERY_HITS.items() if h["gdelt_capped"]]
         QUERY_HITS.clear()
         fresh = [c for c in candidates.values() if c["url"] not in seen]
@@ -73,7 +73,9 @@ def main() -> None:
 
         counts = {"new": 0}
         if fresh:
-            counts = process_candidates(client, fresh, stories, seen, decision_log=log)
+            counts = process_candidates(client, fresh, stories, seen, decision_log=log,
+                                        checkpoint=lambda: (save_stories(stories),
+                                                            save_seen_urls(seen)))
             save_stories(stories)
             save_seen_urls(seen)
 
