@@ -245,10 +245,10 @@ def test_exports_and_validation(monkeypatch, tmp_path):
     stats = json.loads((site / "stats.json").read_text())
     assert stats["stories"] == 3 and stats["stories_strict"] == 1
     assert stats["offenders_multiple_incidents"] == 1
-    stories_json = json.loads((site / "stories.json").read_text())
-    assert stories_json[0]["prior_count_arrests"] == 11
-    assert stories_json[0]["qualifies_strict"] is True
-    assert stories_json[1]["prior_count_convictions"] is None
+    by_id = {r["id"]: r for r in json.loads((site / "stories.json").read_text())}
+    assert by_id[1]["prior_count_arrests"] == 11
+    assert by_id[1]["qualifies_strict"] is True
+    assert by_id[2]["prior_count_convictions"] is None
 
     # Corrupt the strict flag and confirm validation catches it.
     rows = store.load_stories()
@@ -443,3 +443,37 @@ def test_fetch_skips_video_pages(monkeypatch):
     import fetch
     monkeypatch.setattr(fetch.trafilatura, "fetch_url", lambda *a, **k: (_ for _ in ()).throw(AssertionError("no fetch")))
     assert fetch.fetch_article_text("https://www.foxnews.com/video/6402730125112") is None
+
+
+def test_exports_merge_daily_and_backfill(monkeypatch, tmp_path):
+    data = tmp_path / "data"
+    (data / "backfill").mkdir(parents=True)
+    site = tmp_path / "site"
+    for mod in (store, validate_data):
+        monkeypatch.setattr(mod, "STORIES_CSV", data / "stories.csv")
+        monkeypatch.setattr(mod, "BACKFILL_STORIES_CSV", data / "backfill" / "stories.csv")
+    monkeypatch.setattr(build_exports, "OFFENDERS_CSV", data / "offenders.csv")
+    monkeypatch.setattr(build_exports, "SITE_DIR", site)
+    monkeypatch.setattr(validate_data, "DATA_DIR", data)
+    daily = make_row(1, _cls(), {"url": "https://x.com/a", "source": "x"})
+    bf = make_row(1_000_001, _cls(offender_name="John Smith", incident_date="2019-05-01"),
+                  {"url": "https://x.com/old", "source": "x"})
+    store.save_stories([daily])
+    store.save_stories([bf], data / "backfill" / "stories.csv")
+    validate_data.main()
+    build_exports.build_exports()
+    rows = list(csv.DictReader(open(site / "stories.csv", newline="", encoding="utf-8")))
+    assert [r["id"] for r in rows] == ["1000001", "1"]   # ordered by incident date
+    offenders = list(csv.DictReader(open(data / "offenders.csv", newline="", encoding="utf-8")))
+    assert offenders[0]["incident_count"] == "2"            # same person across both files
+    # A backfill id in the daily file fails validation.
+    store.save_stories([daily, dict(daily, id="1000002", source_url="https://x.com/b")])
+    with pytest.raises(SystemExit):
+        validate_data.main()
+
+
+def test_backfill_skips_done_weeks(monkeypatch, tmp_path):
+    import backfill
+    monkeypatch.setattr(backfill, "BACKFILL_DONE_WEEKS_JSON", tmp_path / "done.json")
+    backfill.save_done_weeks({"2017-01-01"})
+    assert backfill.load_done_weeks() == {"2017-01-01"}

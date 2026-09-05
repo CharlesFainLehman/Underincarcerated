@@ -101,10 +101,13 @@ pip install -r requirements.txt
 export ANTHROPIC_API_KEY=...
 python pipeline/run_daily.py                    # one daily update
 DAYS_BACK=3 MAX_CLASSIFY=200 python pipeline/run_daily.py   # wider net, bounded run
-python pipeline/backfill.py --start 2024-01 --end 2024-03
+nohup caffeinate -i python pipeline/backfill.py --start 2017-01 --end 2017-12 --push-progress > backfill.log 2>&1 &
 python pipeline/build_exports.py               # rebuild site/ from the CSV only
 python pipeline/validate_data.py
 python -m pytest -q                            # offline tests, no API key needed
 ```
 
-Decision logs land in `data/decisions/` (gitignored).
+The backfill must run from a normal IP (GDELT throttles GitHub Actions' shared IPs). It
+writes only to `data/backfill/`, resumes from the last completed week when rerun, and with
+`--push-progress` commits that directory after every week. Keep the laptop awake and plugged
+in; closing the lid pauses it.

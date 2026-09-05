@@ -12,6 +12,16 @@ SEEN_URLS_JSON = DATA_DIR / "seen_urls.json"
 QUERY_STATS_JSON = DATA_DIR / "query_stats.json"
 DECISIONS_DIR = DATA_DIR / "decisions"  # per-run audit log, committed gzipped
 
+# The backfill writes to its own files so a multi-day local backfill and the
+# daily Actions job never edit the same CSV (both appending to stories.csv
+# would conflict on every push and collide on ids). build_exports merges
+# them. Backfill ids start at BACKFILL_ID_BASE.
+BACKFILL_DIR = DATA_DIR / "backfill"
+BACKFILL_STORIES_CSV = BACKFILL_DIR / "stories.csv"
+BACKFILL_SEEN_URLS_JSON = BACKFILL_DIR / "seen_urls.json"
+BACKFILL_DONE_WEEKS_JSON = BACKFILL_DIR / "done_weeks.json"
+BACKFILL_ID_BASE = 1_000_000
+
 # Haiku for the bulk stages (triage, classify, dedupe): volume is hundreds of
 # articles a day and the tasks are extraction, not judgment. Sonnet for the
 # low-volume feedback triage.

@@ -1,7 +1,7 @@
 """Build the front-end data files in site/ from data/stories.csv.
 
 Outputs:
-  site/stories.csv, site/stories.json   one record per incident
+  site/stories.csv, site/stories.json   one record per incident (daily + backfill)
   site/offenders.csv, site/offenders.json  one record per offender_key
   site/stats.json                        counts for headline figures and charts
   site/index.html                        placeholder index until the front end lands
@@ -15,8 +15,8 @@ import shutil
 from collections import Counter, defaultdict
 from datetime import date
 
-from config import OFFENDER_COLUMNS, OFFENDERS_CSV, SITE_DIR, STORIES_CSV
-from store import load_stories
+from config import CSV_COLUMNS, OFFENDER_COLUMNS, OFFENDERS_CSV, SITE_DIR
+from store import load_all_stories
 
 INT_FIELDS = ("id", "age", "prior_count_arrests", "prior_count_convictions",
               "prior_count_felony_convictions")
@@ -107,7 +107,8 @@ INDEX_HTML = """<!DOCTYPE html>
 
 
 def build_exports() -> None:
-    stories = load_stories()
+    stories = load_all_stories()
+    stories.sort(key=lambda r: (r.get("incident_date") or "", int(r["id"])))
     offenders = build_offenders(stories)
     SITE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -117,8 +118,10 @@ def build_exports() -> None:
         w.writeheader()
         w.writerows(offenders)
 
-    if STORIES_CSV.exists():
-        shutil.copy(STORIES_CSV, SITE_DIR / "stories.csv")
+    with open(SITE_DIR / "stories.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(stories)
     shutil.copy(OFFENDERS_CSV, SITE_DIR / "offenders.csv")
     (SITE_DIR / "stories.json").write_text(
         json.dumps([_to_json_record(s) for s in stories], ensure_ascii=False), encoding="utf-8")

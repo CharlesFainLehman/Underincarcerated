@@ -35,6 +35,9 @@ USER_AGENT = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
               "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 
 GDELT_STATS = {"calls": 0, "retries": 0, "gave_up": 0}
+# The daily run gives up on GDELT fast (it is a supplement there). The
+# backfill depends on GDELT, so it waits out 429s: backfill.py sets this.
+GDELT_PATIENT = False
 # query -> {"gdelt": n, "gdelt_capped": bool, "gnews": n} for the current run.
 QUERY_HITS: dict[str, dict] = {}
 
@@ -94,13 +97,14 @@ def gdelt_search(query: str, start: datetime, end: datetime,
     # live runs about half the queries 429'd through three attempts with
     # 45-135s backoffs, costing ~5 minutes each for nothing. Two attempts,
     # short backoff: GDELT is a supplement to Google News on the daily run.
-    for attempt in range(2):
+    attempts = 4 if GDELT_PATIENT else 2
+    for attempt in range(attempts):
         try:
             resp = requests.get(GDELT_DOC_API, params=params,
                                 headers={"User-Agent": USER_AGENT}, timeout=30)
             if resp.status_code == 429:
                 GDELT_STATS["retries"] += 1
-                time.sleep(15)
+                time.sleep(45 * (attempt + 1) if GDELT_PATIENT else 15)
                 continue
             resp.raise_for_status()
             articles = resp.json().get("articles", [])

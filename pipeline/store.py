@@ -7,7 +7,9 @@ import unicodedata
 from datetime import date
 
 from classify import qualifies_strict
-from config import CSV_COLUMNS, SEEN_URLS_JSON, STORIES_CSV
+from pathlib import Path
+
+from config import BACKFILL_STORIES_CSV, CSV_COLUMNS, SEEN_URLS_JSON, STORIES_CSV
 
 _SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
 
@@ -27,35 +29,44 @@ def offender_key(name: str | None, state: str | None) -> str:
     return f"{parts[-1]}_{parts[0]}_{(state or '').upper()}"
 
 
-def load_stories() -> list[dict]:
-    if not STORIES_CSV.exists():
+def load_stories(path: Path | None = None) -> list[dict]:
+    path = path or STORIES_CSV
+    if not path.exists():
         return []
-    with open(STORIES_CSV, newline="", encoding="utf-8") as f:
+    with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
-def save_stories(stories: list[dict]) -> None:
-    STORIES_CSV.parent.mkdir(parents=True, exist_ok=True)
-    with open(STORIES_CSV, "w", newline="", encoding="utf-8") as f:
+def load_all_stories() -> list[dict]:
+    """Daily stories plus backfill stories: what the exports publish."""
+    return load_stories(STORIES_CSV) + load_stories(BACKFILL_STORIES_CSV)
+
+
+def save_stories(stories: list[dict], path: Path | None = None) -> None:
+    path = path or STORIES_CSV
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(stories)
 
 
-def next_story_id(stories: list[dict]) -> int:
-    return max((int(s["id"]) for s in stories), default=0) + 1
+def next_story_id(stories: list[dict], base: int = 0) -> int:
+    return max((int(s["id"]) for s in stories), default=base) + 1
 
 
-def load_seen_urls() -> set[str]:
-    if not SEEN_URLS_JSON.exists():
+def load_seen_urls(path: Path | None = None) -> set[str]:
+    path = path or SEEN_URLS_JSON
+    if not path.exists():
         return set()
-    with open(SEEN_URLS_JSON, encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return set(json.load(f))
 
 
-def save_seen_urls(urls: set[str]) -> None:
-    SEEN_URLS_JSON.parent.mkdir(parents=True, exist_ok=True)
-    with open(SEEN_URLS_JSON, "w", encoding="utf-8") as f:
+def save_seen_urls(urls: set[str], path: Path | None = None) -> None:
+    path = path or SEEN_URLS_JSON
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(sorted(urls), f, indent=0)
 
 
