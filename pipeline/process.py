@@ -10,6 +10,11 @@ redirect costs about a second of HTTP per URL, and the first live run spent
 half an hour decoding 2,000 of them before classifying anything. Triage
 needs only the headline, outlet, and snippet the feed already gave us.
 
+Everything network-bound runs in thread pools: redirect decoding, and the
+fetch + classify + verify step. Only dedupe and append are serial, because
+each depends on the rows added before it. Work is done in chunks of
+CHECKPOINT_EVERY so a killed run keeps its progress.
+
 Every decision is appended to a JSONL log (data/decisions/, gitignored, and
 uploaded as a workflow artifact) so prompt calibration can be done against
 real outputs instead of memory.
@@ -17,6 +22,8 @@ real outputs instead of memory.
 
 import json
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
 
@@ -86,6 +93,29 @@ def _mark_seen(seen: set[str], candidate: dict) -> None:
 
 
 CHECKPOINT_EVERY = 25
+RESOLVE_WORKERS = 6    # parallel Google News redirect decodes
+CLASSIFY_WORKERS = 8   # parallel fetch + classify (I/O bound: HTTP and API)
+
+
+def _title_key(title: str) -> str:
+    """Headline normalized for cross-source matching. Google News appends
+    " - Outlet"; strip it, then keep letters and digits only."""
+    t = (title or "").rsplit(" - ", 1)[0].lower()
+    return re.sub(r"[^a-z0-9]+", "", t)
+
+
+def _fetch_and_classify(client, candidate: dict) -> dict:
+    """Worker: everything for one candidate that needs no shared state.
+    Returns a dict with exactly one of: text=None (no_text), error, or
+    (cls, text)."""
+    try:
+        text = fetch_article_text(candidate["url"])
+        if not text:
+            return {"no_text": True}
+        cls = classify_article(client, candidate, text)
+        return {"cls": cls, "text": text}
+    except Exception as e:  # noqa: BLE001 - surfaced to the serial loop
+        return {"error": e}
 
 
 def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
@@ -139,17 +169,30 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
             counts["triaged_out"] += 1
     print(f"Triage kept {len(kept)} of {len(fresh)} fresh candidates")
 
-    # Pass 3: resolve Google redirects for kept candidates only, then the
-    # cheap URL-level filters that need the real URL.
+    # Pass 3: resolve Google redirects for kept candidates only, in parallel,
+    # skipping any whose headline duplicates a direct-URL candidate (the same
+    # article reached via GDELT; decoding it would only find a duplicate).
+    t0 = time.monotonic()
+    direct_titles = {_title_key(c["title"]) for c in kept if "news.google.com" not in c["url"]}
+    google = []
+    for c in kept:
+        if "news.google.com" in c["url"] and _title_key(c["title"]) in direct_titles:
+            _mark_seen(seen_urls, c)
+            counts["duplicates"] += 1
+        elif "news.google.com" in c["url"]:
+            google.append(c)
+    if google:
+        print(f"Resolving {len(google)} Google News redirects "
+              f"({len(kept) - len(google)} direct or headline-duplicate)...")
+        with ThreadPoolExecutor(max_workers=RESOLVE_WORKERS) as pool:
+            list(pool.map(resolve_candidate, google))
+        print(f"  resolved in {int(time.monotonic() - t0)}s")
+
     to_fetch = []
-    n_google = sum(1 for c in kept if "news.google.com" in c["url"])
-    if n_google:
-        print(f"Resolving {n_google} Google News redirects (about 1s each)...")
-    for i, candidate in enumerate(kept, 1):
-        if n_google and i % 100 == 0:
-            print(f"  resolved {i}/{len(kept)}")
-        resolve_candidate(candidate)
+    for candidate in kept:
         url = candidate["url"]
+        if "news.google.com" in url and _title_key(candidate["title"]) in direct_titles:
+            continue  # counted above
         if is_vendor_or_wire(url):
             _mark_seen(seen_urls, candidate)
             counts["rejected"] += 1
@@ -171,101 +214,104 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
     if max_classify and len(to_fetch) > max_classify:
         print(f"Capping at {max_classify} this run; {len(to_fetch) - max_classify} deferred")
         to_fetch = to_fetch[:max_classify]
-    print(f"Fetching and classifying {len(to_fetch)}\n")
+    print(f"Fetching and classifying {len(to_fetch)} with {CLASSIFY_WORKERS} workers\n")
 
-    # Pass 4: fetch, classify, verify, dedupe.
-    for i, candidate in enumerate(to_fetch, 1):
-        if checkpoint and i > 1 and (i - 1) % CHECKPOINT_EVERY == 0:
-            checkpoint()  # after every CHECKPOINT_EVERY completed articles
-        url = candidate["url"]
-        print(f"[{i}/{len(to_fetch)}] {candidate['title'][:90]}")
-        try:
-            text = fetch_article_text(url)
-            if not text:
-                # Paywall, 403, or a page with no extractable body. A
-                # prior-record claim cannot be verified without the text, so
-                # there is nothing to classify. Mark seen: the same URL will
-                # not fetch better tomorrow.
+    # Pass 4: fetch + classify + verify in parallel per chunk; dedupe and
+    # append serially in submission order; checkpoint after each chunk.
+    t0 = time.monotonic()
+    done = 0
+    with ThreadPoolExecutor(max_workers=CLASSIFY_WORKERS) as pool:
+        for start in range(0, len(to_fetch), CHECKPOINT_EVERY):
+            chunk = to_fetch[start:start + CHECKPOINT_EVERY]
+            results = list(pool.map(lambda c: _fetch_and_classify(client, c), chunk))
+            for candidate, res in zip(chunk, results):
+                done += 1
+                url = candidate["url"]
+                print(f"[{done}/{len(to_fetch)}] {candidate['title'][:90]}")
+                if "error" in res:
+                    # Never mark seen on errors: retried next run.
+                    print(f"  error, skipping (will retry next run): {res['error']}")
+                    counts["errors"] += 1
+                    continue
                 _mark_seen(seen_urls, candidate)
-                counts["no_text"] += 1
-                log.write(stage="fetch", url=url, result="no_text")
-                print("  no article text; skipping")
-                continue
-            cls = classify_article(client, candidate, text)
-        except Exception as e:
-            # Never mark seen on errors: the article must be retried next run.
-            print(f"  error, skipping (will retry next run): {e}")
-            counts["errors"] += 1
-            continue
+                if res.get("no_text"):
+                    # Paywall, 403, or no extractable body. A prior-record
+                    # claim cannot be verified without the text.
+                    counts["no_text"] += 1
+                    log.write(stage="fetch", url=url, result="no_text")
+                    print("  no article text; skipping")
+                    continue
+                cls, text = res["cls"], res["text"]
+                if not cls or not cls.qualifies:
+                    reason = cls.reason if cls else "no classification"
+                    log.write(stage="classify", url=url, qualifies=False, reason=reason)
+                    print(f"  rejected: {reason[:100]}")
+                    counts["rejected"] += 1
+                    continue
+                problem = check_evidence(cls, text)
+                if not problem and cls.state and cls.state.upper() not in US_STATES:
+                    problem = f"state {cls.state!r} is not a US state"
+                if problem:
+                    log.write(stage="verify", url=url, qualifies=False, reason=problem,
+                              classification=cls.model_dump())
+                    print(f"  rejected on verification: {problem}")
+                    counts["rejected"] += 1
+                    continue
 
-        _mark_seen(seen_urls, candidate)
+                row = make_row(next_story_id(stories), cls, candidate)
+                log.write(stage="classify", url=url, qualifies=True, row=row)
+                try:
+                    dup = check_duplicate(client, row, stories)
+                except anthropic.APIError as e:
+                    print(f"  dedupe call failed ({e}); treating as new")
+                    dup = None
 
-        if not cls or not cls.qualifies:
-            reason = cls.reason if cls else "no classification"
-            log.write(stage="classify", url=url, qualifies=False, reason=reason)
-            print(f"  rejected: {reason[:100]}")
-            counts["rejected"] += 1
-            continue
+                if dup and dup.relation == "same_incident":
+                    for s in stories:
+                        if s["id"] == dup.matching_id:
+                            urls = [u for u in s.get("additional_sources", "").split(" ") if u]
+                            if url not in urls and url != s.get("source_url"):
+                                urls.append(url)
+                                s["additional_sources"] = " ".join(urls)
+                            # Adopt a name or counts the first report lacked.
+                            if not s.get("offender_name") and row["offender_name"]:
+                                s["offender_name"] = row["offender_name"]
+                                s["offender_key"] = row["offender_key"]
+                            for f in ("prior_count_arrests", "prior_count_convictions",
+                                      "prior_count_felony_convictions"):
+                                if row[f] and (not s.get(f) or int(row[f]) > int(s[f])):
+                                    s[f] = row[f]
+                            if row["qualifies_strict"] == "yes":
+                                s["qualifies_strict"] = "yes"
+                    stored.add(canonical_url(url))
+                    if path := syndication_path(url):
+                        stored_paths.add(path)
+                    log.write(stage="dedupe", url=url, relation="same_incident",
+                              matching_id=dup.matching_id)
+                    print(f"  duplicate of id {dup.matching_id}")
+                    counts["duplicates"] += 1
+                    continue
 
-        problem = check_evidence(cls, text)
-        if not problem and cls.state and cls.state.upper() not in US_STATES:
-            problem = f"state {cls.state!r} is not a US state"
-        if problem:
-            log.write(stage="verify", url=url, qualifies=False, reason=problem,
-                      classification=cls.model_dump())
-            print(f"  rejected on verification: {problem}")
-            counts["rejected"] += 1
-            continue
+                if dup and dup.relation == "same_person_new_incident":
+                    for s in stories:
+                        if s["id"] == dup.matching_id and s.get("offender_key"):
+                            row["offender_key"] = s["offender_key"]
+                    log.write(stage="dedupe", url=url, relation="same_person_new_incident",
+                              matching_id=dup.matching_id)
+                    print(f"  same person as id {dup.matching_id}, new incident")
+                    counts["same_person"] += 1
 
-        row = make_row(next_story_id(stories), cls, candidate)
-        log.write(stage="classify", url=url, qualifies=True, row=row)
-        try:
-            dup = check_duplicate(client, row, stories)
-        except anthropic.APIError as e:
-            print(f"  dedupe call failed ({e}); treating as new")
-            dup = None
-
-        if dup and dup.relation == "same_incident":
-            for s in stories:
-                if s["id"] == dup.matching_id:
-                    urls = [u for u in s.get("additional_sources", "").split(" ") if u]
-                    if url not in urls and url != s.get("source_url"):
-                        urls.append(url)
-                        s["additional_sources"] = " ".join(urls)
-                    # Adopt a name or counts the first report lacked.
-                    if not s.get("offender_name") and row["offender_name"]:
-                        s["offender_name"] = row["offender_name"]
-                        s["offender_key"] = row["offender_key"]
-                    for f in ("prior_count_arrests", "prior_count_convictions",
-                              "prior_count_felony_convictions"):
-                        if row[f] and (not s.get(f) or int(row[f]) > int(s[f])):
-                            s[f] = row[f]
-                    if row["qualifies_strict"] == "yes":
-                        s["qualifies_strict"] = "yes"
-            stored.add(canonical_url(url))
-            if path := syndication_path(url):
-                stored_paths.add(path)
-            log.write(stage="dedupe", url=url, relation="same_incident", matching_id=dup.matching_id)
-            print(f"  duplicate of id {dup.matching_id}")
-            counts["duplicates"] += 1
-            continue
-
-        if dup and dup.relation == "same_person_new_incident":
-            for s in stories:
-                if s["id"] == dup.matching_id and s.get("offender_key"):
-                    row["offender_key"] = s["offender_key"]
-            log.write(stage="dedupe", url=url, relation="same_person_new_incident",
-                      matching_id=dup.matching_id)
-            print(f"  same person as id {dup.matching_id}, new incident")
-            counts["same_person"] += 1
-
-        stories.append(row)
-        stored.add(canonical_url(url))
-        if path := syndication_path(url):
-            stored_paths.add(path)
-        strict = " STRICT" if row["qualifies_strict"] == "yes" else ""
-        print(f"  ADDED{strict}: {row['offender_name'] or '(unnamed)'} | {row['city']}, "
-              f"{row['state']} | {row['new_offense_type']} | {row['release_status']}")
-        counts["new"] += 1
+                stories.append(row)
+                stored.add(canonical_url(url))
+                if path := syndication_path(url):
+                    stored_paths.add(path)
+                strict = " STRICT" if row["qualifies_strict"] == "yes" else ""
+                print(f"  ADDED{strict}: {row['offender_name'] or '(unnamed)'} | {row['city']}, "
+                      f"{row['state']} | {row['new_offense_type']} | {row['release_status']}")
+                counts["new"] += 1
+            if checkpoint:
+                checkpoint()
+    if to_fetch:
+        print(f"\nClassified {len(to_fetch)} in {int(time.monotonic() - t0)}s")
 
     return counts
