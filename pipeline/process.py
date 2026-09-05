@@ -159,8 +159,8 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
 
     # Pass 3: fetch, classify, verify, dedupe.
     for i, candidate in enumerate(to_fetch, 1):
-        if checkpoint and i % CHECKPOINT_EVERY == 0:
-            checkpoint()
+        if checkpoint and i > 1 and (i - 1) % CHECKPOINT_EVERY == 0:
+            checkpoint()  # after every CHECKPOINT_EVERY completed articles
         url = candidate["url"]
         print(f"[{i}/{len(to_fetch)}] {candidate['title'][:90]}")
         try:

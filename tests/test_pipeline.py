@@ -274,5 +274,5 @@ def test_process_checkpoint_and_cap(monkeypatch, tmp_path):
     counts = process_candidates(FakeClient(), cands, stories, seen,
                                 checkpoint=lambda: calls.append(len(stories)), max_classify=35)
     assert counts["new"] == 35
-    assert calls == [10, 20, 30]          # every 10 fetched, before the fetch
+    assert calls == [10, 20, 30]          # after every 10 completed
     assert len(seen) == 35                # deferred candidates are not marked seen
