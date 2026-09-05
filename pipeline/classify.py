@@ -123,25 +123,27 @@ An article QUALIFIES only if ALL of the following hold:
 
 An article does NOT qualify if it is:
 - A policy, statistics, editorial, or opinion piece on recidivism, bail, or sentencing with no specific new incident.
-- A story where "repeat offender", "known to police", or "criminal history" appears with no concrete prior.
+- A story where "repeat offender", "career criminal", "known to police", "several convictions", or "criminal history" appears with no concrete prior (no count, no named prior offense, no prior sentence). A charge of "armed career criminal" or "habitual offender" is a label, not a documented prior, unless the article names the priors.
 - A story whose only priors are traffic infractions or a juvenile record with no offense detail.
-- A story where the only "prior" is the same case: re-arrest for failure to appear, a bond violation on the same charge, or a retrial.
+- A story where the "new offense" is not a new crime: an arrest on a warrant for failure to appear, a bond or probation violation with no new criminal act, a retrial, or an immigration (ICE) arrest or detainer. An ICE arrest after release qualifies only if the article describes a new crime committed after the release.
 - A story about a crime outside the United States.
 - A police blotter, arrest log, or list of unrelated bookings.
 - A story about a wrongful arrest or exoneration.
 
+Exception to the label rule: a charge styled "Nth offense" or "subsequent offense" (e.g. "carrying a firearm without a license, fourth offense") documents N-1 prior convictions for that offense. Count them: prior_count_convictions = N-1, and quote the charge as prior_evidence_quote.
+
 Field guidance for qualifying articles:
 - incident_date: date of the NEW offense, as specific as the article allows (YYYY-MM-DD, YYYY-MM, or YYYY). Use the arrest date if the offense date is not given. Use the publication date only if nothing better is stated.
 - state: two-letter US postal code. Always provide it when the article names or implies any location; leave city blank rather than state.
-- offender_name: full name as printed. Blank if the article does not name the person.
+- offender_name: ONE person, full name as printed. If the article covers several arrestees, choose the one whose prior record or release status is documented and mention the others only in the summary. Blank if the article does not name the person.
 - age: as stated, else blank.
 - new_offense_type: best fit from: {", ".join(NEW_OFFENSE_TYPES)}. Use the most serious charge.
 - new_offense_severity: one of {", ".join(OFFENSE_SEVERITIES)}.
-- prior_count_arrests, prior_count_convictions, prior_count_felony_convictions: ONLY if the article states a number. "More than a dozen arrests" is 13. "Dozens" or "numerous" is blank. Never estimate.
+- prior_count_arrests, prior_count_convictions, prior_count_felony_convictions: ONLY if the article states a number. "More than a dozen arrests" is 13; "nearly two dozen" is 24; "half a dozen" is 6. "Dozens" or "numerous" is blank. "N prior charges" counts as N arrests. "N-time convicted felon" means prior_count_felony_convictions = N (and prior_count_convictions at least N). Never estimate beyond what the words say.
 - prior_offenses: short list of the prior offenses the article names, separated by semicolons. Blank if none named.
 - prior_evidence_quote: copy VERBATIM, character for character, the single sentence from the article that best documents the prior record. Do not paraphrase, shorten, or fix typos. If the article has no such sentence, the story does not qualify under 2a.
-- release_status: one of {", ".join(RELEASE_STATUSES)}. "bail/bond" means released on bail or bond in an earlier, different case. "none stated" if the article does not say.
-- release_evidence_quote: copy VERBATIM the sentence that documents the release status. Required whenever release_status is not "none stated".
+- release_status: the person's supervision or release status AT THE TIME OF THE NEW OFFENSE, arising from an EARLIER case. One of {", ".join(RELEASE_STATUSES)}. "bail/bond" means the person was already out on bail or bond from an earlier case when the new offense happened. Bail or bond set, posted, or denied AFTER the new arrest is NOT a release status: that is the new case. If the article only describes bail on the new charge, use "none stated". Likewise "probation" and "parole" mean the person was on probation or parole from an earlier conviction when the new offense happened.
+- release_evidence_quote: copy VERBATIM the sentence that documents that earlier-case release status. Required whenever release_status is not "none stated".
 - releasing_jurisdiction: the county, city, state, or court that released the person, if named.
 - outcome: short phrase for the new case: "arrested", "charged", "convicted", "sentenced", "killed by police", "at large".
 - summary: 1-2 factual sentences: who, what new offense, and what the prior record or release status was.
@@ -168,7 +170,11 @@ def classify_article(client: anthropic.Anthropic, candidate: dict,
         messages=[{"role": "user", "content": user_msg}],
     )
     text = "".join(b.text for b in response.content if getattr(b, "type", "") == "text")
-    return parse_classification(text)
+    cls = parse_classification(text)
+    if cls.offender_name and ";" in cls.offender_name:
+        # One person per row. The prompt says so; enforce it.
+        cls.offender_name = cls.offender_name.split(";")[0].strip()
+    return cls
 
 
 _QUOTE_MAP = str.maketrans({

@@ -407,3 +407,39 @@ def test_pack_decisions(tmp_path, monkeypatch):
     assert not (tmp_path / "2026-09-05.jsonl").exists()
     assert gzip.open(tmp_path / "2026-09-05.jsonl.gz").read() == b'{"a":1}\n'
     assert not old.exists()
+
+
+def test_obvious_same_incident_and_stateless_match():
+    from dedupe import check_duplicate, obvious_same_incident, same_person
+    a = {"offender_key": "simpson_david_NC", "state": "NC", "incident_date": "2026-07-29", "id": "45"}
+    b = {"offender_key": "simpson_david_", "state": "", "incident_date": "2026-08-03"}
+    c = {"offender_key": "simpson_david_TX", "state": "TX", "incident_date": "2026-07-29"}
+    d = {"offender_key": "simpson_david_NC", "state": "NC", "incident_date": "2026-01-01"}
+    assert same_person(a, b) and not same_person(a, c)
+    assert obvious_same_incident(b, a)
+    assert not obvious_same_incident(d, a)        # same person, 7 months apart
+    # Deterministic merge never calls the model.
+    class NoCalls:
+        class messages:
+            @staticmethod
+            def parse(**kw):
+                raise AssertionError("model should not be called")
+    r = check_duplicate(NoCalls(), b, [a])
+    assert r.relation == "same_incident" and r.matching_id == "45"
+
+
+def test_classify_splits_multi_name(monkeypatch):
+    import classify
+    from types import SimpleNamespace
+    reply = ('{"qualifies": true, "reason": "r", "state": "AL", "offender_name": "Tarus Giles Jr.; William Wingard",'
+             ' "prior_evidence_quote": "q"}')
+    client = SimpleNamespace(messages=SimpleNamespace(
+        create=lambda **kw: SimpleNamespace(content=[SimpleNamespace(type="text", text=reply)])))
+    c = classify.classify_article(client, {"title": "t", "source": "s", "published": "p"}, "text")
+    assert c.offender_name == "Tarus Giles Jr."
+
+
+def test_fetch_skips_video_pages(monkeypatch):
+    import fetch
+    monkeypatch.setattr(fetch.trafilatura, "fetch_url", lambda *a, **k: (_ for _ in ()).throw(AssertionError("no fetch")))
+    assert fetch.fetch_article_text("https://www.foxnews.com/video/6402730125112") is None
