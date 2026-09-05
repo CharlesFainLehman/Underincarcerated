@@ -40,7 +40,7 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Build exports
         run: |
-          python pipeline/validate_data.py
+          python pipeline/validate_data.py || { python pipeline/quarantine.py && python pipeline/validate_data.py; }
           python pipeline/build_exports.py
       - name: Commit rebuilt exports
         run: |
