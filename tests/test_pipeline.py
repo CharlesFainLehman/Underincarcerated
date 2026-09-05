@@ -350,3 +350,60 @@ def test_google_headline_duplicates_skip_resolution(monkeypatch):
     assert resolved == ["https://news.google.com/rss/articles/Y"]
     assert counts["duplicates"] == 1 and counts["new"] == 2
     assert "https://news.google.com/rss/articles/X" in seen
+
+
+def test_parse_classification_tolerates_fences_and_coerces():
+    from classify import ClassificationParseError, parse_classification
+    reply = """```json
+{"qualifies": true, "reason": "r", "incident_date": "2026-09-01", "city": "X", "state": "oh",
+ "offender_name": "A B", "age": "34", "new_offense_type": "sexual battery",
+ "new_offense_severity": "violent", "prior_count_arrests": "11", "prior_count_convictions": null,
+ "prior_count_felony_convictions": 3, "prior_offenses": "burglary", "prior_evidence_quote": "q",
+ "release_status": "bond", "release_evidence_quote": null, "releasing_jurisdiction": null,
+ "outcome": "charged", "summary": "s", "confidence": "very high"}
+```"""
+    c = parse_classification(reply)
+    assert c.state == "OH" and c.age == 34 and c.prior_count_arrests == 11
+    assert c.new_offense_type == "other"          # unknown enum -> catch-all
+    assert c.release_status == "none stated"      # unknown enum -> none stated
+    assert c.confidence == "low"
+    with pytest.raises(ClassificationParseError):
+        parse_classification("Sorry, I cannot help with that.")
+    with pytest.raises(ClassificationParseError):
+        parse_classification('{"qualifies": "maybe"}')
+
+
+def test_classify_article_uses_plain_text_reply(monkeypatch):
+    """classify_article must not use structured-output mode (schema too complex)."""
+    import classify
+    from types import SimpleNamespace
+    captured = {}
+
+    class FakeMessages:
+        def create(self, **kw):
+            captured.update(kw)
+            return SimpleNamespace(content=[SimpleNamespace(
+                type="text", text='{"qualifies": false, "reason": "policy piece"}')])
+
+        def parse(self, **kw):
+            raise AssertionError("structured outputs must not be used for classification")
+
+    client = SimpleNamespace(messages=FakeMessages())
+    c = classify.classify_article(client, {"title": "t", "source": "s", "published": "p"}, "text")
+    assert c.qualifies is False and "output_format" not in captured
+    assert "JSON schema" in captured["system"]
+
+
+def test_pack_decisions(tmp_path, monkeypatch):
+    import gzip
+    import pack_decisions
+    monkeypatch.setattr(pack_decisions, "DECISIONS_DIR", tmp_path)
+    (tmp_path / "2026-09-05.jsonl").write_text('{"a":1}\n')
+    old = tmp_path / "2026-01-01.jsonl.gz"
+    old.write_bytes(b"x")
+    import os, time
+    os.utime(old, (time.time() - 40 * 86400,) * 2)
+    pack_decisions.main()
+    assert not (tmp_path / "2026-09-05.jsonl").exists()
+    assert gzip.open(tmp_path / "2026-09-05.jsonl.gz").read() == b'{"a":1}\n'
+    assert not old.exists()

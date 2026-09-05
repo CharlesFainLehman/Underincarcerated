@@ -67,6 +67,7 @@ jobs:
           git pull --rebase --autostash origin main
           python pipeline/validate_data.py
           python pipeline/build_exports.py
+          python pipeline/pack_decisions.py
           git add data site
           git diff --cached --quiet || git commit -m "Daily update $(date -u +%F)"
           git push

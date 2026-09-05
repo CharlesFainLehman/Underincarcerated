@@ -3,6 +3,6 @@ __pycache__/
 .venv/
 .DS_Store
 .pytest_cache/
-data/decisions/
+data/decisions/*.jsonl
 data/imports/
 drafts/

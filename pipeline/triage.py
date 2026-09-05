@@ -10,10 +10,14 @@ The triage errs toward keeping: the full classifier decides precision.
 Anything the model does not return a decision for is kept (fail open).
 """
 
+from concurrent.futures import ThreadPoolExecutor
+
 import anthropic
 from pydantic import BaseModel
 
 from config import TRIAGE_BATCH_SIZE, TRIAGE_MODEL
+
+TRIAGE_WORKERS = 8
 
 
 class TriageDecision(BaseModel):
@@ -37,29 +41,43 @@ For each numbered headline, decide whether the full article is WORTH FETCHING: c
 Return one decision per index. Do not skip any index."""
 
 
-def triage_candidates(client: anthropic.Anthropic, candidates: list[dict]) -> list[bool]:
-    """One bool per candidate, in order. True means fetch and classify."""
-    keep = [True] * len(candidates)
-    for start in range(0, len(candidates), TRIAGE_BATCH_SIZE):
-        batch = candidates[start:start + TRIAGE_BATCH_SIZE]
-        lines = []
-        for i, c in enumerate(batch):
-            snippet = (c.get("snippet") or "").strip()
-            line = f"{i}. [{c.get('source', '')}] {c.get('title', '')}"
-            if snippet:
-                line += f" -- {snippet[:200]}"
-            lines.append(line)
-        response = client.messages.parse(
-            model=TRIAGE_MODEL,
-            max_tokens=2048,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": "\n".join(lines)}],
-            output_format=TriageBatch,
-        )
-        parsed = response.parsed_output
-        if not parsed:
-            continue
+def _triage_batch(client: anthropic.Anthropic, batch: list[dict]) -> list[bool]:
+    lines = []
+    for i, c in enumerate(batch):
+        snippet = (c.get("snippet") or "").strip()
+        line = f"{i}. [{c.get('source', '')}] {c.get('title', '')}"
+        if snippet:
+            line += f" -- {snippet[:200]}"
+        lines.append(line)
+    keep = [True] * len(batch)
+    response = client.messages.parse(
+        model=TRIAGE_MODEL,
+        max_tokens=2048,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": "\n".join(lines)}],
+        output_format=TriageBatch,
+    )
+    parsed = response.parsed_output
+    if parsed:
         for d in parsed.decisions:
             if 0 <= d.index < len(batch):
-                keep[start + d.index] = d.worth_fetching
+                keep[d.index] = d.worth_fetching
     return keep
+
+
+def triage_candidates(client: anthropic.Anthropic, candidates: list[dict]) -> list[bool]:
+    """One bool per candidate, in order. True means fetch and classify.
+    Batches run in parallel; a batch whose call fails is kept whole."""
+    batches = [candidates[i:i + TRIAGE_BATCH_SIZE]
+               for i in range(0, len(candidates), TRIAGE_BATCH_SIZE)]
+
+    def run(batch):
+        try:
+            return _triage_batch(client, batch)
+        except Exception as e:  # noqa: BLE001
+            print(f"  triage batch failed ({e}); keeping all {len(batch)}")
+            return [True] * len(batch)
+
+    with ThreadPoolExecutor(max_workers=TRIAGE_WORKERS) as pool:
+        results = list(pool.map(run, batches))
+    return [k for batch in results for k in batch]
