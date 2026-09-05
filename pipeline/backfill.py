@@ -73,7 +73,9 @@ def main() -> None:
 
         counts = {"new": 0}
         if fresh:
-            counts = process_candidates(client, fresh, stories, seen, decision_log=log)
+            counts = process_candidates(client, fresh, stories, seen, decision_log=log,
+                                        checkpoint=lambda: (save_stories(stories),
+                                                            save_seen_urls(seen)))
             save_stories(stories)
             save_seen_urls(seen)
 

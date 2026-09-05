@@ -80,12 +80,20 @@ def _mark_seen(seen: set[str], candidate: dict) -> None:
         seen.add(candidate["google_url"])
 
 
+CHECKPOINT_EVERY = 25
+
+
 def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                        stories: list[dict], seen_urls: set[str],
-                       decision_log: Path | None = None) -> dict:
+                       decision_log: Path | None = None,
+                       checkpoint=None, max_classify: int = 0) -> dict:
     """Classify candidates and append qualifying, non-duplicate rows to stories.
 
     Mutates `stories` and `seen_urls` in place. Returns counts for logging.
+    `checkpoint`, if given, is called every CHECKPOINT_EVERY fetched articles
+    so a killed run (workflow timeout) keeps its progress. `max_classify`
+    caps the number of articles fetched this run (0 = no cap); the rest are
+    left unseen and picked up next run.
     """
     counts = {"new": 0, "duplicates": 0, "same_person": 0, "triaged_out": 0,
               "rejected": 0, "no_text": 0, "skipped_seen": 0, "errors": 0}
@@ -143,10 +151,16 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
         else:
             _mark_seen(seen_urls, candidate)
             counts["triaged_out"] += 1
-    print(f"Triage kept {len(to_fetch)} of {len(fresh)} fresh candidates\n")
+    print(f"Triage kept {len(to_fetch)} of {len(fresh)} fresh candidates")
+    if max_classify and len(to_fetch) > max_classify:
+        print(f"Capping at {max_classify} this run; {len(to_fetch) - max_classify} deferred")
+        to_fetch = to_fetch[:max_classify]
+    print()
 
     # Pass 3: fetch, classify, verify, dedupe.
     for i, candidate in enumerate(to_fetch, 1):
+        if checkpoint and i % CHECKPOINT_EVERY == 0:
+            checkpoint()
         url = candidate["url"]
         print(f"[{i}/{len(to_fetch)}] {candidate['title'][:90]}")
         try:

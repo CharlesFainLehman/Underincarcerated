@@ -25,8 +25,14 @@ def main() -> None:
     print(f"Found {len(candidates)} candidate URLs "
           f"({sum(1 for c in candidates if c['url'] in seen)} already seen)\n")
 
+    def checkpoint() -> None:
+        save_stories(stories)
+        save_seen_urls(seen)
+
     counts = process_candidates(client, candidates, stories, seen,
-                                decision_log=default_decision_log())
+                                decision_log=default_decision_log(),
+                                checkpoint=checkpoint,
+                                max_classify=int(os.environ.get("MAX_CLASSIFY", "0")))
 
     save_stories(stories)
     save_seen_urls(seen)

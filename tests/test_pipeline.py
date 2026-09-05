@@ -256,3 +256,23 @@ def test_exports_and_validation(monkeypatch, tmp_path):
     store.save_stories(rows)
     with pytest.raises(SystemExit):
         validate_data.main()
+
+
+def test_process_checkpoint_and_cap(monkeypatch, tmp_path):
+    stories: list[dict] = []
+    cands = [{"url": f"https://x.com/{i}", "title": "t", "source": "x.com"} for i in range(60)]
+    monkeypatch.setattr(process, "CHECKPOINT_EVERY", 10)
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cs: [True] * len(cs))
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article",
+                        lambda c, cand, t: _cls(offender_name=f"Person {cand['url'][-2:]}"))
+    monkeypatch.setattr(process, "check_duplicate",
+                        lambda c, row, st: DedupeResult(relation="unrelated"))
+    monkeypatch.setattr(process, "resolve_candidate", lambda cand: None)
+    calls = []
+    seen: set[str] = set()
+    counts = process_candidates(FakeClient(), cands, stories, seen,
+                                checkpoint=lambda: calls.append(len(stories)), max_classify=35)
+    assert counts["new"] == 35
+    assert calls == [10, 20, 30]          # every 10 fetched, before the fetch
+    assert len(seen) == 35                # deferred candidates are not marked seen
