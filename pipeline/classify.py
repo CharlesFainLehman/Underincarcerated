@@ -130,6 +130,8 @@ An article does NOT qualify if it is:
 - A police blotter, arrest log, or list of unrelated bookings.
 - A story about a wrongful arrest or exoneration.
 
+A NAMED prior offense is concrete even without a count: "prior arrests for burglary and assault on a peace officer" qualifies under 2a; "three gun charges that prosecutors dismissed in 2022" qualifies under 2c. Only bare labels with no offense named, no number, and no sentence fail the rule.
+
 Exception to the label rule: a charge styled "Nth offense" or "subsequent offense" (e.g. "carrying a firearm without a license, fourth offense") documents N-1 prior convictions for that offense. Count them: prior_count_convictions = N-1, and quote the charge as prior_evidence_quote.
 
 Field guidance for qualifying articles:

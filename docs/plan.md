@@ -195,3 +195,22 @@ GDELT is now off for the daily run (47 of 2,600 candidates over three runs, at 5
 of 429 backoff per run). The backfill still needs it and must run from a non-Actions IP.
 
 Calibration data was reset and the same window re-run on the fixed prompt.
+
+## 11. Calibration run 2 (same window, fixed prompt)
+
+14 minutes. 2,438 candidates; of 200 fetched, 59 had no text, 29 rejected by the classifier,
+6 rejected by the quote check, 105 classified qualifying, 26 merged, 79 stored, 31 strict.
+
+Hand review of the 79 rows: one label-only false positive ("several convictions and
+suspended sentences"), no multi-name rows, no non-crime "new offenses", no duplicate
+people except one legitimately linked pair. Release status still misread in about 3 of 11
+bail/bond rows, down from about 8 of 31, and all three rows qualify on their priors anyway.
+Row-level precision about 97%.
+
+Cost of the tighter prompt: two articles with named prior offenses were rejected as
+"labels" (Caleb Jenkins, Austin: three dismissed gun charges; Larry Barnes, Aurora: prior
+drug distribution, assault on an officer, burglary). Prompt now says a named prior offense
+is concrete without a count.
+
+Next: run the full 3-day window uncapped to seed the database, then let the 10:30 UTC cron
+take over with a 1-day window.
