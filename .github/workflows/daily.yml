@@ -1,0 +1,73 @@
+name: Daily update
+
+on:
+  schedule:
+    - cron: "30 10 * * *"  # 10:30 UTC = 6:30am ET (EDT)
+  workflow_dispatch:
+    inputs:
+      days_back:
+        description: "Days of news to search (default 1)"
+        default: "1"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run daily pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DAYS_BACK: ${{ inputs.days_back || '1' }}
+          PYTHONUNBUFFERED: "1"
+        run: python pipeline/run_daily.py
+
+      - name: Upload decision log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decisions-${{ github.run_id }}
+          path: data/decisions/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Commit updated data and exports
+        run: |
+          git config user.name "underincarcerated-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -- site || true
+          git pull --rebase --autostash origin main
+          python pipeline/validate_data.py
+          python pipeline/build_exports.py
+          git add data site
+          git diff --cached --quiet || git commit -m "Daily update $(date -u +%F)"
+          git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
