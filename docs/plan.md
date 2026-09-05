@@ -145,7 +145,17 @@ f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `d
 
 ## 9. Status
 
-Phase 1 scaffold is done: all modules, workflows, tests, and README. Not yet run against live
-news: the build environment had no API key and no route to GDELT. Next step is phase 2, a
-calibration run (`workflow_dispatch` on the daily job with `days_back=3`, or locally), then
-hand review of the decision log.
+Phase 1 scaffold is done. The first live run (2026-09-05, 3-day window) timed out before
+classifying anything and taught two things, both fixed:
+
+- GDELT rate-limits 29 sequential queries into the ground (88 minutes of discovery, 13 queries
+  gave up). GDELT now gets 6 OR-grouped queries with window splitting on cap; Google News
+  keeps the narrow list.
+- Decoding Google News redirects costs ~1s per URL and ran before triage. Triage now runs
+  first on the feed's own headline and snippet; only kept candidates are decoded.
+- Runs checkpoint every 25 articles, the commit step runs on timeout, and `MAX_CLASSIFY`
+  bounds a calibration run.
+
+The first run found 2,579 candidate URLs over 3 days, roughly 860/day, in line with the
+estimate in section 6. Next: re-run with `days_back=3`, `max_classify=200`, review the
+decision log.

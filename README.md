@@ -12,12 +12,14 @@ and `site/stats.json` for it.
 ## How it works
 
 1. **Discovery.** Each day, candidate articles are pulled from the
-   [GDELT DOC 2.0 API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) and Google News
-   RSS using ~30 narrow queries such as `"repeat offender" arrested` and `"out on bond" arrested`
-   ([pipeline/fetch.py](pipeline/fetch.py), [pipeline/config.py](pipeline/config.py)).
+   [GDELT DOC 2.0 API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) with six
+   OR-grouped queries (splitting the window when one hits GDELT's 250-record cap) and from
+   Google News RSS with ~30 narrow queries such as `"repeat offender" arrested` and
+   `"out on bond" arrested` ([pipeline/fetch.py](pipeline/fetch.py),
+   [pipeline/config.py](pipeline/config.py)).
 2. **Triage.** Headlines are screened in batches of 25 by Claude Haiku before any article is
-   fetched. Policy pieces, blotters, and non-US stories are dropped here; anything plausible
-   is kept ([pipeline/triage.py](pipeline/triage.py)).
+   fetched or any Google News redirect is decoded. Policy pieces, blotters, and non-US stories
+   are dropped here; anything plausible is kept ([pipeline/triage.py](pipeline/triage.py)).
 3. **Classification.** Each surviving article's text is extracted and classified by Haiku as
    qualifying or not, with structured fields: offender, new offense, prior counts, release
    status, and two verbatim evidence quotes ([pipeline/classify.py](pipeline/classify.py)).
@@ -97,7 +99,8 @@ first and last incident date, max prior counts, strict flag. Never edit it by ha
 ```bash
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY=...
-python pipeline/run_daily.py                    # one daily update (DAYS_BACK=3 for a wider net)
+python pipeline/run_daily.py                    # one daily update
+DAYS_BACK=3 MAX_CLASSIFY=200 python pipeline/run_daily.py   # wider net, bounded run
 python pipeline/backfill.py --start 2024-01 --end 2024-03
 python pipeline/build_exports.py               # rebuild site/ from the CSV only
 python pipeline/validate_data.py

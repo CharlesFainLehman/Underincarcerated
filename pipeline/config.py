@@ -22,12 +22,25 @@ REVIEW_MODEL = "claude-sonnet-5"
 
 TRIAGE_BATCH_SIZE = 25
 
-# Discovery queries. Each runs against GDELT DOC 2.0 and Google News RSS.
-# "Repeat offender" is a concept, not a brand name, so the list is long and
-# narrow. Per-query hit counts go to data/query_stats.json; a query that hits
-# GDELT's 250-record cap every day should be split, one that returns nothing
-# for a month should be dropped.
-SEARCH_QUERIES = [
+# Discovery queries.
+#
+# GDELT rate-limits hard: the first live run (29 sequential queries, 3-day
+# window) spent 88 minutes in discovery and 13 queries gave up after 429
+# backoffs. So GDELT gets a few OR-grouped queries (its syntax allows
+# ("a" OR "b") term), and fetch.py splits the window in half whenever a query
+# hits the 250-record cap. Google News RSS is cheap, so it keeps the narrow
+# list: each narrow query returns up to 100 results, which is more coverage
+# than one broad one.
+GDELT_QUERIES = [
+    '("repeat offender" OR "career criminal" OR "habitual offender" OR "prolific offender") arrested',
+    '("prior convictions" OR "previously convicted" OR "felony convictions" OR "prior felony") arrested',
+    '("lengthy criminal history" OR "extensive criminal history" OR "long criminal history" OR "prior arrests") arrested',
+    '("out on bail" OR "out on bond" OR "released on bond" OR "free on bond" OR "posted bond") arrested',
+    '("on parole" OR "on probation" OR "supervised release" OR "pretrial release") arrested',
+    '("released without bail" OR "cashless bail" OR "no bail" OR "released early" OR "charges dropped") arrested',
+]
+
+GOOGLE_NEWS_QUERIES = [
     # Prior record
     '"repeat offender" arrested',
     '"repeat offender" charged',
@@ -62,9 +75,8 @@ SEARCH_QUERIES = [
     '"arrests" "criminal history" charged',
 ]
 
-# Broad queries for the historical backfill, where per-window volume is lower
-# and fewer calls means less GDELT throttling. Backfill windows are weekly.
-BACKFILL_QUERIES = SEARCH_QUERIES
+# Backfill uses the GDELT groups only (Google News RSS has no date filter).
+BACKFILL_QUERIES = GDELT_QUERIES
 
 # Threshold for the strict "serious repeat offender" flag. The database stores
 # every story with at least one concrete prior; this flag marks the subset the

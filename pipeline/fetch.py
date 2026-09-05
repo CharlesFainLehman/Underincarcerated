@@ -7,9 +7,9 @@ Two sources:
     Google wraps links in redirect URLs; we decode the older base64 format
     when possible and otherwise keep the Google link as the source URL.
 
-Ported from flock-crime-tracker. The one addition is per-query hit
-accounting (QUERY_HITS), because "repeat offender" queries saturate GDELT's
-250-record cap in a way "Flock camera" never did.
+Ported from flock-crime-tracker, with two changes for a topic that is a
+concept rather than a brand name: per-query hit accounting (QUERY_HITS), and
+window splitting when a GDELT query saturates the 250-record cap.
 """
 
 import base64
@@ -24,7 +24,7 @@ import requests
 import trafilatura
 from googlenewsdecoder import gnewsdecoder
 
-from config import QUERY_STATS_JSON, SEARCH_QUERIES
+from config import GDELT_QUERIES, GOOGLE_NEWS_QUERIES, QUERY_STATS_JSON
 
 GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc"
 GDELT_MAX_RECORDS = 250
@@ -111,8 +111,6 @@ def gdelt_search(query: str, start: datetime, end: datetime,
     h["gdelt"] += len(articles)
     if len(articles) >= max_records:
         h["gdelt_capped"] = True
-        print(f"  GDELT cap hit for {query!r} ({start:%Y-%m-%d}..{end:%Y-%m-%d}); "
-              f"narrow the query or the window")
 
     out = []
     for a in articles:
@@ -133,6 +131,29 @@ def gdelt_search(query: str, start: datetime, end: datetime,
             "query": query,
         }))
     return out
+
+
+GDELT_SLEEP = 8  # GDELT asks for ~1 request per 5s; 6 was not enough
+MIN_SPLIT_HOURS = 6
+
+
+def gdelt_search_split(query: str, start: datetime, end: datetime,
+                       depth: int = 0) -> list[dict]:
+    """gdelt_search, but when a window returns the full 250-record cap, re-run
+    the query on each half of the window so nothing past the cap is lost.
+    Stops splitting below MIN_SPLIT_HOURS: a window that dense is a query
+    that needs narrowing, not more calls."""
+    out = gdelt_search(query, start, end)
+    hours = (end - start).total_seconds() / 3600
+    if len(out) < GDELT_MAX_RECORDS * 0.9 or hours < MIN_SPLIT_HOURS * 2 or depth >= 4:
+        return out
+    time.sleep(GDELT_SLEEP)
+    mid = start + (end - start) / 2
+    left = gdelt_search_split(query, start, mid, depth + 1)
+    time.sleep(GDELT_SLEEP)
+    right = gdelt_search_split(query, mid, end, depth + 1)
+    seen = {c["url"] for c in left}
+    return left + [c for c in right if c["url"] not in seen]
 
 
 def _decode_google_news_url(url: str) -> str | None:
@@ -184,14 +205,19 @@ def discover_daily(days_back: int = 1) -> list[dict]:
     end = datetime.now(timezone.utc).replace(tzinfo=None)
     start = end - timedelta(days=days_back)
     candidates: dict[str, dict] = {}
-    for q in SEARCH_QUERIES:
-        for c in gdelt_search(q, start, end):
+    for q in GDELT_QUERIES:
+        found = gdelt_search_split(q, start, end)
+        for c in found:
             candidates.setdefault(c["url"], c)
-        time.sleep(6)  # GDELT asks for ~1 request per 5s
-    for q in SEARCH_QUERIES:
-        for c in google_news_search(q):
+        print(f"  GDELT {len(found):4} | {q[:80]}")
+        time.sleep(GDELT_SLEEP)
+    for q in GOOGLE_NEWS_QUERIES:
+        found = google_news_search(q)
+        for c in found:
             candidates.setdefault(c["url"], c)
         time.sleep(1)
+    print(f"  Google News: {sum(h['gnews'] for h in QUERY_HITS.values())} items "
+          f"across {len(GOOGLE_NEWS_QUERIES)} queries")
     return list(candidates.values())
 
 

@@ -1,9 +1,14 @@
 """Shared candidate-processing loop used by the daily run and the backfill.
 
 Order per candidate:
-  seen-URL check -> Google redirect resolve -> wire/blotter filter ->
-  same-article URL check -> triage (batched, headline only) -> fetch ->
+  seen-URL check -> triage (batched, headline only) -> Google redirect
+  resolve -> wire/blotter filter -> same-article URL check -> fetch ->
   classify -> evidence-quote check -> dedupe -> append.
+
+Triage runs before URL resolution on purpose: decoding a Google News
+redirect costs about a second of HTTP per URL, and the first live run spent
+half an hour decoding 2,000 of them before classifying anything. Triage
+needs only the headline, outlet, and snippet the feed already gave us.
 
 Every decision is appended to a JSONL log (data/decisions/, gitignored, and
 uploaded as a workflow artifact) so prompt calibration can be done against
@@ -106,12 +111,43 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                     for u in [s_["source_url"], *s_.get("additional_sources", "").split()]
                     for p in [syndication_path(u)] if p}
 
-    # Pass 1: cheap filters, no model calls.
-    fresh: list[dict] = []
+    # Pass 1: drop anything already seen. No model calls, no HTTP.
+    fresh = []
     for candidate in candidates:
         if candidate["url"] in seen_urls:
             counts["skipped_seen"] += 1
-            continue
+        else:
+            fresh.append(candidate)
+
+    # Pass 2: batched headline triage on the feed's own title and snippet.
+    if fresh:
+        try:
+            keep = triage_candidates(client, fresh)
+        except Exception as e:
+            print(f"  triage failed ({e}); fetching everything")
+            keep = [True] * len(fresh)
+    else:
+        keep = []
+    kept = []
+    for candidate, k in zip(fresh, keep):
+        log.write(stage="triage", url=candidate["url"], title=candidate.get("title"),
+                  query=candidate.get("query"), keep=k)
+        if k:
+            kept.append(candidate)
+        else:
+            _mark_seen(seen_urls, candidate)
+            counts["triaged_out"] += 1
+    print(f"Triage kept {len(kept)} of {len(fresh)} fresh candidates")
+
+    # Pass 3: resolve Google redirects for kept candidates only, then the
+    # cheap URL-level filters that need the real URL.
+    to_fetch = []
+    n_google = sum(1 for c in kept if "news.google.com" in c["url"])
+    if n_google:
+        print(f"Resolving {n_google} Google News redirects (about 1s each)...")
+    for i, candidate in enumerate(kept, 1):
+        if n_google and i % 100 == 0:
+            print(f"  resolved {i}/{len(kept)}")
         resolve_candidate(candidate)
         url = candidate["url"]
         if is_vendor_or_wire(url):
@@ -127,37 +163,17 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
             _mark_seen(seen_urls, candidate)
             counts["duplicates"] += 1
             continue
-        if url in seen_urls:
+        if url in seen_urls:  # resolved URL was seen under another Google id
             _mark_seen(seen_urls, candidate)
             counts["skipped_seen"] += 1
             continue
-        fresh.append(candidate)
-
-    # Pass 2: batched headline triage.
-    if fresh:
-        try:
-            keep = triage_candidates(client, fresh)
-        except Exception as e:
-            print(f"  triage failed ({e}); fetching everything")
-            keep = [True] * len(fresh)
-    else:
-        keep = []
-    to_fetch = []
-    for candidate, k in zip(fresh, keep):
-        log.write(stage="triage", url=candidate["url"], title=candidate.get("title"),
-                  query=candidate.get("query"), keep=k)
-        if k:
-            to_fetch.append(candidate)
-        else:
-            _mark_seen(seen_urls, candidate)
-            counts["triaged_out"] += 1
-    print(f"Triage kept {len(to_fetch)} of {len(fresh)} fresh candidates")
+        to_fetch.append(candidate)
     if max_classify and len(to_fetch) > max_classify:
         print(f"Capping at {max_classify} this run; {len(to_fetch) - max_classify} deferred")
         to_fetch = to_fetch[:max_classify]
-    print()
+    print(f"Fetching and classifying {len(to_fetch)}\n")
 
-    # Pass 3: fetch, classify, verify, dedupe.
+    # Pass 4: fetch, classify, verify, dedupe.
     for i, candidate in enumerate(to_fetch, 1):
         if checkpoint and i > 1 and (i - 1) % CHECKPOINT_EVERY == 0:
             checkpoint()  # after every CHECKPOINT_EVERY completed articles

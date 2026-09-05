@@ -276,3 +276,49 @@ def test_process_checkpoint_and_cap(monkeypatch, tmp_path):
     assert counts["new"] == 35
     assert calls == [10, 20, 30]          # after every 10 completed
     assert len(seen) == 35                # deferred candidates are not marked seen
+
+
+def test_gdelt_split_on_cap(monkeypatch):
+    """A capped window is re-queried on each half; an uncapped one is not."""
+    import fetch
+    from datetime import datetime
+    calls = []
+
+    def fake_search(query, start, end, max_records=250):
+        calls.append((start, end))
+        hours = (end - start).total_seconds() / 3600
+        n = 250 if hours >= 24 else 40
+        return [{"url": f"https://x.com/{start:%Y%m%d%H}/{i}", "title": "t"} for i in range(n)]
+
+    monkeypatch.setattr(fetch, "gdelt_search", fake_search)
+    monkeypatch.setattr(fetch.time, "sleep", lambda s: None)
+    out = fetch.gdelt_search_split("q", datetime(2026, 9, 1), datetime(2026, 9, 4))
+    assert len(calls) == 7            # 72h capped -> 2x36h capped -> 4x18h fine
+    assert len(out) == 160
+    assert len({c["url"] for c in out}) == 160
+
+
+def test_triage_runs_before_resolution(monkeypatch, tmp_path):
+    """Only triage-kept candidates pay for Google redirect decoding."""
+    resolved = []
+    stories: list[dict] = []
+    cands = [{"url": "https://news.google.com/rss/articles/A", "title": "policy piece", "source": "s"},
+             {"url": "https://news.google.com/rss/articles/B", "title": "man arrested", "source": "s"}]
+
+    def fake_resolve(cand):
+        resolved.append(cand["url"])
+        cand["google_url"] = cand["url"]
+        cand["url"] = "https://real.com/story"
+
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cs: [False, True])
+    monkeypatch.setattr(process, "resolve_candidate", fake_resolve)
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article", lambda c, cand, t: _cls())
+    monkeypatch.setattr(process, "check_duplicate", lambda c, r, s: DedupeResult(relation="unrelated"))
+    seen: set[str] = set()
+    counts = process_candidates(FakeClient(), cands, stories, seen)
+    assert resolved == ["https://news.google.com/rss/articles/B"]
+    assert counts["triaged_out"] == 1 and counts["new"] == 1
+    assert stories[0]["source_url"] == "https://real.com/story"
+    assert {"https://news.google.com/rss/articles/A", "https://news.google.com/rss/articles/B",
+            "https://real.com/story"} <= seen
