@@ -140,6 +140,7 @@ b. **Threshold.** Ingest every story with at least one concrete prior or a relea
 c. **Scope.** US only. Non-US stories rejected at triage and again at classification.
 d. **Backfill depth.** 2017.
 e. **Person linking.** `offenders.csv` built from phase 1.
+g. **Juveniles** (settled 2026-09-05). Kept when the article gives offense detail.
 f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `data/`, front
    end and exports in `site/`.
 
@@ -214,3 +215,12 @@ is concrete without a count.
 
 Next: run the full 3-day window uncapped to seed the database, then let the 10:30 UTC cron
 take over with a 1-day window.
+
+## 12. Backfill design
+
+GDELT throttles by IP and GitHub Actions' shared egress IPs are always busy, so the
+backfill runs on the maintainer's machine. It writes only to `data/backfill/` (stories,
+seen URLs, done weeks) with ids from 1,000,000, so a multi-day local run and the daily
+Actions job never edit the same file; `--push-progress` commits that directory after each
+week with a plain merge. Weeks with a GDELT give-up are not marked done and are retried on
+the next run. `build_exports.py` merges both story files into `site/`.

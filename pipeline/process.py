@@ -121,7 +121,7 @@ def _fetch_and_classify(client, candidate: dict) -> dict:
 def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                        stories: list[dict], seen_urls: set[str],
                        decision_log: Path | None = None,
-                       checkpoint=None, max_classify: int = 0) -> dict:
+                       checkpoint=None, max_classify: int = 0, id_base: int = 0) -> dict:
     """Classify candidates and append qualifying, non-duplicate rows to stories.
 
     Mutates `stories` and `seen_urls` in place. Returns counts for logging.
@@ -258,7 +258,7 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                     counts["rejected"] += 1
                     continue
 
-                row = make_row(next_story_id(stories), cls, candidate)
+                row = make_row(next_story_id(stories, id_base), cls, candidate)
                 log.write(stage="classify", url=url, qualifies=True, row=row)
                 try:
                     dup = check_duplicate(client, row, stories)

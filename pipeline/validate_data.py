@@ -13,8 +13,8 @@ import sys
 from datetime import date, timedelta
 
 from classify import qualifies_strict
-from config import (DATA_DIR, NEW_OFFENSE_TYPES, OFFENSE_SEVERITIES, RELEASE_STATUSES,
-                    STORIES_CSV, US_STATES)
+from config import (BACKFILL_ID_BASE, BACKFILL_STORIES_CSV, DATA_DIR, NEW_OFFENSE_TYPES,
+                    OFFENSE_SEVERITIES, RELEASE_STATUSES, STORIES_CSV, US_STATES)
 
 MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 BAD_SOURCE = re.compile(r"prnewswire|businesswire|globenewswire|einpresswire|press_release|"
@@ -36,7 +36,7 @@ def main() -> None:
         except json.JSONDecodeError as e:
             fail(f"{p.name} is not valid JSON: {e}")
 
-    for p in DATA_DIR.glob("*.csv"):
+    for p in list(DATA_DIR.glob("*.csv")) + list(DATA_DIR.glob("backfill/*.csv")):
         text = p.read_text(encoding="utf-8")
         for m in MARKERS:
             if any(line.startswith(m) for line in text.splitlines()):
@@ -47,10 +47,25 @@ def main() -> None:
             dupes = sorted({i for i in ids if ids.count(i) > 1})[:5]
             fail(f"{p.name} has duplicate ids: {dupes}")
 
-    if not STORIES_CSV.exists():
+    rows = []
+    for p in (STORIES_CSV, BACKFILL_STORIES_CSV):
+        if p.exists():
+            rows += list(csv.DictReader(open(p, newline="", encoding="utf-8")))
+    daily_ids = [int(r["id"]) for r in rows[:0]]
+    if STORIES_CSV.exists():
+        daily_ids = [int(r["id"]) for r in csv.DictReader(open(STORIES_CSV, newline="", encoding="utf-8"))]
+    if any(i >= BACKFILL_ID_BASE for i in daily_ids):
+        fail("stories.csv contains an id in the backfill range")
+    if BACKFILL_STORIES_CSV.exists():
+        bf_ids = [int(r["id"]) for r in csv.DictReader(open(BACKFILL_STORIES_CSV, newline="", encoding="utf-8"))]
+        if any(i < BACKFILL_ID_BASE for i in bf_ids):
+            fail("backfill/stories.csv contains an id below the backfill range")
+    all_ids = [r["id"] for r in rows]
+    if len(all_ids) != len(set(all_ids)):
+        fail("duplicate ids across stories.csv and backfill/stories.csv")
+    if not rows:
         print("data validation OK (no stories yet)")
         return
-    rows = list(csv.DictReader(open(STORIES_CSV, newline="", encoding="utf-8")))
     horizon = (date.today() + timedelta(days=2)).isoformat()
     for r in rows:
         rid = r.get("id")
