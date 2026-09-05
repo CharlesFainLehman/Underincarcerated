@@ -10,7 +10,7 @@ STORIES_CSV = DATA_DIR / "stories.csv"
 OFFENDERS_CSV = DATA_DIR / "offenders.csv"
 SEEN_URLS_JSON = DATA_DIR / "seen_urls.json"
 QUERY_STATS_JSON = DATA_DIR / "query_stats.json"
-DECISIONS_DIR = DATA_DIR / "decisions"  # gitignored; per-run audit log
+DECISIONS_DIR = DATA_DIR / "decisions"  # per-run audit log, committed gzipped
 
 # Haiku for the bulk stages (triage, classify, dedupe): volume is hundreds of
 # articles a day and the tasks are extraction, not judgment. Sonnet for the

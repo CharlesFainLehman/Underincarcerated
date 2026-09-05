@@ -4,6 +4,14 @@ Decides whether an article describes a specific person arrested, charged, or
 convicted for a new offense who has a documented prior record or was on
 release at the time, and extracts the structured fields for the database.
 
+The model answers with a JSON object in plain text, which pydantic then
+validates. The first live run used the API's structured-output mode
+(messages.parse) and every call stalled for three minutes and failed with
+"Schema is too complex": this schema has two large enums and many optional
+fields, and the grammar compiler gave up. Plain JSON has no such limit, and
+Haiku follows a schema in the prompt reliably; unknown enum values are
+coerced to the catch-all rather than failing the row.
+
 The two *_evidence_quote fields are the accuracy guard. The model must copy
 the article's own sentence for the prior record and for the release status;
 process.py rejects any row whose quote is not actually in the fetched text.
@@ -11,11 +19,12 @@ A prior-record claim the model cannot quote is a prior-record claim it
 invented or inflated.
 """
 
+import json
 import re
 from typing import Literal, Optional
 
 import anthropic
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, field_validator
 
 from config import (CLASSIFY_MODEL, NEW_OFFENSE_TYPES, OFFENSE_SEVERITIES, RELEASE_STATUSES,
                     STRICT_MIN_ARRESTS, STRICT_MIN_CONVICTIONS, STRICT_MIN_FELONY_CONVICTIONS)
@@ -46,6 +55,60 @@ class StoryClassification(BaseModel):
     outcome: Optional[str] = None
     summary: Optional[str] = None
     confidence: Literal["high", "medium", "low"] = "low"
+
+    @field_validator("new_offense_type", mode="before")
+    @classmethod
+    def _coerce_offense(cls, v):
+        return v if v in NEW_OFFENSE_TYPES or v is None else "other"
+
+    @field_validator("new_offense_severity", mode="before")
+    @classmethod
+    def _coerce_severity(cls, v):
+        return v if v in OFFENSE_SEVERITIES or v is None else "other"
+
+    @field_validator("release_status", mode="before")
+    @classmethod
+    def _coerce_release(cls, v):
+        return v if v in RELEASE_STATUSES else "none stated"
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def _coerce_confidence(cls, v):
+        return v if v in ("high", "medium", "low") else "low"
+
+    @field_validator("age", "prior_count_arrests", "prior_count_convictions",
+                     "prior_count_felony_convictions", mode="before")
+    @classmethod
+    def _coerce_int(cls, v):
+        if v is None or v == "" or isinstance(v, bool):
+            return None
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
+
+    @field_validator("state", mode="before")
+    @classmethod
+    def _coerce_state(cls, v):
+        return v.strip().upper() if isinstance(v, str) and v.strip() else None
+
+
+class ClassificationParseError(ValueError):
+    """The model's reply was not a JSON object matching StoryClassification."""
+
+
+def parse_classification(text: str) -> StoryClassification:
+    """Extract the first JSON object from a model reply and validate it."""
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end <= start:
+        raise ClassificationParseError(f"no JSON object in reply: {text[:200]!r}")
+    try:
+        return StoryClassification.model_validate(json.loads(text[start:end + 1]))
+    except (json.JSONDecodeError, ValidationError) as e:
+        raise ClassificationParseError(str(e)[:300]) from e
+
+
+_SCHEMA_JSON = json.dumps(StoryClassification.model_json_schema(), separators=(",", ":"))
 
 
 SYSTEM_PROMPT = f"""You classify news articles for a public database of repeat offenders: specific people arrested, charged, or convicted for a NEW crime in the United States who had a documented prior criminal record, or who were free at the time of the new crime because of a release decision.
@@ -84,7 +147,10 @@ Field guidance for qualifying articles:
 - summary: 1-2 factual sentences: who, what new offense, and what the prior record or release status was.
 - confidence: "high" if the article is explicit on both the new offense and the prior record or release; "medium" if reasonably clear; "low" if you are inferring.
 
-Always give a one-sentence reason for your decision."""
+Always give a one-sentence reason for your decision.
+
+Reply with ONLY a JSON object, no prose and no code fence, matching this JSON schema exactly (use null for unknown optional fields):
+{_SCHEMA_JSON}"""
 
 
 def classify_article(client: anthropic.Anthropic, candidate: dict,
@@ -95,14 +161,14 @@ def classify_article(client: anthropic.Anthropic, candidate: dict,
         f"Published: {candidate.get('published')}\n\n"
         f"Full article text:\n\n{article_text}"
     )
-    response = client.messages.parse(
+    response = client.messages.create(
         model=CLASSIFY_MODEL,
         max_tokens=2048,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_msg}],
-        output_format=StoryClassification,
     )
-    return response.parsed_output
+    text = "".join(b.text for b in response.content if getattr(b, "type", "") == "text")
+    return parse_classification(text)
 
 
 _QUOTE_MAP = str.maketrans({

@@ -89,20 +89,24 @@ def gdelt_search(query: str, start: datetime, end: datetime,
     }
     GDELT_STATS["calls"] += 1
     articles = None
-    for attempt in range(3):
+    # GDELT throttles GitHub Actions' shared egress IPs hard: in the first
+    # live runs about half the queries 429'd through three attempts with
+    # 45-135s backoffs, costing ~5 minutes each for nothing. Two attempts,
+    # short backoff: GDELT is a supplement to Google News on the daily run.
+    for attempt in range(2):
         try:
             resp = requests.get(GDELT_DOC_API, params=params,
                                 headers={"User-Agent": USER_AGENT}, timeout=30)
             if resp.status_code == 429:
                 GDELT_STATS["retries"] += 1
-                time.sleep(45 * (attempt + 1))
+                time.sleep(15)
                 continue
             resp.raise_for_status()
             articles = resp.json().get("articles", [])
             break
         except (requests.RequestException, ValueError) as e:
             print(f"  GDELT error for {query!r}: {e}")
-            time.sleep(10)
+            time.sleep(5)
     if articles is None:
         GDELT_STATS["gave_up"] += 1
         print(f"  GDELT gave up on {query!r}")

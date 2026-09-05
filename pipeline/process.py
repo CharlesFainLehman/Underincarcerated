@@ -93,7 +93,7 @@ def _mark_seen(seen: set[str], candidate: dict) -> None:
 
 
 CHECKPOINT_EVERY = 25
-RESOLVE_WORKERS = 6    # parallel Google News redirect decodes
+RESOLVE_WORKERS = 8    # parallel Google News redirect decodes
 CLASSIFY_WORKERS = 8   # parallel fetch + classify (I/O bound: HTTP and API)
 
 
