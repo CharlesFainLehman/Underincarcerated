@@ -15,7 +15,7 @@ tolerated; from GitHub Actions' shared IPs most calls 429. Run this
 locally:
 
     export ANTHROPIC_API_KEY=...
-    nohup caffeinate -i python pipeline/backfill.py --start 2017-01 --end 2017-12 \\
+    nohup caffeinate -i python -u pipeline/backfill.py --start 2017-01 --end 2017-12 \\
         --push-progress > backfill.log 2>&1 &
 """
 
@@ -75,6 +75,9 @@ def main() -> None:
     if not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY is not set; refusing to run.")
     fetch.GDELT_PATIENT = True
+    # Unbuffered: under nohup the log otherwise shows nothing for the
+    # first several minutes and the run looks hung.
+    sys.stdout.reconfigure(line_buffering=True)
     client = anthropic.Anthropic()
     stories = load_stories(BACKFILL_STORIES_CSV)
     seen = load_seen_urls(BACKFILL_SEEN_URLS_JSON)
@@ -92,16 +95,20 @@ def main() -> None:
         t0 = time.monotonic()
         stats_before = dict(GDELT_STATS)
         candidates: dict[str, dict] = {}
+        print(f"\n--- week of {label}: querying GDELT ({len(BACKFILL_QUERIES)} queries, "
+              f"8s apart, longer when throttled) ---")
         for q in BACKFILL_QUERIES:
-            for c in gdelt_search_split(q, w_start, w_end):
+            found = gdelt_search_split(q, w_start, w_end)
+            for c in found:
                 candidates.setdefault(c["url"], c)
+            print(f"  GDELT {len(found):4} | {q[:70]}")
             time.sleep(GDELT_SLEEP)
         capped = [q for q, h in QUERY_HITS.items() if h["gdelt_capped"]]
         QUERY_HITS.clear()
         gave_up = GDELT_STATS["gave_up"] - stats_before["gave_up"]
         retries = GDELT_STATS["retries"] - stats_before["retries"]
         fresh = [c for c in candidates.values() if c["url"] not in seen]
-        print(f"\n=== week of {label}: {len(candidates)} candidates, {len(fresh)} new, "
+        print(f"=== week of {label}: {len(candidates)} candidates, {len(fresh)} new, "
               f"{len(capped)} capped queries, gdelt {gave_up} gave-up/{retries} retries ===")
 
         counts = {"new": 0}

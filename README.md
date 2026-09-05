@@ -101,7 +101,7 @@ pip install -r requirements.txt
 export ANTHROPIC_API_KEY=...
 python pipeline/run_daily.py                    # one daily update
 DAYS_BACK=3 MAX_CLASSIFY=200 python pipeline/run_daily.py   # wider net, bounded run
-nohup caffeinate -i python pipeline/backfill.py --start 2017-01 --end 2017-12 --push-progress > backfill.log 2>&1 &
+nohup caffeinate -i python -u pipeline/backfill.py --start 2017-01 --end 2017-12 --push-progress > backfill.log 2>&1 &
 python pipeline/build_exports.py               # rebuild site/ from the CSV only
 python pipeline/validate_data.py
 python -m pytest -q                            # offline tests, no API key needed

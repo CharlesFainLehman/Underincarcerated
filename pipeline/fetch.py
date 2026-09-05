@@ -104,7 +104,10 @@ def gdelt_search(query: str, start: datetime, end: datetime,
                                 headers={"User-Agent": USER_AGENT}, timeout=30)
             if resp.status_code == 429:
                 GDELT_STATS["retries"] += 1
-                time.sleep(45 * (attempt + 1) if GDELT_PATIENT else 15)
+                wait = 45 * (attempt + 1) if GDELT_PATIENT else 15
+                if GDELT_PATIENT:
+                    print(f"    GDELT 429; waiting {wait}s (attempt {attempt + 1}/{attempts})")
+                time.sleep(wait)
                 continue
             resp.raise_for_status()
             articles = resp.json().get("articles", [])
