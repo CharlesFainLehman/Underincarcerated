@@ -110,11 +110,22 @@ def gdelt_search(query: str, start: datetime, end: datetime,
                 time.sleep(wait)
                 continue
             resp.raise_for_status()
-            articles = resp.json().get("articles", [])
+            try:
+                articles = resp.json().get("articles", [])
+            except ValueError:
+                # GDELT answers invalid or too-slow queries with HTTP 200 and
+                # a plain-text message. Show it: it names the problem.
+                body = " ".join(resp.text.split())[:200]
+                if not body:
+                    articles = []  # empty body means no results for this window
+                    break
+                print(f"  GDELT non-JSON reply for {query[:60]!r}: {body}")
+                raise
             break
         except (requests.RequestException, ValueError) as e:
-            print(f"  GDELT error for {query!r}: {e}")
-            time.sleep(5)
+            if not isinstance(e, ValueError):
+                print(f"  GDELT error for {query[:60]!r}: {e}")
+            time.sleep(30 if GDELT_PATIENT else 5)
     if articles is None:
         GDELT_STATS["gave_up"] += 1
         print(f"  GDELT gave up on {query!r}")
