@@ -4,7 +4,7 @@ Outputs:
   site/stories.csv, site/stories.json   one record per incident (daily + backfill)
   site/offenders.csv, site/offenders.json  one record per offender_key
   site/stats.json                        counts for headline figures and charts
-  site/index.html                        placeholder index until the front end lands
+  site/index.html is hand-maintained (the front end) and reads these files.
 
 data/offenders.csv is also written (derived; never edit by hand).
 """
@@ -90,22 +90,6 @@ def build_stats(stories: list[dict], offenders: list[dict]) -> dict:
     }
 
 
-INDEX_HTML = """<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>Underincarcerated data</title>
-<meta name="robots" content="noindex"></head>
-<body style="font-family:system-ui;max-width:40em;margin:3em auto">
-<h1>Underincarcerated: data exports</h1>
-<p>Updated {updated}. {stories} stories, {strict} meeting the strict threshold, {offenders} offenders.</p>
-<ul>
-<li><a href="stories.csv">stories.csv</a> / <a href="stories.json">stories.json</a></li>
-<li><a href="offenders.csv">offenders.csv</a> / <a href="offenders.json">offenders.json</a></li>
-<li><a href="stats.json">stats.json</a></li>
-</ul>
-<p>Front end to come. Source: <a href="https://github.com/CharlesFainLehman/Underincarcerated">GitHub</a>.</p>
-</body></html>
-"""
-
-
 def build_exports() -> None:
     stories = load_all_stories()
     stories.sort(key=lambda r: (r.get("incident_date") or "", int(r["id"])))
@@ -129,9 +113,6 @@ def build_exports() -> None:
         json.dumps([_to_json_record(o) for o in offenders], ensure_ascii=False), encoding="utf-8")
     stats = build_stats(stories, offenders)
     (SITE_DIR / "stats.json").write_text(json.dumps(stats, indent=1), encoding="utf-8")
-    (SITE_DIR / "index.html").write_text(INDEX_HTML.format(
-        updated=stats["updated"], stories=stats["stories"], strict=stats["stories_strict"],
-        offenders=stats["offenders"]), encoding="utf-8")
     print(f"Exports built: {len(stories)} stories, {len(offenders)} offenders")
 
 
