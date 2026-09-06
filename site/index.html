@@ -1,13 +1,232 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>Underincarcerated data</title>
-<meta name="robots" content="noindex"></head>
-<body style="font-family:system-ui;max-width:40em;margin:3em auto">
-<h1>Underincarcerated: data exports</h1>
-<p>Updated 2026-09-05. 691 stories, 206 meeting the strict threshold, 668 offenders.</p>
-<ul>
-<li><a href="stories.csv">stories.csv</a> / <a href="stories.json">stories.json</a></li>
-<li><a href="offenders.csv">offenders.csv</a> / <a href="offenders.json">offenders.json</a></li>
-<li><a href="stats.json">stats.json</a></li>
-</ul>
-<p>Front end to come. Source: <a href="https://github.com/CharlesFainLehman/Underincarcerated">GitHub</a>.</p>
-</body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Underincarcerated</title>
+<meta name="description" content="A database of news stories about repeat offenders: people arrested for a new crime who had a documented prior record or were free on a release decision.">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #f6f7f9; --card: #ffffff; --ink: #1f2937; --ink-strong: #0b0b0b;
+    --muted: #52514e; --hairline: #dfe3e8; --accent: #2a78d6; --accent-soft: #dbe8f8;
+    --strict: #b23c17; --strict-soft: #fbe6de; --link: #1c5cab;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #131313; --card: #1a1a19; --ink: #e5e5e0; --ink-strong: #ffffff;
+      --muted: #c3c2b7; --hairline: #33332f; --accent: #3987e5; --accent-soft: #1f3552;
+      --strict: #f0865f; --strict-soft: #3d2117; --link: #7fb3f0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.45; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
+  header { padding: 40px 0 10px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; color: var(--ink-strong); letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); margin: 0 0 4px; max-width: 60em; }
+  .updated { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 22px 0; }
+  .tile { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; }
+  .tile .v { font-size: 1.9rem; font-weight: 600; color: var(--ink-strong); font-variant-numeric: tabular-nums; }
+  .tile .l { font-size: 0.82rem; color: var(--muted); }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0 18px; }
+  .filters input[type=search], .filters select { padding: 7px 10px; border: 1px solid var(--hairline);
+    border-radius: 7px; background: var(--card); color: var(--ink); font: inherit; }
+  .filters input[type=search] { min-width: 240px; }
+  .filters label.chk { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+  .filters .n { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+  .card { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+  .card h2 { margin: 0 0 8px; font-size: 1rem; color: var(--ink-strong); }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart .bar { fill: var(--accent); }
+  .chart .bar:hover { opacity: 0.8; }
+  .chart text { fill: var(--muted); font-size: 11px; }
+  .chart .grid { stroke: var(--hairline); stroke-width: 1; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.sum { min-width: 18em; max-width: 30em; color: var(--muted); }
+  td.pri { max-width: 16em; }
+  td.pri .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  td.sum .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  td.src a { display: inline-block; max-width: 11em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+  .chart .note { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
+  .badge { display: inline-block; font-size: 0.72rem; padding: 1px 7px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--ink-strong); white-space: nowrap; }
+  .badge.strict { background: var(--strict-soft); color: var(--strict); font-weight: 600; }
+  a { color: var(--link); }
+  .more { margin: 12px 0 0; }
+  button { padding: 7px 14px; border: 1px solid var(--hairline); border-radius: 7px; background: var(--card); color: var(--ink); font: inherit; cursor: pointer; }
+  footer { font-size: 0.85rem; color: var(--muted); margin-top: 30px; }
+  footer p { margin: 6px 0; }
+  .empty { color: var(--muted); padding: 20px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Underincarcerated</h1>
+    <p class="subtitle">News stories about repeat offenders: people arrested, charged, or convicted for a new crime who had a documented prior record, or who were free at the time because of a release decision. Automatically collected and classified; every record cites its source.</p>
+    <p class="updated" id="updated">Loading…</p>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search name, city, summary…">
+    <select id="state"><option value="">All states</option></select>
+    <select id="release"><option value="">Any release status</option></select>
+    <select id="offense"><option value="">Any new offense</option></select>
+    <label class="chk"><input type="checkbox" id="strict"> Strict only (5+ arrests, 5+ convictions, or 3+ felonies)</label>
+    <span class="n" id="count"></span>
+  </div>
+
+  <div class="card chart">
+    <h2>Stories by month of new offense</h2>
+    <div id="chart"></div>
+  </div>
+
+  <div class="card">
+    <h2>Stories</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>Incident</th><th>Offender</th><th>Where</th><th>New offense</th>
+          <th>Prior record</th><th>Status at offense</th><th>Summary</th><th>Source</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="more"><button id="more" hidden>Show more</button></p>
+  </div>
+
+  <footer>
+    <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code</a></p>
+    <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible.</p>
+  </footer>
+</div>
+
+<script>
+(async function () {
+  const [stories, stats] = await Promise.all([
+    fetch('stories.json').then(r => r.json()),
+    fetch('stats.json').then(r => r.json()),
+  ]);
+  stories.sort((a, b) => (b.incident_date || '').localeCompare(a.incident_date || '') || b.id - a.id);
+
+  document.getElementById('updated').textContent =
+    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.offenders.toLocaleString()} offenders.`;
+
+  const tiles = [
+    [stats.stories, 'Stories'],
+    [stats.stories_strict, 'Meet the strict threshold'],
+    [stats.offenders, 'Named offenders'],
+    [stats.offenders_multiple_incidents, 'With more than one incident'],
+  ];
+  document.getElementById('tiles').innerHTML = tiles.map(([v, l]) =>
+    `<div class="tile"><div class="v">${(v || 0).toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+
+  const fill = (id, values) => {
+    const sel = document.getElementById(id);
+    [...new Set(values.filter(Boolean))].sort().forEach(v => {
+      const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o);
+    });
+  };
+  fill('state', stories.map(s => s.state));
+  fill('release', stories.map(s => s.release_status));
+  fill('offense', stories.map(s => s.new_offense_type));
+
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const priors = s => {
+    const parts = [];
+    if (s.prior_count_arrests) parts.push(`${s.prior_count_arrests} arrests`);
+    if (s.prior_count_convictions) parts.push(`${s.prior_count_convictions} convictions`);
+    if (s.prior_count_felony_convictions) parts.push(`${s.prior_count_felony_convictions} felonies`);
+    const head = parts.join(', ');
+    const tail = s.prior_offenses ? esc(s.prior_offenses) : '';
+    return (head ? `<b>${head}</b>` : '') + (head && tail ? '<br>' : '') + `<span class="sum">${tail}</span>`;
+  };
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'source'; } };
+
+  let filtered = stories, shown = 0;
+  const PAGE = 100;
+  const tbody = document.getElementById('rows');
+  const more = document.getElementById('more');
+
+  function renderRows(reset) {
+    if (reset) { tbody.innerHTML = ''; shown = 0; }
+    const slice = filtered.slice(shown, shown + PAGE);
+    tbody.insertAdjacentHTML('beforeend', slice.map(s => `<tr>
+      <td class="num">${esc(s.incident_date || '—')}</td>
+      <td>${esc(s.offender_name || 'Unnamed')}${s.age ? `, ${s.age}` : ''}</td>
+      <td>${esc([s.city, s.state].filter(Boolean).join(', '))}</td>
+      <td>${esc(s.new_offense_type)}${s.qualifies_strict ? ' <span class="badge strict">strict</span>' : ''}</td>
+      <td class="pri"><div class="clamp" title="${esc(s.prior_offenses)}">${priors(s)}</div></td>
+      <td>${s.release_status === 'none stated' ? '<span class="sum">not stated</span>' : `<span class="badge">${esc(s.release_status)}</span>`}</td>
+      <td class="sum"><div class="clamp" title="${esc(s.summary)}">${esc(s.summary)}</div></td>
+      <td class="src"><a href="${esc(s.source_url)}" target="_blank" rel="noopener" title="${esc(s.source_url)}">${esc(host(s.source_url))}</a>${s.additional_sources.length ? ` <span class="sum">+${s.additional_sources.length}</span>` : ''}</td>
+    </tr>`).join(''));
+    shown += slice.length;
+    more.hidden = shown >= filtered.length;
+    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="8" class="empty">No stories match.</td></tr>';
+  }
+
+  function renderChart() {
+    const byMonth = {};
+    filtered.forEach(s => { const m = (s.incident_date || '').slice(0, 7); if (m.length === 7) byMonth[m] = (byMonth[m] || 0) + 1; });
+    const el = document.getElementById('chart');
+    const all = Object.keys(byMonth).sort();
+    if (!all.length) { el.innerHTML = '<p class="empty">No dated stories.</p>'; return; }
+    // Last 24 months; a handful of sentencing stories reach back decades and
+    // would flatten the chart.
+    const last = all[all.length - 1];
+    const [ly, lm] = last.split('-').map(Number);
+    const months = [];
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(Date.UTC(ly, lm - 1 - i, 1));
+      months.push(d.toISOString().slice(0, 7));
+    }
+    const earlier = all.filter(m => m < months[0]).reduce((n, m) => n + byMonth[m], 0);
+    months.forEach(m => { byMonth[m] = byMonth[m] || 0; });
+    const W = 1100, H = 220, padL = 36, padB = 28, padT = 8;
+    const max = Math.max(...months.map(m => byMonth[m]));
+    const bw = (W - padL) / months.length;
+    const y = v => padT + (H - padT - padB) * (1 - v / max);
+    const ticks = [0, Math.round(max / 2), max];
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Stories per month">`;
+    ticks.forEach(t => { svg += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/>` +
+      `<text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end">${t}</text>`; });
+    months.forEach((m, i) => {
+      const x = padL + i * bw + 1, h = H - padB - y(byMonth[m]);
+      svg += `<rect class="bar" x="${x}" y="${y(byMonth[m])}" width="${Math.max(bw - 2, 1)}" height="${h}" rx="2"><title>${m}: ${byMonth[m]} stories</title></rect>`;
+      if (i % 3 === 0) svg += `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${m}</text>`;
+    });
+    el.innerHTML = svg + '</svg>' + (earlier ? `<p class="note">${earlier.toLocaleString()} earlier stories not shown.</p>` : '');
+  }
+
+  function apply() {
+    const q = document.getElementById('q').value.trim().toLowerCase();
+    const st = document.getElementById('state').value;
+    const rel = document.getElementById('release').value;
+    const off = document.getElementById('offense').value;
+    const strict = document.getElementById('strict').checked;
+    filtered = stories.filter(s =>
+      (!st || s.state === st) && (!rel || s.release_status === rel) && (!off || s.new_offense_type === off) &&
+      (!strict || s.qualifies_strict) &&
+      (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)));
+    document.getElementById('count').textContent = `${filtered.length.toLocaleString()} of ${stories.length.toLocaleString()} stories`;
+    renderChart();
+    renderRows(true);
+  }
+  ['q', 'state', 'release', 'offense', 'strict'].forEach(id => document.getElementById(id).addEventListener('input', apply));
+  more.addEventListener('click', () => renderRows(false));
+  apply();
+})().catch(e => { document.getElementById('updated').textContent = 'Could not load data: ' + e; });
+</script>
+</body>
+</html>
