@@ -101,13 +101,15 @@ pip install -r requirements.txt
 export ANTHROPIC_API_KEY=...
 python pipeline/run_daily.py                    # one daily update
 DAYS_BACK=3 MAX_CLASSIFY=200 python pipeline/run_daily.py   # wider net, bounded run
-nohup caffeinate -i python -u pipeline/backfill.py --start 2017-01 --end 2017-12 --push-progress > backfill.log 2>&1 &
+python pipeline/backfill.py --start 2025-01 --end 2025-06 --max-per-week 150   # or the Backfill workflow in Actions
 python pipeline/build_exports.py               # rebuild site/ from the CSV only
 python pipeline/validate_data.py
 python -m pytest -q                            # offline tests, no API key needed
 ```
 
-The backfill must run from a normal IP (GDELT throttles GitHub Actions' shared IPs). It
-writes only to `data/backfill/`, resumes from the last completed week when rerun, and with
-`--push-progress` commits that directory after every week. Keep the laptop awake and plugged
-in; closing the lid pauses it.
+The backfill searches Google News week by week with date operators (GDELT throttled nearly
+every request from both GitHub's and a home IP; `--source gdelt` remains available). Each week
+is capped at `--max-per-week` articles, best headlines first. It writes only to
+`data/backfill/`, records completed weeks and resumes on rerun, and with `--push-progress`
+commits that directory after every week. The "Backfill (manual)" workflow runs it on Actions
+in 300-minute slices; rerun the same range until it reports no weeks left.

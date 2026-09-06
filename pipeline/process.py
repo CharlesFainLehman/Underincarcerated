@@ -108,6 +108,30 @@ def _title_key(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", t)
 
 
+_COUNT_RE = re.compile(
+    r"\b(\d{1,3}|dozen|dozens)\b[^.]{0,40}?\b(prior|previous|arrest|convict|felon|offense|"
+    r"times|charges|rap sheet|busts)", re.I)
+_LABEL_RE = re.compile(r"repeat offender|career criminal|habitual offender|prolific|"
+                       r"serial (thief|burglar|offender)|rap sheet", re.I)
+_RELEASE_RE = re.compile(r"out on (bail|bond)|on (parole|probation)|released (early|on bond)|"
+                         r"pretrial release|days after (his|her|being) release", re.I)
+
+
+def headline_priority(candidate: dict) -> int:
+    """Higher first when a run is capped. A headline that states a count
+    ("man with 12 prior arrests") is the most likely to meet the strict
+    threshold; a label or a release phrase is next; everything else last."""
+    t = candidate.get("title") or ""
+    score = 0
+    if _COUNT_RE.search(t):
+        score += 4
+    if _LABEL_RE.search(t):
+        score += 2
+    if _RELEASE_RE.search(t):
+        score += 1
+    return score
+
+
 def _fetch_and_classify(client, candidate: dict) -> dict:
     """Worker: everything for one candidate that needs no shared state.
     Returns a dict with exactly one of: text=None (no_text), error, or
@@ -172,6 +196,11 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
             _mark_seen(seen_urls, candidate)
             counts["triaged_out"] += 1
     print(f"Triage kept {len(kept)} of {len(fresh)} fresh candidates")
+    if max_classify:
+        # Best headlines first, and no more redirect decoding than the cap
+        # can use (with a margin for URLs that turn out to be duplicates).
+        kept.sort(key=headline_priority, reverse=True)
+        kept = kept[:int(max_classify * 1.3) + 5]
 
     # Pass 3: resolve Google redirects for kept candidates only, in parallel,
     # skipping any whose headline duplicates a direct-URL candidate (the same

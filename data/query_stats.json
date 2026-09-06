@@ -18,17 +18,17 @@
   "\"cashless bail\" arrested": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 60
+   "gnews": 61
   },
   "\"charges dropped\" arrested again": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 66
+   "gnews": 65
   },
   "\"criminal record\" arrested again": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 72
+   "gnews": 71
   },
   "\"extensive criminal history\"": {
    "gdelt": 0,
@@ -53,7 +53,7 @@
   "\"lengthy criminal history\"": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 45
+   "gnews": 100
   },
   "\"long criminal history\" arrested": {
    "gdelt": 0,

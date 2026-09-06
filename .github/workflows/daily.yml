@@ -1,8 +1,10 @@
 name: Daily update
 
 on:
-  schedule:
-    - cron: "30 10 * * *"  # 10:30 UTC = 6:30am ET (EDT)
+  # Schedule paused 2026-09-05 while the maintainer evaluates cost. To
+  # resume, uncomment the two lines below.
+  # schedule:
+  #   - cron: "30 10 * * *"  # 10:30 UTC = 6:30am ET (EDT)
   workflow_dispatch:
     inputs:
       days_back:
