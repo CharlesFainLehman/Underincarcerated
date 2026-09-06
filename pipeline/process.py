@@ -97,7 +97,14 @@ def _mark_seen(seen: set[str], candidate: dict) -> None:
 
 
 CHECKPOINT_EVERY = 25
-RESOLVE_WORKERS = 8    # parallel Google News redirect decodes
+RESOLVE_WORKERS = 4    # parallel Google News redirect decodes (8 tripped Google's throttle)
+RESOLVE_RETRY_WAIT = 600  # seconds to wait when Google throttles the decoder, before retrying
+RESOLVE_RETRIES = 2
+
+
+class ResolutionThrottled(RuntimeError):
+    """Google refused to decode most redirects even after waiting. Nothing
+    in this batch was marked seen; the caller should stop and retry later."""
 CLASSIFY_WORKERS = 8   # parallel fetch + classify (I/O bound: HTTP and API)
 
 
@@ -159,7 +166,7 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
     left unseen and picked up next run.
     """
     counts = {"new": 0, "duplicates": 0, "same_person": 0, "triaged_out": 0,
-              "rejected": 0, "no_text": 0, "skipped_seen": 0, "errors": 0}
+              "rejected": 0, "no_text": 0, "unresolved": 0, "skipped_seen": 0, "errors": 0}
     log = DecisionLog(decision_log)
 
     stored = {canonical_url(s_["source_url"]) for s_ in stories}
@@ -217,15 +224,36 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
     if google:
         print(f"Resolving {len(google)} Google News redirects "
               f"({len(kept) - len(google)} direct or headline-duplicate)...")
-        with ThreadPoolExecutor(max_workers=RESOLVE_WORKERS) as pool:
-            list(pool.map(resolve_candidate, google))
-        print(f"  resolved in {int(time.monotonic() - t0)}s")
+        pending = google
+        for attempt in range(RESOLVE_RETRIES + 1):
+            with ThreadPoolExecutor(max_workers=RESOLVE_WORKERS) as pool:
+                list(pool.map(resolve_candidate, pending))
+            pending = [c for c in pending if "news.google.com" in c["url"]]
+            print(f"  resolved {len(google) - len(pending)}/{len(google)} "
+                  f"in {int(time.monotonic() - t0)}s")
+            if len(pending) <= max(2, 0.5 * len(google)):
+                break
+            # Google throttles its decoder after ~1,500 decodes in an hour.
+            # In the first backfill that silently cost 78 weeks: every
+            # undecoded URL was treated as "no text" and marked seen. Now
+            # wait and retry, and never mark an undecoded URL seen.
+            if attempt < RESOLVE_RETRIES:
+                print(f"  {len(pending)} still undecoded: Google is throttling; "
+                      f"waiting {RESOLVE_RETRY_WAIT // 60} min")
+                time.sleep(RESOLVE_RETRY_WAIT)
+        if pending and len(pending) > max(2, 0.5 * len(google)):
+            raise ResolutionThrottled(f"{len(pending)} of {len(google)} redirects undecoded "
+                                      f"after {RESOLVE_RETRIES} retries")
 
     to_fetch = []
     for candidate in kept:
         url = candidate["url"]
         if "news.google.com" in url and _title_key(candidate["title"]) in direct_titles:
             continue  # counted above
+        if "news.google.com" in url:
+            counts["unresolved"] += 1  # not marked seen: retried next run
+            log.write(stage="unresolved", url=url, title=candidate.get("title"))
+            continue
         if is_vendor_or_wire(url):
             _mark_seen(seen_urls, candidate)
             counts["rejected"] += 1

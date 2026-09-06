@@ -38,7 +38,7 @@ from build_exports import build_exports
 from config import (BACKFILL_DONE_WEEKS_JSON, BACKFILL_ID_BASE, BACKFILL_QUERIES,
                     BACKFILL_SEEN_URLS_JSON, BACKFILL_STORIES_CSV, DECISIONS_DIR)
 from fetch import GDELT_SLEEP, GDELT_STATS, QUERY_HITS, discover_window, gdelt_search_split
-from process import process_candidates
+from process import ResolutionThrottled, process_candidates
 from progress import push_progress
 from store import load_seen_urls, load_stories, save_seen_urls, save_stories
 
@@ -138,11 +138,22 @@ def main() -> None:
         print(f"=== week of {label}: {len(found_all)} candidates, {len(fresh)} new ===")
 
         counts = {"new": 0}
+        throttled = False
         if fresh:
-            counts = process_candidates(client, fresh, stories, seen, decision_log=log,
-                                        checkpoint=checkpoint, id_base=BACKFILL_ID_BASE,
-                                        max_classify=args.max_per_week)
+            try:
+                counts = process_candidates(client, fresh, stories, seen, decision_log=log,
+                                            checkpoint=checkpoint, id_base=BACKFILL_ID_BASE,
+                                            max_classify=args.max_per_week)
+            except ResolutionThrottled as e:
+                throttled = True
+                print(f"  {e}")
         checkpoint()
+        if throttled:
+            print(f"\nGoogle is throttling redirect decoding; stopping. Week {label} is not "
+                  f"marked done. Rerun the same range later to continue.")
+            if args.push_progress:
+                push_progress(f"Backfill progress: stopped at week {label}, decoder throttled")
+            break
         if gave_up == 0:
             done.add(label)
             save_done_weeks(done)
