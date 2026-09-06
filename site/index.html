@@ -3,28 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Underincarcerated</title>
+<title>Underincarceration Stories</title>
 <meta name="description" content="A database of news stories about repeat offenders: people arrested for a new crime who had a documented prior record or were free on a release decision.">
+<meta property="og:title" content="Underincarceration Stories">
+<meta property="og:description" content="News stories about repeat offenders: people arrested for a new crime who had a documented prior record or were free on a release decision. Every record cites its source.">
+<meta property="og:type" content="website">
 <style>
   :root {
     color-scheme: light;
     --ground: #f6f7f9; --card: #ffffff; --ink: #1f2937; --ink-strong: #0b0b0b;
     --muted: #52514e; --hairline: #dfe3e8; --accent: #2a78d6; --accent-soft: #dbe8f8;
-    --strict: #b23c17; --strict-soft: #fbe6de; --link: #1c5cab;
+    --strict: #b23c17; --strict-soft: #fbe6de; --link: #1c5cab; --row-hover: #f3f6fa;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
       --ground: #131313; --card: #1a1a19; --ink: #e5e5e0; --ink-strong: #ffffff;
       --muted: #c3c2b7; --hairline: #33332f; --accent: #3987e5; --accent-soft: #1f3552;
-      --strict: #f0865f; --strict-soft: #3d2117; --link: #7fb3f0;
+      --strict: #f0865f; --strict-soft: #3d2117; --link: #7fb3f0; --row-hover: #222221;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--ground); color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.45; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
-  header { padding: 40px 0 10px; }
+  nav.top { display: flex; gap: 18px; align-items: baseline; padding: 18px 0 0; font-size: 0.9rem; }
+  nav.top .brand { font-weight: 700; color: var(--ink-strong); text-decoration: none; margin-right: 8px; }
+  nav.top a { color: var(--muted); text-decoration: none; }
+  nav.top a.here { color: var(--ink-strong); border-bottom: 2px solid var(--accent); }
+  nav.top .soon { color: var(--muted); opacity: 0.6; }
+  header { padding: 26px 0 10px; }
   h1 { font-size: 2rem; margin: 0 0 4px; color: var(--ink-strong); letter-spacing: -0.01em; }
   .subtitle { color: var(--muted); margin: 0 0 4px; max-width: 60em; }
   .updated { font-size: 0.85rem; color: var(--muted); margin: 0; }
@@ -45,35 +53,56 @@
   .chart .bar:hover { opacity: 0.8; }
   .chart text { fill: var(--muted); font-size: 11px; }
   .chart .grid { stroke: var(--hairline); stroke-width: 1; }
-  .tablewrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
-  th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  td.sum { min-width: 18em; max-width: 30em; color: var(--muted); }
-  td.pri { max-width: 16em; }
-  td.pri .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  td.sum .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  td.src a { display: inline-block; max-width: 11em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   .chart .note { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; user-select: none; }
+  th.sortable { cursor: pointer; }
+  th.sortable:hover { color: var(--ink-strong); }
+  th .dir { font-size: 0.7rem; margin-left: 3px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.pic { width: 52px; padding-right: 0; }
+  td.pic img { width: 44px; height: 55px; object-fit: cover; border-radius: 4px; display: block; background: var(--hairline); }
+  tr.row { cursor: pointer; }
+  tr.row:hover { background: var(--row-hover); }
+  tr.row.open { background: var(--row-hover); }
+  tr.detail td { padding: 0 8px 16px 60px; border-bottom: 1px solid var(--hairline); }
+  .detail-box { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; padding-top: 6px; }
+  .detail-box p { margin: 0 0 8px; }
+  .detail-box h4 { margin: 0 0 4px; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .detail-box blockquote { margin: 0 0 8px; padding: 6px 10px; border-left: 3px solid var(--accent-soft); color: var(--muted); font-size: 0.88rem; }
+  .detail-box .links a { display: block; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .detail-box .perma { font-size: 0.82rem; color: var(--muted); }
+  @media (max-width: 760px) { .detail-box { grid-template-columns: 1fr; } tr.detail td { padding-left: 8px; } }
+  .name { color: var(--ink-strong); }
+  .who { color: var(--muted); font-size: 0.85rem; }
   .badge { display: inline-block; font-size: 0.72rem; padding: 1px 7px; border-radius: 10px;
     background: var(--accent-soft); color: var(--ink-strong); white-space: nowrap; }
   .badge.strict { background: var(--strict-soft); color: var(--strict); font-weight: 600; }
+  .dim { color: var(--muted); }
   a { color: var(--link); }
+  td.src a { display: inline-block; max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   .more { margin: 12px 0 0; }
   button { padding: 7px 14px; border: 1px solid var(--hairline); border-radius: 7px; background: var(--card); color: var(--ink); font: inherit; cursor: pointer; }
-  footer { font-size: 0.85rem; color: var(--muted); margin-top: 30px; }
+  footer { font-size: 0.85rem; color: var(--muted); margin-top: 30px; border-top: 1px solid var(--hairline); padding-top: 16px; }
   footer p { margin: 6px 0; }
   .empty { color: var(--muted); padding: 20px 0; }
-  td.pic { width: 56px; padding-right: 0; }
-  td.pic img { width: 48px; height: 60px; object-fit: cover; border-radius: 4px; display: block; background: var(--hairline); }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <nav class="top">
+    <a class="brand" href="./">Underincarcerated</a>
+    <a class="here" href="./">Stories</a>
+    <span class="soon" title="Coming soon">Facts</span>
+    <a href="stories.csv">Data</a>
+    <a href="https://github.com/CharlesFainLehman/Underincarcerated">Code</a>
+  </nav>
   <header>
-    <h1>Underincarcerated</h1>
-    <p class="subtitle">News stories about repeat offenders: people arrested, charged, or convicted for a new crime who had a documented prior record, or who were free at the time because of a release decision. Automatically collected and classified; every record cites its source.</p>
+    <h1>Underincarceration Stories</h1>
+    <p class="subtitle">News stories about repeat offenders: people arrested, charged, or convicted for a new crime who had a documented prior record, or who were free at the time because of a release decision. Automatically collected and classified; every record cites its source. Click a row for the full record.</p>
     <p class="updated" id="updated">Loading…</p>
   </header>
 
@@ -82,9 +111,10 @@
   <div class="filters">
     <input type="search" id="q" placeholder="Search name, city, summary…">
     <select id="state"><option value="">All states</option></select>
-    <select id="release"><option value="">Any release status</option></select>
+    <select id="release"><option value="">Any status at offense</option></select>
     <select id="offense"><option value="">Any new offense</option></select>
-    <label class="chk"><input type="checkbox" id="strict"> Strict only (5+ arrests, 5+ convictions, or 3+ felonies)</label>
+    <label class="chk"><input type="checkbox" id="strict"> Strict only</label>
+    <label class="chk"><input type="checkbox" id="photo"> With photo</label>
     <span class="n" id="count"></span>
   </div>
 
@@ -94,12 +124,17 @@
   </div>
 
   <div class="card">
-    <h2>Stories</h2>
     <div class="tablewrap">
       <table>
         <thead><tr>
-          <th></th><th>Incident</th><th>Offender</th><th>Where</th><th>New offense</th>
-          <th>Prior record</th><th>Status at offense</th><th>Summary</th><th>Source</th>
+          <th></th>
+          <th class="sortable" data-key="incident_date">Incident<span class="dir"></span></th>
+          <th class="sortable" data-key="offender_name">Offender<span class="dir"></span></th>
+          <th class="sortable" data-key="state">Where<span class="dir"></span></th>
+          <th class="sortable" data-key="new_offense_type">New offense<span class="dir"></span></th>
+          <th class="sortable" data-key="prior_count_arrests" title="Prior arrests / convictions / felony convictions, as stated in the article">Priors<span class="dir"></span></th>
+          <th class="sortable" data-key="release_status">Status at offense<span class="dir"></span></th>
+          <th>Source</th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -108,8 +143,9 @@
   </div>
 
   <footer>
-    <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code</a></p>
-    <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible.</p>
+    <p><b>Strict</b> marks stories where the article states 5+ prior arrests, 5+ prior convictions, or 3+ prior felony convictions. Counts are never estimated.</p>
+    <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible. Photos are linked from the cited outlet and not stored here.</p>
+    <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
   </footer>
 </div>
 
@@ -119,19 +155,14 @@
     fetch('stories.json').then(r => r.json()),
     fetch('stats.json').then(r => r.json()),
   ]);
-  stories.sort((a, b) => (b.incident_date || '').localeCompare(a.incident_date || '') || b.id - a.id);
+  const byId = new Map(stories.map(s => [s.id, s]));
 
   document.getElementById('updated').textContent =
-    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.offenders.toLocaleString()} offenders.`;
-
-  const tiles = [
-    [stats.stories, 'Stories'],
-    [stats.stories_strict, 'Meet the strict threshold'],
-    [stats.offenders, 'Named offenders'],
-    [stats.offenders_multiple_incidents, 'With more than one incident'],
-  ];
-  document.getElementById('tiles').innerHTML = tiles.map(([v, l]) =>
-    `<div class="tile"><div class="v">${(v || 0).toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.offenders.toLocaleString()} named offenders.`;
+  document.getElementById('tiles').innerHTML = [
+    [stats.stories, 'Stories'], [stats.stories_strict, 'Meet the strict threshold'],
+    [stats.offenders, 'Named offenders'], [stats.offenders_multiple_incidents, 'With more than one incident'],
+  ].map(([v, l]) => `<div class="tile"><div class="v">${(v || 0).toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
 
   const fill = (id, values) => {
     const sel = document.getElementById(id);
@@ -144,40 +175,94 @@
   fill('offense', stories.map(s => s.new_offense_type));
 
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const priors = s => {
-    const parts = [];
-    if (s.prior_count_arrests) parts.push(`${s.prior_count_arrests} arrests`);
-    if (s.prior_count_convictions) parts.push(`${s.prior_count_convictions} convictions`);
-    if (s.prior_count_felony_convictions) parts.push(`${s.prior_count_felony_convictions} felonies`);
-    const head = parts.join(', ');
-    const tail = s.prior_offenses ? esc(s.prior_offenses) : '';
-    return (head ? `<b>${head}</b>` : '') + (head && tail ? '<br>' : '') + `<span class="sum">${tail}</span>`;
-  };
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'source'; } };
+  const priorsShort = s => {
+    const p = [];
+    if (s.prior_count_arrests) p.push(`${s.prior_count_arrests} arr.`);
+    if (s.prior_count_convictions) p.push(`${s.prior_count_convictions} conv.`);
+    if (s.prior_count_felony_convictions) p.push(`${s.prior_count_felony_convictions} fel.`);
+    return p.length ? p.join(' · ') : (s.prior_offenses ? '<span class="dim">named</span>' : '<span class="dim">—</span>');
+  };
+  const statusCell = s => s.release_status === 'none stated'
+    ? '<span class="dim">not stated</span>' : `<span class="badge">${esc(s.release_status)}</span>`;
 
-  let filtered = stories, shown = 0;
+  // Sort state. Default: newest incident first.
+  let sortKey = 'incident_date', sortDir = -1;
+  const numeric = new Set(['prior_count_arrests']);
+  function cmp(a, b) {
+    let x = a[sortKey], y = b[sortKey];
+    if (numeric.has(sortKey)) { x = x ?? -1; y = y ?? -1; return (x - y) * sortDir || b.id - a.id; }
+    x = x || ''; y = y || '';
+    if (!x && y) return 1; if (x && !y) return -1;   // blanks last either way
+    return x.localeCompare(y) * sortDir || b.id - a.id;
+  }
+  document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
+    const k = th.dataset.key;
+    if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = k === 'incident_date' || numeric.has(k) ? -1 : 1; }
+    document.querySelectorAll('th .dir').forEach(d => d.textContent = '');
+    th.querySelector('.dir').textContent = sortDir > 0 ? '▲' : '▼';
+    apply();
+  }));
+  document.querySelector('th[data-key="incident_date"] .dir').textContent = '▼';
+
+  let filtered = stories, shown = 0, openId = null;
   const PAGE = 100;
   const tbody = document.getElementById('rows');
   const more = document.getElementById('more');
 
+  function rowHtml(s) {
+    return `<tr class="row${s.id === openId ? ' open' : ''}" data-id="${s.id}">
+      <td class="pic">${s.mugshot_url ? `<img src="${esc(s.mugshot_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</td>
+      <td class="date">${esc(s.incident_date || '—')}</td>
+      <td><span class="name">${esc(s.offender_name || 'Unnamed')}</span>${s.age ? `<span class="who">, ${s.age}</span>` : ''}</td>
+      <td>${esc([s.city, s.state].filter(Boolean).join(', '))}</td>
+      <td>${esc(s.new_offense_type)}${s.qualifies_strict ? ' <span class="badge strict">strict</span>' : ''}</td>
+      <td class="num">${priorsShort(s)}</td>
+      <td>${statusCell(s)}</td>
+      <td class="src"><a href="${esc(s.source_url)}" target="_blank" rel="noopener" title="${esc(s.source_url)}" onclick="event.stopPropagation()">${esc(host(s.source_url))}</a>${s.additional_sources.length ? ` <span class="dim">+${s.additional_sources.length}</span>` : ''}</td>
+    </tr>` + (s.id === openId ? detailHtml(s) : '');
+  }
+  function detailHtml(s) {
+    const links = [s.source_url, ...s.additional_sources].map(u =>
+      `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(host(u))}<span class="dim"> — ${esc(u.replace(/^https?:\/\/(www\.)?[^/]+/, '').slice(0, 48))}${u.length > 60 ? '…' : ''}</span></a>`).join('');
+    const counts = [];
+    if (s.prior_count_arrests) counts.push(`${s.prior_count_arrests} prior arrests`);
+    if (s.prior_count_convictions) counts.push(`${s.prior_count_convictions} prior convictions`);
+    if (s.prior_count_felony_convictions) counts.push(`${s.prior_count_felony_convictions} prior felony convictions`);
+    const permalink = `${location.origin}${location.pathname}#id=${s.id}`;
+    return `<tr class="detail"><td colspan="8"><div class="detail-box">
+      <div>
+        <p>${esc(s.summary)}</p>
+        <h4>Prior record</h4>
+        <p>${counts.length ? esc(counts.join(', ')) + (s.prior_offenses ? '. ' : '') : ''}${esc(s.prior_offenses || (counts.length ? '' : 'Not stated'))}</p>
+        ${s.prior_evidence_quote ? `<blockquote>“${esc(s.prior_evidence_quote)}”</blockquote>` : ''}
+        ${s.release_status !== 'none stated' ? `<h4>Status at the time of the new offense</h4><p>${esc(s.release_status)}${s.releasing_jurisdiction ? ` (${esc(s.releasing_jurisdiction)})` : ''}</p>` : ''}
+        ${s.release_evidence_quote ? `<blockquote>“${esc(s.release_evidence_quote)}”</blockquote>` : ''}
+      </div>
+      <div>
+        <h4>Sources</h4><div class="links">${links}</div>
+        <h4 style="margin-top:10px">Record</h4>
+        <p class="perma">id ${s.id} · outcome: ${esc(s.outcome || '—')} · confidence: ${esc(s.confidence)} · added ${esc(s.date_added)}<br><a href="${esc(permalink)}">permalink</a></p>
+      </div>
+    </div></td></tr>`;
+  }
+
   function renderRows(reset) {
     if (reset) { tbody.innerHTML = ''; shown = 0; }
     const slice = filtered.slice(shown, shown + PAGE);
-    tbody.insertAdjacentHTML('beforeend', slice.map(s => `<tr>
-      <td class="pic">${s.mugshot_url ? `<img src="${esc(s.mugshot_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</td>
-      <td class="num">${esc(s.incident_date || '—')}</td>
-      <td>${esc(s.offender_name || 'Unnamed')}${s.age ? `, ${s.age}` : ''}</td>
-      <td>${esc([s.city, s.state].filter(Boolean).join(', '))}</td>
-      <td>${esc(s.new_offense_type)}${s.qualifies_strict ? ' <span class="badge strict">strict</span>' : ''}</td>
-      <td class="pri"><div class="clamp" title="${esc(s.prior_offenses)}">${priors(s)}</div></td>
-      <td>${s.release_status === 'none stated' ? '<span class="sum">not stated</span>' : `<span class="badge">${esc(s.release_status)}</span>`}</td>
-      <td class="sum"><div class="clamp" title="${esc(s.summary)}">${esc(s.summary)}</div></td>
-      <td class="src"><a href="${esc(s.source_url)}" target="_blank" rel="noopener" title="${esc(s.source_url)}">${esc(host(s.source_url))}</a>${s.additional_sources.length ? ` <span class="sum">+${s.additional_sources.length}</span>` : ''}</td>
-    </tr>`).join(''));
+    tbody.insertAdjacentHTML('beforeend', slice.map(rowHtml).join(''));
     shown += slice.length;
     more.hidden = shown >= filtered.length;
-    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="9" class="empty">No stories match.</td></tr>';
+    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="8" class="empty">No stories match.</td></tr>';
   }
+  tbody.addEventListener('click', e => {
+    const tr = e.target.closest('tr.row');
+    if (!tr) return;
+    const id = Number(tr.dataset.id);
+    openId = openId === id ? null : id;
+    history.replaceState(null, '', openId ? `#id=${openId}` : location.pathname);
+    renderRows(true);
+  });
 
   function renderChart() {
     const byMonth = {};
@@ -185,25 +270,18 @@
     const el = document.getElementById('chart');
     const all = Object.keys(byMonth).sort();
     if (!all.length) { el.innerHTML = '<p class="empty">No dated stories.</p>'; return; }
-    // Last 24 months; a handful of sentencing stories reach back decades and
-    // would flatten the chart.
     const last = all[all.length - 1];
     const [ly, lm] = last.split('-').map(Number);
     const months = [];
-    for (let i = 23; i >= 0; i--) {
-      const d = new Date(Date.UTC(ly, lm - 1 - i, 1));
-      months.push(d.toISOString().slice(0, 7));
-    }
+    for (let i = 23; i >= 0; i--) months.push(new Date(Date.UTC(ly, lm - 1 - i, 1)).toISOString().slice(0, 7));
     const earlier = all.filter(m => m < months[0]).reduce((n, m) => n + byMonth[m], 0);
     months.forEach(m => { byMonth[m] = byMonth[m] || 0; });
     const W = 1100, H = 220, padL = 36, padB = 28, padT = 8;
-    const max = Math.max(...months.map(m => byMonth[m]));
+    const max = Math.max(1, ...months.map(m => byMonth[m]));
     const bw = (W - padL) / months.length;
     const y = v => padT + (H - padT - padB) * (1 - v / max);
-    const ticks = [0, Math.round(max / 2), max];
     let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Stories per month">`;
-    ticks.forEach(t => { svg += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/>` +
-      `<text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end">${t}</text>`; });
+    [0, Math.round(max / 2), max].forEach(t => { svg += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/><text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end">${t}</text>`; });
     months.forEach((m, i) => {
       const x = padL + i * bw + 1, h = H - padB - y(byMonth[m]);
       svg += `<rect class="bar" x="${x}" y="${y(byMonth[m])}" width="${Math.max(bw - 2, 1)}" height="${h}" rx="2"><title>${m}: ${byMonth[m]} stories</title></rect>`;
@@ -214,20 +292,27 @@
 
   function apply() {
     const q = document.getElementById('q').value.trim().toLowerCase();
-    const st = document.getElementById('state').value;
-    const rel = document.getElementById('release').value;
-    const off = document.getElementById('offense').value;
-    const strict = document.getElementById('strict').checked;
+    const st = document.getElementById('state').value, rel = document.getElementById('release').value,
+          off = document.getElementById('offense').value, strict = document.getElementById('strict').checked,
+          photo = document.getElementById('photo').checked;
     filtered = stories.filter(s =>
       (!st || s.state === st) && (!rel || s.release_status === rel) && (!off || s.new_offense_type === off) &&
-      (!strict || s.qualifies_strict) &&
-      (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)));
+      (!strict || s.qualifies_strict) && (!photo || s.mugshot_url) &&
+      (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)))
+      .sort(cmp);
     document.getElementById('count').textContent = `${filtered.length.toLocaleString()} of ${stories.length.toLocaleString()} stories`;
     renderChart();
     renderRows(true);
   }
-  ['q', 'state', 'release', 'offense', 'strict'].forEach(id => document.getElementById(id).addEventListener('input', apply));
+  ['q', 'state', 'release', 'offense', 'strict', 'photo'].forEach(id => document.getElementById(id).addEventListener('input', apply));
   more.addEventListener('click', () => renderRows(false));
+
+  // Permalink: #id=123 opens that record at the top.
+  const m = location.hash.match(/id=(\d+)/);
+  if (m && byId.has(Number(m[1]))) {
+    openId = Number(m[1]);
+    document.getElementById('q').value = byId.get(openId).offender_name || '';
+  }
   apply();
 })().catch(e => { document.getElementById('updated').textContent = 'Could not load data: ' + e; });
 </script>
