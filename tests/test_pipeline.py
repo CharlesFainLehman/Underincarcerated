@@ -220,6 +220,7 @@ def test_exports_and_validation(monkeypatch, tmp_path):
     data.mkdir()
     for mod in (store, build_exports, validate_data, config):
         monkeypatch.setattr(mod, "STORIES_CSV", data / "stories.csv", raising=False)
+        monkeypatch.setattr(mod, "BACKFILL_STORIES_CSV", data / "backfill.csv", raising=False)
     monkeypatch.setattr(build_exports, "OFFENDERS_CSV", data / "offenders.csv")
     monkeypatch.setattr(build_exports, "SITE_DIR", site)
     monkeypatch.setattr(validate_data, "DATA_DIR", data)
@@ -505,3 +506,49 @@ def test_future_incident_date_blanked_at_ingest(monkeypatch, tmp_path):
     cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
     counts, _ = _run(monkeypatch, tmp_path, cands, stories, _cls(incident_date="2099-01-01"))
     assert counts["new"] == 1 and stories[0]["incident_date"] == ""
+
+
+def test_headline_priority_orders_counts_first():
+    from process import headline_priority
+    titles = ["Local man arrested after bar fight",
+              "Repeat offender charged in Apopka",
+              "Man with 12 prior arrests charged in shooting",
+              "Suspect out on bond arrested again"]
+    ranked = sorted(titles, key=lambda t: headline_priority({"title": t}), reverse=True)
+    assert ranked[0].startswith("Man with 12") and ranked[-1].startswith("Local man")
+
+
+def test_google_news_search_adds_date_operators(monkeypatch):
+    import fetch
+    from datetime import datetime
+    seen_urls = []
+    monkeypatch.setattr(fetch.feedparser, "parse",
+                        lambda url: (seen_urls.append(url), type("F", (), {"entries": []})())[1])
+    fetch.google_news_search('"repeat offender" arrested', datetime(2025, 1, 1), datetime(2025, 1, 7))
+    assert "after%3A2025-01-01" in seen_urls[0] and "before%3A2025-01-07" in seen_urls[0]
+    fetch.google_news_search('"repeat offender" arrested')
+    assert "after" not in seen_urls[1]
+
+
+def test_process_cap_ranks_before_resolution(monkeypatch, tmp_path):
+    """With a cap, only the best headlines (times a margin) are decoded."""
+    resolved = []
+    stories: list[dict] = []
+    cands = [{"url": f"https://news.google.com/rss/articles/{i}", "title": "plain headline", "source": "s"}
+             for i in range(40)]
+    cands.append({"url": "https://news.google.com/rss/articles/best",
+                  "title": "Man with 12 prior arrests charged", "source": "s"})
+
+    def fake_resolve(cand):
+        resolved.append(cand["url"])
+        cand["google_url"] = cand["url"]
+        cand["url"] = "https://real.com/" + cand["google_url"].rsplit("/", 1)[1]
+
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cs: [True] * len(cs))
+    monkeypatch.setattr(process, "resolve_candidate", fake_resolve)
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article", lambda c, cand, t: _cls(offender_name="P " + cand["url"][-3:]))
+    monkeypatch.setattr(process, "check_duplicate", lambda c, r, s: DedupeResult(relation="unrelated"))
+    counts = process_candidates(FakeClient(), cands, stories, set(), max_classify=10)
+    assert resolved[0].endswith("/best")
+    assert len(resolved) == 10 * 1.3 + 5 and counts["new"] == 10

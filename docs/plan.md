@@ -218,8 +218,13 @@ take over with a 1-day window.
 
 ## 12. Backfill design
 
-GDELT throttles by IP and GitHub Actions' shared egress IPs are always busy, so the
-backfill runs on the maintainer's machine. It writes only to `data/backfill/` (stories,
+GDELT throttled nearly every request from GitHub Actions and from the maintainer's home IP
+alike (one query in six got through, after minutes of backoff), so the backfill searches
+Google News RSS with `after:`/`before:` date operators instead, week by week, capped at 150
+articles a week with headlines that state a count fetched first. Scope: January 2025 to
+present (maintainer decision 2026-09-05, ~$90). Runs on Actions in 300-minute slices.
+
+Earlier design, kept for `--source gdelt`: the backfill It writes only to `data/backfill/` (stories,
 seen URLs, done weeks) with ids from 1,000,000, so a multi-day local run and the daily
 Actions job never edit the same file; `--push-progress` commits that directory after each
 week with a plain merge. Weeks with a GDELT give-up are not marked done and are retried on
