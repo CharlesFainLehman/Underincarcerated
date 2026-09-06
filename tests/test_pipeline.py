@@ -552,3 +552,31 @@ def test_process_cap_ranks_before_resolution(monkeypatch, tmp_path):
     counts = process_candidates(FakeClient(), cands, stories, set(), max_classify=10)
     assert resolved[0].endswith("/best")
     assert len(resolved) == 10 * 1.3 + 5 and counts["new"] == 10
+
+
+def test_undecoded_google_urls_are_not_marked_seen(monkeypatch, tmp_path):
+    """A redirect Google refuses to decode is skipped and left unseen; a
+    batch that is mostly refused raises after the retry wait."""
+    from process import ResolutionThrottled
+    monkeypatch.setattr(process.time, "sleep", lambda s: None)
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cs: [True] * len(cs))
+    monkeypatch.setattr(process, "resolve_candidate", lambda cand: None)   # decoder refuses
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article", lambda c, cand, t: _cls())
+    monkeypatch.setattr(process, "check_duplicate", lambda c, r, s: DedupeResult(relation="unrelated"))
+    stories: list[dict] = []
+    seen: set[str] = set()
+    cands = [{"url": f"https://news.google.com/rss/articles/{i}", "title": f"headline {i}", "source": "s"}
+             for i in range(10)]
+    with pytest.raises(ResolutionThrottled):
+        process_candidates(FakeClient(), cands, stories, seen)
+    assert not seen and not stories
+    # A single refusal among decodable ones is skipped, not seen, not fatal.
+    def resolve_most(cand):
+        if not cand["url"].endswith("/0"):
+            cand["google_url"] = cand["url"]
+            cand["url"] = "https://real.com/" + cand["url"].rsplit("/", 1)[1]
+    monkeypatch.setattr(process, "resolve_candidate", resolve_most)
+    counts = process_candidates(FakeClient(), cands, stories, seen)
+    assert counts["unresolved"] == 1 and counts["new"] == 9
+    assert "https://news.google.com/rss/articles/0" not in seen
