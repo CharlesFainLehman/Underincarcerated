@@ -1,0 +1,57 @@
+name: Mug shot sweep (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Stories per file to check (0 = all unchecked)"
+        default: "0"
+      recheck:
+        description: "Re-examine already checked stories"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Sweep
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: python pipeline/mugshots.py --limit "${{ inputs.limit || '0' }}" ${{ inputs.recheck && '--recheck' || '' }}
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "underincarcerated-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -- site || true
+          git pull --rebase --autostash origin main
+          python pipeline/validate_data.py || { python pipeline/quarantine.py && python pipeline/validate_data.py; }
+          python pipeline/build_exports.py
+          git add data site
+          git diff --cached --quiet || git commit -m "Mug shot sweep $(date -u +%F)"
+          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4

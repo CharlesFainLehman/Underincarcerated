@@ -100,6 +100,8 @@ def make_row(story_id: int, cls, candidate: dict) -> dict:
         "outcome": cls.outcome or "",
         "summary": cls.summary or "",
         "qualifies_strict": "yes" if strict else "no",
+        "mugshot_url": "",
+        "mugshot_checked": "",
         "source_name": candidate.get("source", ""),
         "source_url": candidate["url"],
         "additional_sources": "",

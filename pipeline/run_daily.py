@@ -42,6 +42,7 @@ def main() -> None:
     print(f"\nDone. New: {counts['new']} (of which same-person: {counts['same_person']}), "
           f"duplicates: {counts['duplicates']}, triaged out: {counts['triaged_out']}, "
           f"rejected: {counts['rejected']}, no text: {counts['no_text']}, "
+          f"unresolved: {counts['unresolved']}, "
           f"already seen: {counts['skipped_seen']}, errors: {counts['errors']}. "
           f"Database now has {len(stories)} incidents.")
 

@@ -117,6 +117,8 @@ CSV_COLUMNS = [
     "outcome",
     "summary",
     "qualifies_strict",
+    "mugshot_url",
+    "mugshot_checked",
     "source_name",
     "source_url",
     "additional_sources",
