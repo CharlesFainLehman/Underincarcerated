@@ -65,6 +65,8 @@
   footer { font-size: 0.85rem; color: var(--muted); margin-top: 30px; }
   footer p { margin: 6px 0; }
   .empty { color: var(--muted); padding: 20px 0; }
+  td.pic { width: 56px; padding-right: 0; }
+  td.pic img { width: 48px; height: 60px; object-fit: cover; border-radius: 4px; display: block; background: var(--hairline); }
 </style>
 </head>
 <body>
@@ -96,7 +98,7 @@
     <div class="tablewrap">
       <table>
         <thead><tr>
-          <th>Incident</th><th>Offender</th><th>Where</th><th>New offense</th>
+          <th></th><th>Incident</th><th>Offender</th><th>Where</th><th>New offense</th>
           <th>Prior record</th><th>Status at offense</th><th>Summary</th><th>Source</th>
         </tr></thead>
         <tbody id="rows"></tbody>
@@ -162,6 +164,7 @@
     if (reset) { tbody.innerHTML = ''; shown = 0; }
     const slice = filtered.slice(shown, shown + PAGE);
     tbody.insertAdjacentHTML('beforeend', slice.map(s => `<tr>
+      <td class="pic">${s.mugshot_url ? `<img src="${esc(s.mugshot_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</td>
       <td class="num">${esc(s.incident_date || '—')}</td>
       <td>${esc(s.offender_name || 'Unnamed')}${s.age ? `, ${s.age}` : ''}</td>
       <td>${esc([s.city, s.state].filter(Boolean).join(', '))}</td>
@@ -173,7 +176,7 @@
     </tr>`).join(''));
     shown += slice.length;
     more.hidden = shown >= filtered.length;
-    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="8" class="empty">No stories match.</td></tr>';
+    if (!filtered.length) tbody.innerHTML = '<tr><td colspan="9" class="empty">No stories match.</td></tr>';
   }
 
   function renderChart() {
