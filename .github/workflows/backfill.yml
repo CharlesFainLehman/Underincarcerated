@@ -57,6 +57,13 @@ jobs:
           --source "${{ inputs.source || 'gnews' }}" --max-per-week "${{ inputs.max_per_week || '150' }}"
           --max-minutes 300 --push-progress
 
+      - name: Find mug shots for new stories
+        if: always()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: python pipeline/mugshots.py
+
       - name: Upload decision log
         if: always()
         uses: actions/upload-artifact@v4

@@ -580,3 +580,36 @@ def test_undecoded_google_urls_are_not_marked_seen(monkeypatch, tmp_path):
     counts = process_candidates(FakeClient(), cands, stories, seen)
     assert counts["unresolved"] == 1 and counts["new"] == 9
     assert "https://news.google.com/rss/articles/0" not in seen
+
+
+def test_candidate_images_ranks_mugshot_first():
+    from mugshots import candidate_images
+    html = '''<html><head><meta property="og:image" content="https://cdn.x.com/og.jpg"></head><body>
+    <img src="/static/logo.png" alt="Station logo">
+    <img src="/img/booking-smith.jpg" alt="Booking photo of John Smith" width="600">
+    <img src="/img/scene.jpg" alt="Police at the scene">
+    <img src="/img/tiny.jpg" width="40">
+    </body></html>'''
+    out = candidate_images(html, "https://x.com/story", "Smith")
+    assert out[0] == "https://x.com/img/booking-smith.jpg"
+    assert "https://cdn.x.com/og.jpg" in out
+    assert not any("logo" in u or "tiny" in u for u in out)
+
+
+def test_sweep_stores_url_and_marks_checked(monkeypatch, tmp_path):
+    import mugshots
+    from types import SimpleNamespace
+    path = tmp_path / "s.csv"
+    rows = [make_row(1, _cls(), {"url": "https://x.com/a", "source": "x"}),
+            make_row(2, _cls(offender_name="Jane Doe"), {"url": "https://x.com/b", "source": "x"})]
+    store.save_stories(rows, path)
+    monkeypatch.setattr(mugshots, "fetch_html",
+                        lambda url: '<img src="/m.jpg" alt="mugshot">' if url.endswith("/a") else None)
+    monkeypatch.setattr(mugshots, "is_mugshot", lambda c, u: u.endswith("/m.jpg"))
+    counts = mugshots.sweep(SimpleNamespace(), path)
+    got = {r["id"]: r for r in store.load_stories(path)}
+    assert counts == {"checked": 2, "found": 1}
+    assert got["1"]["mugshot_url"] == "https://x.com/m.jpg" and got["1"]["mugshot_checked"]
+    assert got["2"]["mugshot_url"] == "" and got["2"]["mugshot_checked"]
+    # Second sweep skips checked rows.
+    assert mugshots.sweep(SimpleNamespace(), path) == {"checked": 0, "found": 0}
