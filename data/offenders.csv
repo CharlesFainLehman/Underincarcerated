@@ -1,7 +1,10 @@
 offender_key,offender_name,state,story_ids,incident_count,first_incident_date,last_incident_date,max_prior_arrests,max_prior_convictions,qualifies_strict
 acosta_niefred_CO,Niefred Serpa-Acosta,CO,678 1000055,2,2024-12-17,2024-12-17,4,,no
 beck_dylan_CA,Dylan Beck,CA,118 1000011,2,2025-01-02,2025-01-02,,2,no
+braun_jonathan_NY,Jonathan Braun,NY,611 1000578,2,2025-03-29,2025-03-29,5,1,yes
+broussard_sandy_TX,Sandy Broussard,TX,1000565 264,2,2024,2024,,1,no
 charter_desiree_NH,Desiree Charter,NH,237 224,2,2024-07-18,2024-12-15,,,no
+cooper_sherod_NY,Sherod E. Cooper,NY,121 1000430,2,2025-03-18,2025-03-18,,10,yes
 farthing_james_KY,James Farthing,KY,70 294,2,2026-03-29,2026-07-27,3,,no
 hardey_corey_FL,Corey Hardey,FL,365 1000415,2,2025-03-06,2025-03-06,,26,yes
 hidalgo_joaquin_NY,Joaquin Hidalgo,NY,632 1000344,2,2025-02-17,2025-02-24,5,,yes
@@ -41,10 +44,12 @@ alcachupas_sylvan_NM,Sylvan Alcachupas,NM,226,1,2022-08-29,2022-08-29,,1,no
 alcazar_joseph_CA,Joseph Alcazar,CA,149,1,2024-05-25,2024-05-25,,2,no
 ali_ladan_MN,Ladan Ali,MN,1000337,1,2025-02-21,2025-02-21,,1,no
 alioth_chad_NE,Chad A. Alioth,NE,1000428,1,2025-03-05,2025-03-05,,,no
+alvarado_victor_NH,Victor Alvarado,NH,1000497,1,2024,2024,,2,no
 alvarez_pablo_NY,Pablo Aguilar-Alvarez,NY,614,1,2025-11-01,2025-11-01,,4,yes
 amaya_jose_CA,Jose Daniel Amaya,CA,1000159,1,2025-01-22,2025-01-22,,2,no
 ambrose_richard_NY,Richard Ambrose,NY,511,1,2026-04-30,2026-04-30,,1,no
 amundsen_andrew_KS,Andrew Amundsen,KS,176,1,2025-11-21,2025-11-21,,,yes
+andazola_elijah_AR,Elijah Andazola Sr.,AR,1000496,1,2025-02-10,2025-02-10,,4,yes
 anderson_gary_NY,Gary Anderson,NY,1000242,1,2017-06-08,2017-06-08,5,1,yes
 anderson_otis_FL,Otis Anderson,FL,1000039,1,2024-09-11,2024-09-11,,62,yes
 andrade_cleyber_NY,Cleyber Andrade,NY,625,1,2024-02-05,2024-02-05,1,,no
@@ -61,13 +66,17 @@ arnold_zachary_MO,Zachary Arnold,MO,1000352,1,2025-02-25,2025-02-25,,1,no
 arthur_wesley_WY,Wesley Arthur,WY,556,1,2026-03-25,2026-03-25,,1,no
 asare_jeff_OK,Jeff Kufi Asare,OK,11,1,2026-08-12,2026-08-12,,7,yes
 ashcraft_thomas_AR,Thomas Wayne Ashcraft Jr.,AR,1000319,1,2025-02-07,2025-02-07,,1,no
+atwell_michael_NV,"Michael ""Luke"" Atwell",NV,1000579,1,2025-04-04,2025-04-04,,,no
 auplant_brian_FL,Brian Tymone Auplant,FL,1000112,1,2022-12,2022-12,,12,yes
 austin_malik_AL,Malik Quintawn Austin,AL,1000394,1,2025-02-15,2025-02-15,,2,no
 avila_yusneibi_NY,Yusneibi Yohana Machado Avila,NY,630,1,2024-04-03,2024-04-03,,,no
 ayala_alexander_NY,Alexander Ayala,NY,411,1,2024-08-12,2024-08-12,,,no
 ayala_jason_NY,Jason Ayala,NY,1000155,1,2025-01-13,2025-01-13,6,,yes
 babcock_ronald_IN,Ronald Everett Babcock Jr.,IN,408,1,2016-07-27,2016-07-27,,2,no
+baby_bricc_CA,Bricc Baby,CA,1000482,1,2025-03-19,2025-03-19,2,,no
 bacon_robert_NY,Robert F. Bacon,NY,240,1,2025-06-25,2025-06-25,,1,no
+baer_bryan_OH,Bryan Baer,OH,1000470,1,2025-03-19,2025-03-19,,,no
+bailey_jordan_FL,Jordan Bailey,FL,1000526,1,2025-03-13,2025-03-13,,,no
 bailey_omarion_TX,Omarion Bailey,TX,1000268,1,2024-01,2024-01,5,,yes
 bair_kenneth_NM,Kenneth Bair,NM,296,1,2026-08-10,2026-08-10,,,no
 baker_darius_MN,Darius Ahmadd Olson-Baker,MN,587,1,2026-07-17,2026-07-17,,4,no
@@ -79,6 +88,7 @@ ballard_sage_MA,Sage Ballard,MA,320,1,2026-04-12,2026-04-12,1,4,yes
 ballard_tiquan_FL,Tiquan Ballard,FL,537,1,2026-09-02,2026-09-02,,,no
 banks_jamar_NY,Jamar Banks,NY,1000010,1,2025-01-01,2025-01-01,87,,yes
 banks_nelson_LA,Nelson Banks,LA,650,1,2026,2026,,,no
+barba_antonella_NJ,Antonella Barba,NJ,1000541,1,2024-11-late,2024-11-late,,1,no
 barber_stephen_KY,Stephen Barber,KY,47,1,2025-08,2025-08,2,,no
 barbosa_francisco_WA,Francisco Gallegos-Barbosa,WA,1000281,1,2024-09-03,2024-09-03,,,no
 barker_dyllan_WY,Dyllan Barker,WY,1000303,1,2024-10-16,2024-10-16,,,no
@@ -89,6 +99,7 @@ barr_tony_CT,Tony Barr,CT,1000074,1,2025-01-11,2025-01-11,,,no
 barrett_christopher_OK,Christopher Barrett,OK,1000070,1,2025-01-14,2025-01-14,,1,no
 barrett_daniel_AR,Daniel Barrett,AR,286,1,2026-06-08,2026-06-08,22,,yes
 batchigari_varun_AZ,Varun Batchigari,AZ,52,1,2026-08-08,2026-08-08,1,,no
+bauer_loren_AZ,Loren Bauer,AZ,1000431,1,2025-02-16,2025-02-16,24,,yes
 baumgartner_sarah_IL,Sarah R. Baumgartner,IL,1000427,1,2023-04,2023-04,,,no
 beals_eric_CA,Eric Beals,CA,109,1,2025-12-13,2025-12-13,,2,no
 bell_david_MO,David Bell,MO,89,1,2022-10-06,2022-10-06,,,no
@@ -97,6 +108,9 @@ benitez_christopher_NY,Christopher Benitez,NY,1000404,1,2025-02-25,2025-02-25,16
 benitez_jesus_WA,Jesus Javier Benitez,WA,1000024,1,2024-12-28,2024-12-28,,5,yes
 benjamin_hutch_FL,Hutch Benjamin,FL,181,1,2026-07-13,2026-07-13,,,no
 bennett_donald_IL,Donald Bennett,IL,1000296,1,2024-02-14,2024-02-14,,2,no
+bennett_isaiah_OH,Isaiah Bennett,OH,1000570,1,2025-04-08,2025-04-08,,1,no
+berry_leontai_WA,Leontai Berry,WA,1000557,1,2025-04-01,2025-04-01,,1,no
+berst_melody_CA,Melody Berst,CA,1000484,1,2025-03-18,2025-03-18,,2,no
 best_branden_UT,Branden M. Best,UT,429,1,2026-04-26,2026-04-26,,1,no
 betancur_bryan_VA,Bryan Betancur,VA,435,1,2026-03-01,2026-03-01,,1,no
 bianchi_alain_FL,Alain M. Bianchi,FL,646,1,2007-05-29,2007-05-29,,1,no
@@ -108,6 +122,7 @@ bird_richard_MO,Richard Dean Bird,MO,170,1,2026-02,2026-02,,10,yes
 biswell_kyle_NY,Kyle Biswell,NY,1000219,1,2023-04-08,2023-04-08,,,no
 black_kodak_FL,Kodak Black,FL,672,1,2016-05-18,2016-05-18,2,,no
 blackledge_jason_MS,Jason Blackledge,MS,194,1,2025-09-28,2025-09-28,,,no
+blackwell_kayla_NV,Kayla Rose Blackwell,NV,1000463,1,2025-03-17,2025-03-17,,,no
 blake_steven_PA,Steven K. Blake,PA,130,1,2025-11-16,2025-11-16,,8,yes
 blanksby_tanner_PA,Tanner John Blanksby,PA,152,1,2021-11-18,2021-11-18,,3,no
 blevins_adam_OK,Adam Dalaney Blevins,OK,1000286,1,2025-02-08,2025-02-08,,5,yes
@@ -117,14 +132,17 @@ bogan_richard_AR,Richard Alton Bogan,AR,20,1,2026-06-14,2026-06-14,13,,yes
 bolita_wyatt_NE,Wyatt Bolita,NE,567,1,2026-06-30,2026-06-30,,1,no
 bolton_lenice_LA,Lenice Bolton,LA,1000054,1,2025-01-08,2025-01-08,,,no
 bona_george_MA,George W. Bona,MA,1000009,1,2017,2017,,,no
+boner_jennifer_IL,Jennifer Boner,IL,1000560,1,2025-04-04,2025-04-04,,1,no
 bonner_tyrone_WY,Tyrone J. Bonner,WY,266,1,2022-02-24,2022-02-24,,3,yes
 bortos_teofil_NH,Teofil Bortos,NH,340,1,2026-01-13,2026-01-13,,1,no
+bowen_adam_CA,Adam James Bowen,CA,1000507,1,2025-03-28,2025-03-28,,2,no
 boyd_tracy_TN,Tracy Boyd,TN,1000331,1,2025-08-14,2025-08-14,,1,no
 boyer_ronald_IA,Ronald Dean Boyer,IA,1000379,1,2024-09,2024-09,,,no
 boykins_emmett_FL,Emmett L. Boykins,FL,494,1,2021-08-24,2021-08-24,,,no
+bradbury_william_ME,William B. Bradbury,ME,1000511,1,2023-10,2023-10,,3,yes
 bradford_charles_OK,Charles Bradford,OK,78,1,2026-03-14,2026-03-14,,,no
 branch_jermaine_NC,Jermaine Anthony Branch,NC,192,1,2025-12-19,2025-12-19,,,no
-braun_jonathan_NY,Jonathan Braun,NY,611,1,2025-03-29,2025-03-29,,1,no
+braxton_brandon_NC,Brandon Braxton,NC,1000575,1,2024-07,2024-07,4,,no
 brazelis_markeese_NY,Markeese Brazelis,NY,1000154,1,2025-01-28,2025-01-28,2,,no
 breham_dominique_MN,Dominique Lamar Breham,MN,595,1,2023-03-12,2023-03-12,,,no
 brennecke_matthew_WI,Matthew Brennecke,WI,422,1,2026-07-15,2026-07-15,,,no
@@ -135,7 +153,6 @@ brito_diamond_MA,Diamond Jose Brito,MA,1000084,1,2025-09-02,2025-09-02,,,no
 brito_yohenry_NY,Yohenry Brito,NY,628,1,2024-01-27,2024-01-27,2,,no
 brooks_michael_MI,Michael Brooks,MI,1000273,1,2025-02-13,2025-02-13,,,yes
 brophy_michael_IL,Michael Brophy,IL,1000426,1,2025-03-07,2025-03-07,,,no
-broussard_sandy_TX,Sandy Broussard,TX,264,1,2024,2024,,1,no
 brown_andrew_FL,Andrew James Brown Jr.,FL,356,1,2026-06-22,2026-06-22,,37,yes
 brown_arlecia_FL,Arlecia Darnae Brown,FL,1000408,1,2025-03-10,2025-03-10,,,no
 brown_arvis_FL,Arvis Brown,FL,1000007,1,2016-12-25,2016-12-25,,,no
@@ -144,23 +161,32 @@ brown_dyreese_MN,Dyreese Kentrell Brown,MN,1000360,1,2025-02-24,2025-02-24,,2,no
 brown_eugene_IL,Eugene Brown,IL,1000356,1,2025-01-23,2025-01-23,,,no
 brown_hasimba_NY,Hasimba C. Brown,NY,1000164,1,2025-01-21,2025-01-21,,1,no
 brown_jahmare_GA,Jahmare Brown,GA,285,1,2026-05-15,2026-05-15,,,no
+brown_jarren_AR,Jarren Ray Brown,AR,1000505,1,2025-03-27,2025-03-27,,,no
 brown_john_,John Brown,,1000235,1,2024-11-03,2024-11-03,,16,yes
 brown_joshua_FL,Joshua Brown,FL,665,1,2025-04,2025-04,,,no
+brown_lorenzo_TN,Lorenzo Brown,TN,1000471,1,2025-01-29,2025-01-29,,2,no
 brown_moeties_CT,Moeties Brown,CT,190,1,2024-11-20,2024-11-20,,9,yes
 brown_walter_FL,Walter Zachary Brown,FL,538,1,2026-08-28,2026-08-28,,36,yes
 brulewicz_anthony_FL,Anthony Joseph Brulewicz,FL,73,1,2025-12-19,2025-12-19,,,no
 brumfield_raymond_LA,Raymond Brumfield,LA,525,1,2026-03,2026-03,,4,yes
+brunson_muslim_NY,Muslim Brunson,NY,1000567,1,2025-04-08,2025-04-08,5,2,yes
 brunson_shaleek_NY,Shaleek Brunson,NY,616,1,2026-07-29,2026-07-29,53,,yes
 bryan_zachery_SC,Zachery Ty Bryan,SC,1000015,1,2025-01-01,2025-01-01,4,1,no
+bubenik_giovanni_FL,Giovanni Bubenik,FL,1000494,1,2025-03-15,2025-03-15,,,no
 buckner_david_IL,David Buckner,IL,393,1,2022-08-27,2022-08-27,,,no
 bucspun_alexander_FL,Alexander Bucspun,FL,287,1,2026-07-16,2026-07-16,3,,no
+bueh_john_NH,John Bueh,NH,1000531,1,2025-01-18,2025-01-18,,3,no
+bumphus_adrees_TN,Adrees Bumphus,TN,1000433,1,2025-03-12,2025-03-12,,1,no
 bumphus_andrees_TN,Andrees Bumphus,TN,499,1,2025-03-12,2025-03-12,,,no
 burch_rama_MA,Rama Burch,MA,223,1,2024-04-19,2024-04-19,25,14,yes
 burko_shayna_IN,Shayna Burko,IN,1000157,1,2025-01-21,2025-01-21,,2,no
 burns_brenden_TN,Brenden Tyler Burns,TN,1000315,1,,,,,no
+burns_donal_TX,Donal Earl Burns,TX,1000506,1,2025-03-25,2025-03-25,40,,yes
 burrows_michael_ID,Michael Burrows,ID,195,1,2024-03,2024-03,,1,no
+burt_lawrence_LA,Lawrence Burt,LA,1000535,1,2022-03,2022-03,,4,no
 butler_christopher_LA,Christopher Butler,LA,127,1,2026-07-06,2026-07-06,,10,yes
 butler_deshawn_OH,Deshawn Levelle Butler,OH,328,1,2026-07-11,2026-07-11,,1,no
+butler_lejay_NJ,Lejay Jamal Butler,NJ,1000466,1,2025-03-13,2025-03-13,2,,no
 butler_michael_LA,Michael Butler,LA,36,1,2026-05-26,2026-05-26,37,,yes
 byrd_george_TX,George Edward Byrd,TX,480,1,2026-04-10,2026-04-10,,,no
 bytyqi_leart_TN,Leart Bytyqi,TN,1000366,1,2025-02-26,2025-02-26,,1,no
@@ -170,6 +196,7 @@ caldwell_christopher_NC,Christopher Cornelius Caldwell,NC,97,1,2026-04-27,2026-0
 caldwell_lonzo_OR,Lonzo Arthur Caldwell,OR,1000245,1,2025-02-06,2025-02-06,,,no
 calhoun_jesse_OR,Jesse Lee Calhoun,OR,660,1,2023-06,2023-06,,,no
 call_rex_ME,Rex Allen Call Jr.,ME,111,1,2025-11-13,2025-11-13,,20,yes
+callahan_jonathan_FL,Jonathan Callahan,FL,1000450,1,2025-02-20,2025-02-20,,1,no
 callandret_latray_TX,LaTray Callandret,TX,472,1,2026-06-21,2026-06-21,,,no
 calloway_jamario_MS,Jamario Calloway,MS,471,1,2026-03-04,2026-03-04,,,no
 camacho_ryan_NC,Ryan Camacho,NC,49,1,2026-01-03,2026-01-03,24,2,yes
@@ -184,6 +211,7 @@ cantey_james_SC,James Cantey III,SC,267,1,2024-12-28,2024-12-28,,3,no
 capers_don_CA,Don Cornell Capers,CA,1000098,1,2025-01-12,2025-01-12,,2,no
 carlile_sebastian_IL,Sebastian Carlile,IL,1000165,1,2025-01-22,2025-01-22,,,no
 caron_melysia_NH,Melysia Caron,NH,65,1,2026-03-06,2026-03-06,,,no
+carpenter_michael_VT,Michael Lee Carpenter,VT,1000527,1,2025-03-24,2025-03-24,,37,yes
 carr_malik_TX,Malik Carr,TX,1000398,1,2025-02-25,2025-02-25,,,no
 carranza_cesar_UT,Cesar Carranza,UT,1000134,1,2025-01-18,2025-01-18,,1,no
 carreon_aundrae_WA,Aundrae Rodolfo Carreón,WA,419,1,2025-07-21,2025-07-21,,,no
@@ -204,6 +232,7 @@ cerio_joseph_NY,Joseph Cerio,NY,397,1,2018-09-27,2018-09-27,35,,yes
 cervantes_alexandro_IL,Alexandro A. Cervantes,IL,275,1,2025-07-27,2025-07-27,,,no
 chacon_hector_UT,Hector Chacon,UT,1000016,1,2025-01-05,2025-01-05,,,no
 chambless_donny_AL,Donny Chambless,AL,1000127,1,2025-01-25,2025-01-25,1,,no
+chaney_george_TN,George Chaney,TN,1000551,1,2025-04-04,2025-04-04,,,no
 chatham_jason_NY,Jason Chatham,NY,1000049,1,2025-01-07,2025-01-07,,,no
 chavarria_anthony_TX,Anthony Brian Chavarria,TX,1000252,1,2025-01-28,2025-01-28,,,no
 chaves_santiago_VA,Santiago Castellanos Chaves,VA,484,1,2026-08-26,2026-08-26,,,no
@@ -231,7 +260,9 @@ colbert_danette_LA,Danette Colbert,LA,1000223,1,2025-02-06,2025-02-06,7,7,yes
 coleman_dantavious_TN,Dantavious Coleman,TN,1000397,1,2025-03-03,2025-03-03,,,no
 coleman_lionel_TX,Lionel Coleman,TX,363,1,2025-08,2025-08,,11,yes
 coleman_ronald_WI,Ronald Coleman Jr.,WI,210,1,2026-01-25,2026-01-25,,,yes
+collette_austin_TX,Austin Collette,TX,1000550,1,2025-04-04,2025-04-04,,2,no
 collier_david_MN,David Collier,MN,370,1,2023-02-15,2023-02-15,,10,yes
+collier_henry_FL,Henry Wayne Collier,FL,1000562,1,2024-03-11,2024-03-11,,,yes
 collins_bradley_MA,Bradley Collins,MA,421,1,2026-07-07,2026-07-07,,,no
 collins_jacob_VA,Jacob Collins,VA,505,1,2024-11-23,2024-11-23,,,no
 colmenares_pedro_IL,Pedro Colmenares,IL,1000305,1,2024-09-29,2024-09-29,,1,no
@@ -243,8 +274,9 @@ cook_anthony_OH,Anthony Cook,OH,133,1,2023,2023,,126,yes
 cook_jason_IN,Jason Cook,IN,1000414,1,2025-03-06,2025-03-06,,1,no
 cook_lamar_MA,LaMar Cook,MA,438,1,2025-10,2025-10,,,no
 cooley_frankie_CA,Frankie Lee Cooley,CA,141,1,2023-03-04,2023-03-04,,2,no
-cooper_sherod_NY,Sherod E. Cooper,NY,121,1,2025-03-18,2025-03-18,,10,yes
+cooper_brian_IA,Brian Scott Cooper,IA,1000495,1,2024-07,2024-07,,,no
 coppedge_darrell_MA,Darrell Coppedge,MA,542,1,2026-07-31,2026-07-31,,,no
+cordoba_joshua_NC,Joshua Smith-Cordoba,NC,1000439,1,2025-03-14,2025-03-14,,,no
 cortez_phillip_AZ,Phillip John Stephen Cortez,AZ,211,1,2024-06-01,2024-06-01,,2,no
 cory_matthew_WA,Matthew Cory,WA,663,1,2020-05-16,2020-05-16,11,7,yes
 costello_paul_NH,Paul D. Costello,NH,252,1,2025-11-23,2025-11-23,,2,no
@@ -257,6 +289,7 @@ crabbe_latoya_VA,LaToya Crabbe,VA,1000386,1,2024-10-21,2024-10-21,,,no
 crabtree_shannon_NC,Shannon Renee Crabtree,NC,491,1,2026-07-22,2026-07-22,,,no
 craft_thomas_IL,Thomas D. Craft,IL,182,1,2026-07-06,2026-07-06,,,no
 craig_bradley_SC,Bradley Kyle Craig,SC,291,1,2026-04-24,2026-04-24,2,,no
+craig_patrick_NY,Patrick Antonio Colon-Craig,NY,1000462,1,2025-03-14,2025-03-14,,1,no
 crane_blake_NV,Blake Crane,NV,539,1,2026-06,2026-06,,,no
 credle_william_NY,William Credle,NY,445,1,2025-11-07,2025-11-07,,,no
 creed_khadafi_AR,Khadafi Creed,AR,359,1,2026-04-19,2026-04-19,,6,yes
@@ -307,6 +340,7 @@ dickey_alexander_SC,Alexander Dickey,SC,75,1,2025-05-02,2025-05-02,40,8,yes
 dillard_damian_FL,Damian Dillard,FL,496,1,2023-01-12,2023-01-12,,1,no
 ditty_jeanie_NC,Jeanie Ditty,NC,580,1,2026-05-21,2026-05-21,,,no
 dixon_kevin_AR,Kevin Dwane Dixon,AR,521,1,2026-07-08,2026-07-08,,1,no
+dixon_william_MD,William Francis Dixon,MD,1000465,1,2025-03-18,2025-03-18,,2,no
 dodds_lashay_CA,Lashay Dodds,CA,115,1,2025-08-06,2025-08-06,,,no
 dodge_charles_ME,Charles Dodge,ME,430,1,2026-04-29,2026-04-29,,,no
 doneghy_glenn_KY,Glenn Doneghy,KY,324,1,2026-03-29,2026-03-29,,1,no
@@ -335,6 +369,7 @@ escoto_joaquin_CA,Joaquin Escoto,CA,284,1,2026-05-28,2026-05-28,4,,no
 esparza_andrew_TX,Andrew Julian Esparza,TX,403,1,2019-02-26,2019-02-26,5,,yes
 espinoza_sergio_CA,Sergio Villalobos-Espinoza,CA,300,1,2026-05-10,2026-05-10,13,,yes
 etherington_ammon_UT,Ammon Michael Etherington,UT,518,1,2026-08-21,2026-08-21,,,no
+evans_shyrone_NC,Shyrone Evans,NC,1000491,1,2025-03-19,2025-03-19,52,,yes
 ewing_antonio_FL,Antonio Demetrius Ewing,FL,221,1,2025-05-30,2025-05-30,,,no
 exantus_ronald_FL,Ronald Exantus,FL,649,1,2025-10-09,2025-10-09,,3,no
 fair_timmie_NH,Timmie G. Fair,NH,399,1,2010-10-05,2010-10-05,,15,yes
@@ -346,20 +381,26 @@ faust_edrick_GA,Edrick Lamont Faust,GA,217,1,2001-01,2001-01,,,no
 faux_kevin_TX,Kevin Faux,TX,37,1,2026-04-16,2026-04-16,,3,no
 favor_eric_SC,Eric Marshall Favor Jr.,SC,483,1,2026,2026,,,no
 felix_joseph_SC,Joseph Anthony Felix,SC,651,1,2026-01-25,2026-01-25,,1,no
+fernandez_albert_FL,Albert Fernández,FL,1000521,1,2025-03-10,2025-03-10,,20,yes
 ferrer_william_NY,William Ferrer,NY,68,1,2026-07-25,2026-07-25,6,,yes
 fewell_ronnie_NC,Ronnie Fewell,NC,307,1,2025-10-10,2025-10-10,40,,yes
 figueroa_hector_FL,Hector Manuel Martinez-Figueroa,FL,1000169,1,2025-12-22,2025-12-22,,,no
 finch_jerell_MI,Jerell Finch,MI,1000001,1,2017-01-07,2017-01-07,,,no
 finefrock_joshua_VT,Joshua Finefrock,VT,268,1,2022-04-14,2022-04-14,,3,yes
+fischer_john_CO,John Fischer,CO,1000552,1,2025-03-06,2025-03-06,,1,no
 fisher_devonshae_TX,Devonshae Aikeis Fisher,TX,530,1,2026-05-21,2026-05-21,,2,no
+fisher_george_KY,George Fisher,KY,1000501,1,2025-03-22,2025-03-22,,,no
 fisher_jesse_FL,Jesse Fisher,FL,404,1,2018-08-21,2018-08-21,,1,no
 fitzpatrick_stacy_IL,Stacy K. Fitzpatrick,IL,1000141,1,2025-01-19,2025-01-19,,,no
+fleischmann_jonathan_MA,Jonathan Fleischmann,MA,1000487,1,2023-03-18,2023-03-18,,3,no
 fleming_marques_NC,Marques Fleming,NC,456,1,2026-06-28,2026-06-28,,,no
 florenciani_wilfredo_FL,Wilfredo Florenciani,FL,1000048,1,2025-01-01,2025-01-01,,1,no
 flowers_adrian_MN,Adrian Ricardo Flowers,MN,310,1,2026-08-18,2026-08-18,,1,no
+flowers_adrion_FL,Adrion Keith Flowers,FL,1000452,1,2025-03-12,2025-03-12,1,6,yes
 fluker_laquon_MS,Laquon Akeem Fluker,MS,270,1,2021-03,2021-03,,3,yes
 foote_aaron_UT,Aaron Dennis Foote,UT,1000019,1,2024-12-29,2024-12-29,30,,yes
 ford_tyshawn_AL,Tyshawn Ford,AL,1000301,1,2025-02-18,2025-02-18,,,no
+foster_deandre_CA,Deandre Foster,CA,1000447,1,2021,2021,,2,no
 fountain_emmanuel_IA,Emmanuel Joel Fountain Jr.,IA,560,1,2026-07-06,2026-07-06,,2,no
 fountain_eric_NY,Eric Fountain,NY,168,1,2026-05-03,2026-05-03,,1,no
 fowler_oscar_FL,Oscar Freemond Fowler III,FL,80,1,2026-02-23,2026-02-23,,,no
@@ -374,13 +415,17 @@ fulks_eugene_HI,Eugene Macedo Fulks,HI,553,1,2026-08-13,2026-08-13,,15,yes
 funk_bradley_CA,Bradley Gene Funk,CA,301,1,2026-02-11,2026-02-11,2,1,no
 gaddis_john_MS,John Gaddis III,MS,162,1,2026-06-30,2026-06-30,,,no
 gagne_mark_ME,Mark Gagne,ME,1000327,1,2025-02-24,2025-02-24,,,no
+gallardo_joshua_TX,Joshua Anthony Gallardo,TX,1000539,1,2025-02-27,2025-02-27,1,,no
 gallegos_fabian_NM,Fabian Gallegos,NM,1000017,1,2025-05-14,2025-05-14,,3,yes
 gallo_michael_RI,Michael Gallo,RI,434,1,2026-03-30,2026-03-30,2,,no
+galvin_timothy_MA,Timothy Lee Galvin,MA,1000559,1,2024-12,2024-12,,,no
 gama_david_WA,David Joseph Gama,WA,187,1,2026-01,2026-01,75,,yes
 gannon_michael_NH,Michael J. Gannon,NH,1000151,1,2024-05-26,2024-05-26,,1,no
 garcia_jaime_TX,Jaime Michael Garcia,TX,486,1,2026-07-03,2026-07-03,,,no
 garcia_james_IL,James Garcia,IL,1000255,1,2025-11-06,2025-11-06,,,no
+garcia_john_TX,John Garcia,TX,1000457,1,2025-03-17,2025-03-17,,,no
 garland_travis_TN,Travis Keith Garland,TN,1000109,1,2025-01,2025-01,,2,no
+garrison_john_NY,John Garrison,NY,1000475,1,2025-03-17,2025-03-17,13,1,yes
 garza_andrew_MI,Andrew Garza,MI,1000174,1,2025-01-27,2025-01-27,,3,yes
 gave_louis_MN,Louis Edwin Gave,MN,99,1,2026-07-21,2026-07-21,,4,no
 geddings_daniel_NC,Daniel Geddings,NC,400,1,2013-08-02,2013-08-02,,5,yes
@@ -392,13 +437,16 @@ gill_christopher_IN,Christopher Newman Gill,IN,1000220,1,2024-08,2024-08,,3,yes
 gilliam_christopher_GA,Christopher Gilliam,GA,1000148,1,2023-07,2023-07,,,no
 gilliam_j_TX,J. Paul Gilliam,TX,1000388,1,2025-02-24,2025-02-24,,15,yes
 gillis_kardareous_AL,Kardareous Monteniz Gillis,AL,206,1,2025-11-29,2025-11-29,,,no
+gillis_michael_MN,Michael Bruce Gillis,MN,1000435,1,2025-03-02,2025-03-02,,,no
 glanzman_timothy_MN,Timothy Walter Glanzman,MN,1000407,1,2025-02-23,2025-02-23,,,no
+glaser_jayla_CA,Jayla Glaser,CA,1000542,1,2025-02-20,2025-02-20,,,no
 glenn_lovell_TX,Lovell Glenn,TX,231,1,2025-07-10,2025-07-10,,3,yes
 glenn_michael_IL,"Michael Glenn, Jr.",IL,1000152,1,2024-12,2024-12,,,no
 gmuca_anthony_CA,Anthony Aaron Gmuca,CA,527,1,2026-04-29,2026-04-29,,2,no
 gobeil_kevin_NH,Kevin Gobeil,NH,326,1,2025-09-04,2025-09-04,,,no
 godbolt_avery_FL,Avery Tyrone Godbolt,FL,1000298,1,2025-02-18,2025-02-18,,6,yes
 godbout_shannon_RI,Shannon Godbout,RI,283,1,2025-12-06,2025-12-06,102,,yes
+goins_jaiquan_NY,Jaiquan Goins,NY,1000500,1,2025-03-20,2025-03-20,,,no
 goins_matthew_TN,Matthew Goins,TN,83,1,2025-12-15,2025-12-15,,,no
 golden_erik_FL,Erik Dwayne Golden,FL,1000373,1,2025-03-03,2025-03-03,,8,yes
 gomer_cherish_UT,Cherish Gomer,UT,124,1,2025-08-04,2025-08-04,6,2,yes
@@ -419,8 +467,11 @@ green_logan_WI,Logan Green,WI,488,1,2026-08-31,2026-08-31,,,no
 green_steven_FL,Steven Lee Green,FL,1000140,1,2025-01-22,2025-01-22,,1,no
 greene_eric_SC,Eric Greene,SC,1000288,1,2023-11,2023-11,,,no
 grier_joseph_GA,Joseph Grier,GA,1000387,1,2024-06,2024-06,19,,yes
+griffin_john_NH,John R. Griffin,NH,1000530,1,2024-11-20,2024-11-20,,,no
+griffith_brandon_FL,Brandon Michael Griffith,FL,1000468,1,2025-03-21,2025-03-21,,23,yes
 gronwaldt_kurt_AR,Kurt William Gronwaldt,AR,1000100,1,2025-01-11,2025-01-11,,5,yes
 gullesserian_phyllisha_TX,Phyllisha Anne (Amanda Lynn Gullesserian),TX,1000190,1,2025-01-22,2025-01-22,9,,yes
+gunplay_lefty_CA,Lefty Gunplay,CA,1000453,1,2025-03-18,2025-03-18,,,no
 gutierrez_adrian_CA,Adrian Gutierrez,CA,444,1,2026-03-31,2026-03-31,,,no
 gutierrez_augustin_IA,Augustin Gutierrez,IA,489,1,2026-08-10,2026-08-10,,2,no
 gutierrez_rachel_CA,Rachel Fiorentino Gutierrez,CA,216,1,2023-07-03,2023-07-03,,,no
@@ -428,10 +479,13 @@ gwinn_jeremy_WA,Jeremy Joseph Gwinn,WA,322,1,2026-07-25,2026-07-25,,1,no
 haag_johnathon_MN,Johnathon Allen Haag,MN,1000341,1,2025-02-19,2025-02-19,,1,no
 haidar_hossein_NY,Hossein Haidar,NY,443,1,2026-03-01,2026-03-01,,,no
 haines_matthew_MO,Matthew Reuben Haines,MO,1000405,1,2025-03,2025-03,,2,no
+hall_chadrick_FL,Chadrick Arsenio Hall,FL,1000510,1,2025-03-28,2025-03-28,,16,yes
+hall_kareem_NJ,Kareem Hall,NJ,1000479,1,2024-11,2024-11,,1,no
 hall_keylin_MA,Keylin Hall,MA,3,1,2026-07-11,2026-07-11,,3,no
 hamby_johnathan_GA,Johnathan Hamby,GA,202,1,2026-08-23,2026-08-23,30,,yes
 hamel_corey_ME,Corey Hamel,ME,1000150,1,2024-02,2024-02,,,no
 hamilton_chad_MI,Chad Hamilton,MI,1000265,1,2025-02-11,2025-02-11,,,no
+hamilton_jerry_NC,Jerry Lee Hamilton,NC,1000508,1,2025-03-26,2025-03-26,,,no
 hargrove_kip_IN,Kip Hargrove,IN,339,1,2025-11-20,2025-11-20,,1,no
 harrell_curtis_MO,Curtis Wayne Harrell,MO,1000158,1,2025-01-24,2025-01-24,,,no
 harris_demarquiez_LA,DeMarquiez Harris,LA,257,1,2017-04-09,2017-04-09,,,no
@@ -445,12 +499,14 @@ hatch_torrence_TX,Torrence Hatch,TX,584,1,2026-05-01,2026-05-01,,2,no
 haug_christopher_IL,Christopher L. Haug,IL,1000318,1,2025-02-16,2025-02-16,,,no
 hawkins_kamel_NY,Kamel Hawkins,NY,1000014,1,2024-12-31,2024-12-31,9,,yes
 hayes_leanne_NC,Leanne Hayes,NC,1000401,1,2025-03-05,2025-03-05,,1,no
+hayes_messiah_NM,Messiah Hayes,NM,1000490,1,2024-05-29,2024-05-29,,1,no
 haynes_lafimmas_LA,Lafimmas Haynes,LA,183,1,2026-03-27,2026-03-27,,,no
 haynes_thomas_NC,Thomas Haynes,NC,185,1,2026-03-12,2026-03-12,,,no
 heard_lejavaus_CO,Lejavaus Heard,CO,336,1,2026-01-16,2026-01-16,,,yes
 heater_durwin_MO,Durwin Heater,MO,1000332,1,2025-02-25,2025-02-25,,,no
 heine_anna_NH,Anna Kathleen Heine,NH,1000369,1,2024-08-11,2024-08-11,,1,no
 helms_jefferey_FL,Jefferey Helms,FL,1000088,1,2025-01-12,2025-01-12,,23,yes
+henson_tyson_TX,Tyson James Henson,TX,1000512,1,2025-03,2025-03,,,no
 hernandez_bairon_NY,Bairon Hernandez,NY,675,1,2026-03-09,2026-03-09,15,,yes
 hernandez_brian_IL,Brian Hernandez,IL,581,1,2026-03-18,2026-03-18,,,no
 hernandez_cain_FL,Cain Hernandez,FL,564,1,2026-05-16,2026-05-16,13,,yes
@@ -464,6 +520,7 @@ hewlett_dwan_GA,Dwan Maurice Hewlett,GA,1000364,1,2025-02-26,2025-02-26,,3,yes
 hibner_matthew_NY,Matthew Hibner,NY,571,1,2026-05-15,2026-05-15,,,no
 hicks_christopher_PA,Christopher Ross Hicks,PA,297,1,2026-01-29,2026-01-29,,,no
 hicks_sherman_MO,Sherman Hicks,MO,1000200,1,2025-02-04,2025-02-04,1,2,no
+hickson_tykem_SC,Tykem Hickson,SC,1000472,1,2025-03-18,2025-03-18,,,no
 hightower_richard_AL,Richard Hightower,AL,142,1,2023-04-12,2023-04-12,,2,no
 hill_james_NC,James Mikel Hill,NC,572,1,2026-04-02,2026-04-02,,,no
 hill_jordan_IL,Jordan Hill,IL,1000304,1,2025-02-19,2025-02-19,,1,no
@@ -477,6 +534,7 @@ hollingsworth_latrina_SC,Latrina Hollingsworth,SC,1000105,1,2025-01-12,2025-01-1
 holman_marques_CA,Marques Holman,CA,188,1,2026-05-12,2026-05-12,,,no
 holmes_rodrigus_LA,Rodrigus Holmes,LA,199,1,2025-10-15,2025-10-15,20,,yes
 holt_michael_NH,Michael Holt,NH,1000037,1,2025-01-03,2025-01-03,,1,no
+hooks_michael_FL,Michael Avery Hooks,FL,1000571,1,2025-04-04,2025-04-04,,16,yes
 hopkins_montez_MI,Montez Hopkins,MI,255,1,2025-07,2025-07,,2,no
 hopkins_shane_OH,"Shane Hopkins, Jr.",OH,102,1,2026-07-31,2026-07-31,,2,no
 hoskins_tevante_WV,Tevante Dean Hoskins,WV,467,1,2026-02-27,2026-02-27,,1,no
@@ -485,6 +543,7 @@ howell_leon_NY,Leon Howell,NY,1000259,1,2025-02-11,2025-02-11,20,,yes
 huang_jian_CA,Jian Feng Huang,CA,388,1,2026-03-05,2026-03-05,3,1,no
 hubbard_carl_FL,Carl Rex Hubbard,FL,1000111,1,2025-01-18,2025-01-18,1,1,no
 hubbard_raekwon_VA,Raekwon Hubbard,VA,345,1,2025-07-21,2025-07-21,,,no
+hudson_joseph_NY,Joseph Hudson III,NY,1000533,1,2024-03-14,2024-03-14,,1,no
 hudson_torrion_MI,Torrion Hudson,MI,506,1,2023-12-21,2023-12-21,,,no
 huger_karen_MD,Karen Huger,MD,1000295,1,2024-03,2024-03,3,3,no
 hughes_julian_NC,Julian Hughes,NC,578,1,2026-04-04,2026-04-04,,,no
@@ -510,14 +569,17 @@ jack_dominique_TX,Dominique Jack,TX,517,1,2026-03-20,2026-03-20,,1,no
 jackson_lavoski_FL,Lavoski Jackson,FL,377,1,2023-07-15,2023-07-15,42,14,yes
 jacques_mike_FL,Mike Kevin Jacques,FL,1000270,1,2025-02-12,2025-02-12,8,,yes
 jalloh_mohamed_VA,Mohamed Bailor Jalloh,VA,334,1,2026-03-13,2026-03-13,,1,no
+james_nathaniel_FL,Nathaniel James,FL,1000528,1,2025-04-01,2025-04-01,1,1,no
 james_tyrone_NY,Tyrone James,NY,116,1,2024-09-14,2024-09-14,,49,yes
 jaramillo_alvaro_FL,Alvaro Jaramillo,FL,1000416,1,2024-11-21,2024-11-21,,,no
 jayne_michael_UT,Michael Aaron Jayne,UT,392,1,2024-05-06,2024-05-06,,,no
 jeanpaul_aliyah_ME,Aliyah Jeanpaul,ME,1000022,1,2025-01-05,2025-01-05,,,no
 jefferson_silverine_MS,Silverine Jefferson,MS,540,1,2026-07-10,2026-07-10,,,no
+jeffrey_timothy_CA,Timothy Demetrius Jeffrey,CA,1000461,1,2023-04-25,2023-04-25,5,,yes
 jenkins_adrian_FL,Adrian S. Jenkins,FL,447,1,2026-09-01,2026-09-01,,,no
 jenkins_stanley_ME,Stanley Earl Jenkins,ME,341,1,2025-05,2025-05,,3,yes
 jenkinson_daniel_IL,Daniel J. Jenkinson,IL,1000184,1,2025-01-30,2025-01-30,,4,yes
+jergens_elizabeth_FL,Elizabeth Chardonay Jergens,FL,1000574,1,2025-03-31,2025-03-31,,8,yes
 johnson_blake_AR,Blake Daniel Johnson,AR,276,1,2020-07-06,2020-07-06,,5,yes
 johnson_brandon_CA,Brandon Johnson,CA,433,1,2025-12-19,2025-12-19,,,no
 johnson_brett_AR,Brett Steven Johnson,AR,265,1,2022-08-18,2022-08-18,,,yes
@@ -527,20 +589,28 @@ johnson_damon_NY,Damon Johnson,NY,67,1,2026-03-03,2026-03-03,131,,yes
 johnson_darrell_FL,Darrell Daryl Johnson,FL,360,1,2026-06-03,2026-06-03,,29,yes
 johnson_gary_IL,Gary Johnson,IL,1000221,1,2025-01,2025-01,,1,no
 johnson_isaiah_TX,Isaiah Johnson,TX,574,1,2026-07-02,2026-07-02,,1,no
+johnson_leshon_OK,LeShon Johnson,OK,1000518,1,2024-10,2024-10,,1,no
 johnson_reginald_MS,Reginald Donovan Johnson,MS,249,1,2025-09-08,2025-09-08,,,no
 johnson_robert_TX,Robert Gregory Johnson III,TX,1000207,1,2024-07-09,2024-07-09,,,no
 johnson_ronald_OH,Ronald Johnson,OH,1000258,1,2024-10,2024-10,,13,yes
 johnson_shelbi_MI,Shelbi Johnson,MI,522,1,2026-08-21,2026-08-21,,,no
+johnson_solomon_UT,Solomon Lee Johnson,UT,1000458,1,2025-03-13,2025-03-13,2,1,no
 johnson_zeric_TN,Zeric Johnson,TN,502,1,2024-10,2024-10,1,,no
+jones_anthony_IL,Anthony Jones,IL,1000441,1,2025-02-22,2025-02-22,,,no
 jones_caleb_CO,Caleb Jones,CO,465,1,2026-03-30,2026-03-30,,,no
+jones_che_MN,Che Nathaniel Jones,MN,1000451,1,2025-03-12,2025-03-12,,1,no
 jones_jason_NY,Jason Jones,NY,1000078,1,2024-12-28,2024-12-28,,1,no
 jones_kenrod_IL,Kenrod L. Jones,IL,528,1,2026-04-20,2026-04-20,,,no
 jones_matquisha_NC,Matquisha Alexis Jones,NC,235,1,2023-04,2023-04,3,,no
 jones_rasheed_FL,Rasheed Jones,FL,1000036,1,2024-12-30,2024-12-30,,,no
+jones_raymond_WA,Raymond Jones,WA,1000486,1,2025-03-19,2025-03-19,,,no
 jones_sean_NY,Sean Jones,NY,77,1,2026-01-06,2026-01-06,15,1,yes
 joseph_christopher_NY,Christopher Joseph,NY,613,1,2025-03-22,2025-03-22,,,no
+joseph_marcell_MI,Marcell Davon Joseph,MI,1000520,1,2025-03-21,2025-03-21,,3,no
+juan_domingo_IN,Domingo Juan Juan,IN,1000442,1,2024-03-26,2024-03-26,2,,no
 juarez_teresa_CA,Teresa Juarez,CA,114,1,2025-08-13,2025-08-13,,2,no
 kain_aric_IL,Aric Kain,IL,137,1,2025-07-07,2025-07-07,,4,no
+kammueller_nicholas_IL,Nicholas J. Kammueller,IL,1000558,1,2025-04-01,2025-04-01,,,no
 kane_patrick_ME,Patrick Kane,ME,1000042,1,2025-01-05,2025-01-05,,,no
 kanin_dominic_NY,Dominic Kanin,NY,593,1,2026-01-17,2026-01-17,,,no
 kaplan_adam_NY,Adam Kaplan,NY,1000339,1,2025-02-21,2025-02-21,,,no
@@ -550,6 +620,7 @@ karl_jacob_WI,Jacob T. Karl,WI,389,1,2017-07-10,2017-07-10,,,no
 keaulii_shaeden_HI,Shaeden McEnroe-Keaulii,HI,586,1,2026-04-12,2026-04-12,,,no
 keeton_timothy_UT,Timothy Daniel Keeton,UT,1000214,1,2024,2024,,,no
 keiffer_john_AR,John Thomas Keiffer,AR,42,1,2026-08-02,2026-08-02,,,no
+kells_jadaruis_NC,Jadaruis M. Kells,NC,1000473,1,2025-03-14,2025-03-14,,,no
 kelly_ezekiel_TN,Ezekiel Kelly,TN,1000257,1,2022-09,2022-09,,,no
 kelly_tyquan_SC,Tyquan Kelly,SC,1000181,1,2025-02-03,2025-02-03,4,4,no
 kennedy_jonathan_WV,Jonathan Kennedy,WV,588,1,2025-06,2025-06,,1,no
@@ -558,10 +629,14 @@ keovilay_jonathan_MN,Jonathan Jon Keovilay,MN,92,1,2026-08-02,2026-08-02,,,no
 kessler_chad_WI,Chad W. Kessler,WI,1000202,1,2025-01-21,2025-01-21,,,no
 kessler_william_WV,William Joseph Kessler III,WV,39,1,2024-06-26,2024-06-26,,2,no
 kidder_brandon_NH,Brandon Kidder,NH,1000321,1,2024-10-25,2024-10-25,,1,no
+kilbert_kurt_IL,Kurt Kilbert,IL,1000437,1,2025-02-02,2025-02-02,,2,no
 kilgore_gregory_FL,Gregory Lee Kilgore,FL,17,1,2026-04-11,2026-04-11,,,no
 king_everett_CA,Everett King,CA,1000236,1,2025-02-06,2025-02-06,,2,no
+king_juan_GU,Juan Taimanao King Jr.,GU,1000478,1,2025-03-25,2025-03-25,1,,no
 king_kevin_CA,Kevin King,CA,369,1,2023-01-02,2023-01-02,,2,no
+king_theodore_IL,Theodore King,IL,1000522,1,2023-11-02,2023-11-02,,2,no
 kinsey_stacy_NC,Stacy Lashone Kinsey,NC,1000336,1,2025-02-19,2025-02-19,,,no
+kirkpatrick_connor_IL,Connor C. Kirkpatrick,IL,1000474,1,2023-05-20,2023-05-20,,,no
 kirkus_jarrod_TX,Jarrod Kirkus,TX,46,1,2026-02-17,2026-02-17,8,,yes
 kite_brian_IL,Brian S. Kite,IL,1000046,1,2024-12-22,2024-12-22,,1,no
 kletsch_zachariah_WY,Zachariah Tre Kletsch,WY,557,1,2026-02-12,2026-02-12,,1,no
@@ -577,6 +652,7 @@ labelle_kevin_NH,Kevin Labelle,NH,1000313,1,2024-08-30,2024-08-30,,,no
 labombard_james_NH,James Labombard,NH,401,1,2018-12-17,2018-12-17,20,,yes
 lake_james_IL,James C. Lake Jr.,IL,319,1,2026-05-13,2026-05-13,,1,no
 lambeth_herman_AL,Herman Lambeth,AL,14,1,2026-03-23,2026-03-23,14,,yes
+land_connor_VA,Connor Land,VA,1000540,1,2025-03-26,2025-03-26,,,no
 lane_bernard_TX,Bernard Lane,TX,260,1,2024-03-11,2024-03-11,,11,yes
 langdon_james_CA,James Langdon,CA,637,1,2022-02-13,2022-02-13,2,,no
 larsen_conrad_UT,Conrad Jared Larsen,UT,313,1,2026-07-09,2026-07-09,,1,no
@@ -600,7 +676,7 @@ liford_kyle_MN,Kyle Jonathan Liford,MN,1000385,1,2025-02-27,2025-02-27,,,no
 lindenau_alyna_NY,Alyna Lindenau,NY,4,1,2026-08-17,2026-08-17,3,,no
 littlejohn_trae_MD,Trae Littlejohn,MD,24,1,2026-05-18,2026-05-18,,1,no
 lodato_damani_NY,Damani Lodato,NY,1000290,1,2025-02-12,2025-02-12,,,no
-loeffler_sean_OR,Sean Loeffler,OR,1000353,1,2025-02-07,2025-02-07,,1,no
+loeffler_sean_OR,Sean Loeffler,OR,1000353,1,2025-02-07,2025-02-07,,3,no
 lohan_michael_TX,Michael Lohan,TX,1000335,1,2025-02-22,2025-02-22,,,no
 long_james_AR,James Wesley Long,AR,1000035,1,2000,2000,,,no
 long_jermaine_FL,Jermaine Lynn Long,FL,53,1,2026-02-14,2026-02-14,,,no
@@ -630,17 +706,21 @@ marmol_veronica_NY,Veronica Marmol,NY,1000023,1,2025-01-01,2025-01-01,,9,yes
 marra_thomas_CT,Thomas Marra,CT,529,1,2026-01-01,2026-01-01,,1,no
 marshall_ryan_TX,Ryan Anthony Marshall,TX,98,1,2026-05-19,2026-05-19,34,9,yes
 martin_blanton_FL,Blanton Neil Martin,FL,666,1,2026-06-01,2026-06-01,,,no
+martin_darren_SC,Darren Martin,SC,1000443,1,2025-03-12,2025-03-12,,3,no
 martin_jonathan_NY,Jonathan Martin,NY,395,1,2020-01-03,2020-01-03,1,,no
 martin_theodore_FL,Theodore Isaiah Martin,FL,375,1,2024-10-27,2024-10-27,,15,yes
 martin_tyriek_NY,Tyriek Martin,NY,1000294,1,2025-02-20,2025-02-20,70,34,yes
 martinez_andrel_DE,Andrel Martinez,DE,670,1,2014-11-07,2014-11-07,,1,no
 martinez_christopher_FL,Christopher Martinez,FL,256,1,2025-10-08,2025-10-08,80,,yes
 martinez_eduardo_TX,Eduardo Martinez,TX,1000231,1,2025-01-29,2025-01-29,,,no
+marty_catalina_FL,Catalina San Marty,FL,1000477,1,2024-06,2024-06,,1,no
 maske_cody_MI,Cody Allen Maske,MI,535,1,2026-05-21,2026-05-21,,1,no
 masseur_jared_NH,Jared Masseur,NH,1000030,1,2025-01-04,2025-01-04,3,2,no
 massie_dale_MN,Dale Anthony Massie Jr.,MN,1000238,1,2025-08-02,2025-08-02,,,no
+matthews_liam_,Liam Matthews,,1000544,1,2024-09-18,2024-09-18,,1,no
 maull_courtney_AL,Courtney Maull Jr.,AL,439,1,2026-02-04,2026-02-04,,,no
 maysonet_lex_PA,Lex H. Maysonet,PA,1000006,1,2016-12-19,2016-12-19,,9,yes
+mcafee_alexander_FL,Alexander Justin McAfee,FL,1000573,1,2025-04-04,2025-04-04,,,no
 mccain_debron_PA,Debron McCain,PA,1000094,1,2025-01-18,2025-01-18,,1,no
 mccain_robert_NY,Robert McCain,NY,531,1,2025,2025,,1,no
 mcclendon_carroll_OR,Carroll McClendon,OR,163,1,2025-09-22,2025-09-22,,22,yes
@@ -654,6 +734,9 @@ mcdermott_michael_FL,Michael McDermott,FL,1000033,1,2025-01-04,2025-01-04,,1,no
 mcdonald_devan_FL,Devan A. McDonald,FL,1000393,1,2023-03-07,2023-03-07,,1,no
 mcdowell_chance_GA,Chance McDowell,GA,668,1,2025-08-14,2025-08-14,,1,no
 mcdowell_charles_GA,Charles Dion McDowell,GA,1000346,1,2025-02-19,2025-02-19,,,no
+mcgee_jabari_IL,Jabari McGee,IL,1000580,1,2025-04-04,2025-04-04,,,no
+mcgill_jason_NH,Jason McGill,NH,1000445,1,2025-02-02,2025-02-02,,,no
+mcgowan_jodie_FL,Jodie Katherine McGowan,FL,1000456,1,2025-03-13,2025-03-13,,,no
 mcgrier_terryonto_WV,Terryonto McGrier,WV,601,1,2020-08-28,2020-08-28,,3,yes
 mcgriff_jamel_NY,Jamel McGriff,NY,85,1,2025-09-10,2025-09-10,,1,no
 mckay_zarvas_IA,Zarvas Antwon McKay,IA,600,1,2025-02-07,2025-02-07,,6,yes
@@ -670,10 +753,14 @@ medina_charles_TX,Charles Eric Medina,TX,76,1,2026-07-19,2026-07-19,13,,yes
 medina_willy_RI,Willy Medina,RI,423,1,2026-05-19,2026-05-19,,,no
 meeks_nicholas_SC,Nicholas Meeks,SC,1000038,1,2025-01-01,2025-01-01,,1,no
 mejia_waldo_NY,Waldo Mejia,NY,1000051,1,2025-01-10,2025-01-10,4,,no
+mendoza_keith_MN,Keith Cabrera Mendoza,MN,1000523,1,2024,2024,,,no
+merriweather_william_KY,William Merriweather,KY,1000534,1,2025-03-26,2025-03-26,,1,no
+messman_jessica_WI,Jessica L. Messman,WI,1000481,1,2023-10-21,2023-10-21,,1,no
 metzler_john_SC,John Steven Reynovel Metzler,SC,1000308,1,2023-03-15,2023-03-15,,4,no
 mewborn_christopher_NC,Christopher Paul Mewborn,NC,1000248,1,2025-02-06,2025-02-06,,,no
 mewes_coty_MO,Coty Castile Mewes,MO,1000012,1,2025-01-03,2025-01-03,,,no
 miculka_lisa_TX,Lisa Miculka,TX,56,1,2026,2026,13,,yes
+midgett_dawanne_MI,Dawanne Midgett,MI,1000529,1,2023-09-19,2023-09-19,,,yes
 miles_jonny_CA,Jonny Miles,CA,583,1,2026-08-17,2026-08-17,,,no
 milk_mark_SD,Mark Milk,SD,509,1,2026-03-14,2026-03-14,,1,no
 miller_dominique_GA,Dominique Clifford Miller,GA,164,1,2026-08-12,2026-08-12,,,no
@@ -690,6 +777,7 @@ mittelstadt_kristin_FL,Kristin Ann Mittelstadt,FL,1000396,1,2025-03-06,2025-03-0
 modacure_devone_MS,Devone Modacure,MS,157,1,2026-06,2026-06,,,no
 monteiro_victor_MA,Victor Monteiro,MA,126,1,2025-11-13,2025-11-13,,3,yes
 montez_demus_WA,Demus Montez,WA,1000032,1,2025-01-03,2025-01-03,29,,yes
+montgomery_eric_IN,Eric Montgomery,IN,1000572,1,2025-03-13,2025-03-13,,6,yes
 montgomery_paul_IL,Paul Montgomery,IL,1000095,1,2025-01-17,2025-01-17,,,no
 moore_jessica_FL,Jessica Moore,FL,22,1,2026-07-15,2026-07-15,,,no
 moore_shawnee_NY,Shawnee Moore,NY,615,1,2026-05-31,2026-05-31,3,,no
@@ -702,8 +790,10 @@ moreno_peter_CA,Peter Moreno,CA,569,1,2026-03-03,2026-03-03,,,no
 morphew_barry_CO,Barry Morphew,CO,487,1,2026-09-05,2026-09-05,,,no
 morrill_scott_MA,Scott Morrill,MA,603,1,2025-04-07,2025-04-07,,1,no
 morris_calvin_TX,Calvin Morris,TX,1000227,1,2024-11,2024-11,,2,no
+morrison_mark_FL,Mark Morrison,FL,1000503,1,2025-03-22,2025-03-22,6,3,yes
 morrison_william_MO,William Morrison,MO,508,1,2026-05,2026-05,,,no
 morrow_ricky_FL,Ricky Morrow,FL,1000307,1,2025-02-16,2025-02-16,,47,yes
+morson_stephon_TX,Stephon Morson,TX,1000454,1,2024-10-16,2024-10-16,2,,no
 mota_jose_ME,Jose Mota,ME,1000130,1,2025-01-22,2025-01-22,,,no
 moultry_keith_CA,Keith Moultry,CA,644,1,2012-03-08,2012-03-08,,,no
 mullins_haley_AR,Haley Jo Mullins,AR,1000060,1,2025-01-12,2025-01-12,,1,no
@@ -711,13 +801,17 @@ munoz_alfredo_CA,Alfredo Munoz,CA,344,1,2025-11-10,2025-11-10,,1,no
 murphy_william_FL,William Murphy III,FL,101,1,2026-03-13,2026-03-13,,10,yes
 murray_ian_NH,Ian A. Murray,NH,123,1,2024-04-04,2024-04-04,3,2,no
 murray_ronald_FL,"Ronald Lee Murray, Jr.",FL,371,1,2024-02-16,2024-02-16,,,no
+muscardin_nicholas_FL,Nicholas Muscardin,FL,1000547,1,2025-02-05,2025-02-05,1,,no
 muslim_yahya_CA,Yahya Muslim,CA,315,1,2026-07-27,2026-07-27,,1,no
 myers_james_FL,James Myers,FL,66,1,2026-03-03,2026-03-03,,,no
 myrick_daniel_FL,Daniel Phillip Myrick,FL,358,1,2026-05-03,2026-05-03,,34,yes
+myrick_michael_NY,Michael Myrick,NY,1000555,1,2024-09-16,2024-09-16,,1,no
+narvaez_dennis_IL,Dennis W. Narvaez,IL,1000488,1,2025-03-08,2025-03-08,,3,no
 nash_assamad_NY,Assamad Nash,NY,597,1,2022-02-13,2022-02-13,3,,no
 nash_thomas_MD,Thomas W. Nash III,MD,532,1,2026-06-08,2026-06-08,,1,no
 nations_daniel_CO,Daniel Nations,CO,215,1,2025-07-25,2025-07-25,,,no
 navarro_raymundo_CA,Raymundo Flores-Navarro,CA,1000067,1,2025-01-08,2025-01-08,,2,no
+navarro_tristian_GA,Tristian Navarro,GA,1000549,1,2025-04-02,2025-04-02,,,no
 ndutiye_moise_NH,Moise Ndutiye,NH,1000085,1,2024-04-19,2024-04-19,,2,no
 nealy_joshua_OR,Joshua Cory Nealy,OR,61,1,2023-01,2023-01,166,55,yes
 neeley_adrian_IA,Adrian Warren Neeley,IA,604,1,2020-02-04,2020-02-04,,2,no
@@ -731,11 +825,14 @@ nicholas_charlena_NY,Charlena Nicholas,NY,1000429,1,2025-02-27,2025-02-27,,,no
 nickles_steven_NC,Steven Nickles,NC,262,1,2024-12-02,2024-12-02,134,,yes
 nicolas_jathon_GU,Jathon San Nicolas,GU,1000233,1,2025-02-04,2025-02-04,,,no
 nieneker_ethan_TX,Ethan Nieneker,TX,201,1,2025-08-11,2025-08-11,,,no
+noble_gregory_TX,Gregory Noble,TX,1000464,1,2025-03-20,2025-03-20,,,no
 norfleet_joseph_NC,Joseph Tae'Quez Norfleet,NC,1000188,1,2025-01-24,2025-01-24,,3,no
+nuzman_justin_UT,Justin Erin Nuzman,UT,1000446,1,2024-12-26,2024-12-26,22,14,yes
 oglesby_samantha_NC,Samantha Paige Oglesby,NC,561,1,2026-02-13,2026-02-13,,2,no
 olivas_jose_IL,Jose A. Zuniga-Olivas,IL,1000334,1,2023-08-02,2023-08-02,,2,no
 oliver_corey_AL,Corey Oliver,AL,177,1,2018,2018,40,,yes
 olson_michael_NY,Michael Olson,NY,1000204,1,2023-05-26,2023-05-26,,,no
+oneal_roderick_IL,Roderick Oneal,IL,1000577,1,2022-05-01,2022-05-01,,,no
 orndorff_logan_PA,Logan Eugene Orndorff,PA,1000312,1,2025-01-23,2025-01-23,,1,no
 orosco_michael_CA,Michael Orosco,CA,1000285,1,2025-02-14,2025-02-14,,,no
 ortiz_adrian_CA,Adrian Ortiz,CA,548,1,2026-07-14,2026-07-14,,,no
@@ -744,6 +841,7 @@ otero_jesse_CA,Jesse Leonardo Otero,CA,407,1,2023-12-08,2023-12-08,90,,yes
 owens_dandre_NV,Dandre Owens,NV,1000371,1,2024-08-09,2024-08-09,,6,yes
 oxendine_gregory_OH,Gregory Oxendine,OH,1000144,1,,,,,no
 padron_nestor_TX,Nestor Padron,TX,5,1,2026-08-18,2026-08-18,,,no
+padua_rebekah_NH,Rebekah M. Padua,NH,1000485,1,2025-03-19,2025-03-19,,2,no
 palacios_jorge_CA,Jorge Palacios,CA,233,1,2024-02-16,2024-02-16,,,no
 palacios_michael_NY,Michael Palacios,NY,629,1,2022-10-09,2022-10-09,,,no
 palm_john_GA,John Harold Palm,GA,1000375,1,2025-02-25,2025-02-25,,,no
@@ -763,10 +861,13 @@ pea_fale_WA,Fale Vaigalepa Pea,WA,44,1,2025-12-03,2025-12-03,,,no
 penate_oscar_PA,Oscar Adalberto Penate,PA,680,1,2025-07-22,2025-07-22,1,1,no
 perez_may_GU,May Quichocho Perez,GU,1000324,1,2025-01-26,2025-01-26,17,7,yes
 perkins_camron_TX,Camron Josh-Anthony Perkins,TX,1000225,1,2024-11-25,2024-11-25,,,no
+perkins_jessica_MI,Jessica Perkins,MI,1000566,1,2024-09,2024-09,,2,no
 perry_lamontaye_CT,Lamontaye Perry,CT,1000176,1,2025-01-31,2025-01-31,,,no
 perry_warren_SC,Warren Spence Perry,SC,555,1,2026-07-14,2026-07-14,,1,no
 peterson_alan_NH,Alan R. Peterson,NH,442,1,2026-03-25,2026-03-25,,2,no
 peterson_aquil_CA,Aquil Peterson,CA,602,1,2024-09-30,2024-09-30,,1,no
+peterson_willie_AL,Willie Frank Peterson,AL,1000459,1,2025-03-17,2025-03-17,,1,no
+phillips_timothy_AR,Timothy Phillips,AR,1000519,1,2023-04,2023-04,,1,no
 pierce_cornelius_TN,Cornelius Pierce,TN,498,1,2024-06-20,2024-06-20,2,,no
 pinero_leo_TX,Leo Xavier Pinero,TX,1000066,1,2025-01-14,2025-01-14,,2,no
 pinnetti_nicholas_NY,Nicholas Pinnetti,NY,1000244,1,2025-02-04,2025-02-04,,,no
@@ -780,6 +881,7 @@ pope_david_FL,David Morley Pope,FL,1000162,1,2025-01-22,2025-01-22,,,no
 porter_clive_NY,Clive Porter,NY,308,1,2025-10-31,2025-10-31,,85,yes
 porter_nathaniel_CA,Nathaniel Porter,CA,1000061,1,2024-03-21,2024-03-21,,,no
 poulos_brandon_TX,Brandon Scott Poulos,TX,1000160,1,2025-01-23,2025-01-23,1,,no
+powell_garrick_MD,Garrick Powell,MD,1000561,1,2023-04,2023-04,,,no
 prack_sonlee_NE,Sonlee Prack,NE,120,1,2024-04-25,2024-04-25,,5,yes
 prentice_jamie_NH,Jamie Prentice,NH,1000191,1,2024-08-02,2024-08-02,,,no
 price_james_CA,James Price,CA,514,1,2026-07-28,2026-07-28,,,no
@@ -802,6 +904,8 @@ rangel_roberto_TX,Roberto Rangel,TX,1000161,1,2022-12-18,2022-12-18,,,no
 rankin_kirby_OH,Kirby Rankin,OH,490,1,2026-08-08,2026-08-08,,1,no
 reardon_patrick_NH,Patrick Thomas Reardon,NH,1000417,1,2025-03-04,2025-03-04,1,,no
 reavenell_marcus_DC,Marcus Reavenell,DC,139,1,2025-05-14,2025-05-14,,3,no
+redding_edward_MI,Edward Delorean Redding,MI,1000564,1,2025-04-06,2025-04-06,,3,yes
+reddy_kevin_CA,Kevin James Reddy,CA,1000493,1,2025-03-21,2025-03-21,,,no
 reece_ronnie_AR,Ronnie Reece,AR,254,1,2025-09-25,2025-09-25,,1,no
 reed_christopher_AR,Christopher Deshaun Reed,AR,239,1,2022-04,2022-04,,5,yes
 reed_lawrence_IL,Lawrence Reed,IL,71,1,2025-11-17,2025-11-17,72,15,yes
@@ -811,17 +915,24 @@ reid_billy_AL,Billy Wayne Reid,AL,451,1,2026-08-19,2026-08-19,,2,no
 reid_jamond_GA,Jamond Reid,GA,154,1,2026-07-24,2026-07-24,,1,no
 remoket_dawn_GU,Dawn Edchuul Remoket II,GU,1000355,1,2024-12-04,2024-12-04,,1,no
 reyes_antonio_IL,Antonio Reyes,IL,1000354,1,2020,2020,,,no
+reyes_gil_FL,Gil Gio Nasser De Los Reyes,FL,1000514,1,2025-03-27,2025-03-27,,1,no
+reyes_ramon_NY,Ramon Reyes,NY,1000568,1,2025-04-06,2025-04-06,8,1,yes
 reynolds_justin_VT,Justin Lee Reynolds,VT,1000201,1,2025-02-04,2025-02-04,,14,yes
+reynolds_michael_VT,Michael Reynolds,VT,1000467,1,2025,2025,200,50,yes
 rhyan_royshell_IL,Royshell L. Rhyan,IL,289,1,2026-05-20,2026-05-20,43,,yes
 rice_rashee_TX,Rashee Rice,TX,565,1,2026-05-19,2026-05-19,,1,no
 richards_justin_ID,Justin Roy Richards,ID,1000424,1,2025-08-18,2025-08-18,,1,no
 richardson_fredricquez_AL,Fredricquez Richardson,AL,457,1,2026-07-05,2026-07-05,,,no
+rico_joseph_NY,Joseph Rico,NY,1000553,1,2025-03-27,2025-03-27,,2,no
 rider_frederic_AL,Frederic Rider,AL,504,1,2025-08-21,2025-08-21,,,no
 ridley_catherine_FL,Catherine Ridley,FL,1000377,1,2025-02-19,2025-02-19,,,no
+ridley_joel_WA,Joel David Ridley,WA,1000569,1,2025-02-23,2025-02-23,,1,no
 ridley_nakyris_GA,Nakyris Ridley,GA,234,1,2022-02-02,2022-02-02,7,,yes
 riffel_leonard_WY,Leonard Raymond Riffel,WY,1000187,1,2025-01-28,2025-01-28,,,no
 rio_henry_MA,Henry Del Rio,MA,1000340,1,2023-01-01,2023-01-01,,,no
 rios_juan_NY,Juan Rios,NY,1000064,1,2024-12-29,2024-12-29,,,no
+rivas_jonathan_FL,Jonathan Savir Rivas,FL,1000432,1,2025-03-12,2025-03-12,,1,no
+rivas_tomas_NM,Tomas Rivas,NM,1000498,1,2025-03,2025-03,2,,no
 rivera_arnold_IL,Arnold Rivera,IL,209,1,2025-11-14,2025-11-14,,2,no
 rivera_edwin_NY,Edwin Rivera,NY,1000263,1,2025-02-18,2025-02-18,,,no
 rivera_gabriel_FL,Gabriel Rivera,FL,609,1,2022-06-13,2022-06-13,,,no
@@ -844,6 +955,8 @@ rogers_ronnell_CT,Ronnell Rogers,CT,590,1,2024-05-02,2024-05-02,,3,yes
 rojas_arron_AZ,Arron Rojas,AZ,43,1,2026-03-07,2026-03-07,,,yes
 rollins_flay_FL,Flay Rollins Jr.,FL,492,1,2026-01-16,2026-01-16,,,no
 romero_felix_IL,Felix Pitre Romero,IL,582,1,2025-11-17,2025-11-17,,,no
+romero_george_AK,George Moises Romero Jr.,AK,1000576,1,2024-06-06,2024-06-06,,3,yes
+romo_richard_IL,Richard Romo,IL,1000516,1,2025-03-23,2025-03-23,,,no
 rosales_jose_CA,Jose Valdez-Rosales,CA,1000068,1,2024,2024,,,no
 rose_keeland_MA,Keeland Rose,MA,1000269,1,2025-02-11,2025-02-11,,2,no
 rose_simon_WI,Simon Rose,WI,468,1,2026-03,2026-03,,,no
@@ -851,6 +964,8 @@ rosslow_michael_WA,Michael W. Rosslow,WA,1000125,1,2024-12-29,2024-12-29,,,yes
 rubio_marco_CA,Marco Antonio Rubio,CA,1000278,1,2025-02-09,2025-02-09,,,no
 ruiz_michael_NY,Michael Ruiz,NY,1000251,1,2025-01-06,2025-01-06,,1,no
 russell_justin_MA,Justin Russell,MA,28,1,2026-07-27,2026-07-27,,1,no
+russell_stanford_PA,Stanford A. Russell Jr.,PA,1000537,1,2025-03-27,2025-03-27,,,no
+saavedra_miguel_MA,Miguel Saavedra,MA,1000548,1,2025-04-01,2025-04-01,1,,no
 sabourin_jon_MI,Jon Lee Sabourin,MI,1000413,1,2025-01-26,2025-01-26,,1,no
 sahaf_sadiq_TN,Sadiq Al-Sahaf,TN,1000383,1,2025-02-24,2025-02-24,,,no
 sanchez_adrian_IL,Adrian Sanchez,IL,1000138,1,2024-08-03,2024-08-03,,,no
@@ -859,6 +974,8 @@ sandifer_jordan_TN,Jordan Sandifer,TN,495,1,2023-03-01,2023-03-01,1,,no
 santiago_ernesto_IN,Ernesto Santiago,IN,380,1,2025-03-04,2025-03-04,,2,no
 santiago_kenneth_FL,Kenneth Emmanuel Cruz-Santiago,FL,1000077,1,2025-01-12,2025-01-12,,3,no
 santillan_jonathan_NC,Jonathan Santillan,NC,658,1,2025-04,2025-04,,2,no
+santos_henrry_VA,Henrry Villatoro Santos,VA,1000509,1,2025-03-27,2025-03-27,,,no
+scales_jailen_CA,Jailen Emani Scales,CA,1000543,1,2025-03-27,2025-03-27,2,,no
 schaff_james_MA,James Schaff,MA,383,1,2026-05-20,2026-05-20,,,no
 scott_tony_NY,Tony Scott,NY,1000129,1,2025-01-24,2025-01-24,32,,yes
 scott_trey_NE,Trey Scott,NE,479,1,2026-06-26,2026-06-26,,1,no
@@ -892,6 +1009,7 @@ slaton_prentice_MI,Prentice Slaton,MI,205,1,2025-11-06,2025-11-06,,,no
 small_jason_NE,Jason Small,NE,1000349,1,2025-02-24,2025-02-24,,1,no
 smalls_lawrence_HI,Lawrence Smalls,HI,145,1,2021-10,2021-10,,161,yes
 smith_christopher_TN,Christopher Smith,TN,622,1,2024-11-11,2024-11-11,,,no
+smith_clarence_IL,Clarence Smith Jr.,IL,1000499,1,2025-03-25,2025-03-25,,,no
 smith_davion_FL,Davion Smith,FL,386,1,2021-06-29,2021-06-29,9,,yes
 smith_donte_VA,Donte Smith,VA,30,1,2026-04-27,2026-04-27,5,2,yes
 smith_jeremiah_WA,Jeremiah Smith,WA,664,1,2015-05-26,2015-05-26,,,no
@@ -905,18 +1023,26 @@ sohol_dejay_IL,Dejay Sohol,IL,135,1,2025-08-30,2025-08-30,,13,yes
 sonza_robert_CA,Robert Sonza,CA,1000018,1,,,,,no
 sorensen_bobbie_UT,Bobbie Joe Sorensen,UT,634,1,2026-07-22,2026-07-22,,1,no
 sorensen_thomas_WA,Thomas D. Sorensen,WA,117,1,2025-08-31,2025-08-31,,10,yes
+sosa_pablo_IL,Pablo Sosa,IL,1000476,1,2024-10,2024-10,,1,no
+soto_billy_CO,Billy Soto,CO,1000489,1,2025-03-18,2025-03-18,14,,yes
+soto_mauro_UT,Mauro Juan Soto,UT,1000563,1,2023-01-17,2023-01-17,,,no
 spataro_todd_NH,Todd Edward Spataro,NH,1000365,1,2023,2023,,,no
 spearman_james_CA,James Spearman,CA,1000359,1,2025-02-28,2025-02-28,,,no
 spencer_matthew_OH,Matthew Spencer,OH,1000027,1,2024-12-11,2024-12-11,,,no
+spencer_randy_FL,Randy Lavern Spencer,FL,1000438,1,2025-02-26,2025-02-26,,21,yes
 spencer_wayne_NY,Wayne Spencer,NY,166,1,2026-06-25,2026-06-25,,1,no
 spies_casey_LA,Casey Spies,LA,391,1,2024-09-23,2024-09-23,40,,yes
 spurlin_russell_FL,Russell Spurlin,FL,352,1,2026-03-13,2026-03-13,,,no
 standifer_ervin_OR,Ervin Standifer,OR,220,1,2023-03-23,2023-03-23,,1,no
 standinghorn_geronimo_MT,Geronimo Standinghorn,MT,455,1,2026-06-21,2026-06-21,,,no
 stanton_jabryant_NC,Jabryant Avian Stanton,NC,316,1,2026-06-05,2026-06-05,,1,no
+starr_jesse_CA,Jesse James Starr,CA,1000556,1,2025-03-27,2025-03-27,,1,no
 steele_webster_NC,Webster Steele,NC,1000026,1,2024-12-28,2024-12-28,,11,yes
 stephenson_james_FL,"James ""Jim"" Stephenson",FL,1000175,1,2025-01-31,2025-01-31,,2,no
+stevens_nathan_WI,Nathan D. Stevens,WI,1000554,1,2025-04-03,2025-04-03,,,no
+stewart_dshon_TN,Dshon Stewart,TN,1000532,1,2025-03-20,2025-03-20,,,no
 stewart_edward_GA,Edward Stewart,GA,280,1,2026-08-12,2026-08-12,100,,yes
+stewart_lily_GA,Lily Stewart,GA,1000480,1,2025-03-23,2025-03-23,1,,no
 stiff_clarence_KY,Clarence Stiff,KY,140,1,2024-02-06,2024-02-06,,8,yes
 stoker_mike_TX,Mike Douglas Stoker,TX,1000261,1,2024-05,2024-05,,17,yes
 stokes_dennis_NY,Dennis O. Stokes,NY,1000008,1,2017-01-02,2017-01-02,,2,no
@@ -952,6 +1078,7 @@ teal_john_FL,"John Teal, Jr.",FL,1000368,1,2025-03-03,2025-03-03,13,,yes
 telemacque_tyroan_TX,Tyroan Jakeil Telemacque,TX,12,1,2026-05-18,2026-05-18,35,10,yes
 terry_maurice_FL,Maurice Marsalis Terry,FL,544,1,2026-08-31,2026-08-31,,6,yes
 terry_omari_FL,Omari Terry,FL,1000249,1,2025-02-04,2025-02-04,1,,no
+theng_samonty_MN,Samonty Sam Ouk-Theng,MN,1000483,1,2024-09-18,2024-09-18,,,no
 thompson_adam_MN,Adam Kyle Thompson,MN,1000316,1,2024-12,2024-12,,3,yes
 thompson_dominique_KY,Dominique Edward Thompson Jr.,KY,229,1,2023-09-08,2023-09-08,,,no
 thompson_frederick_FL,Frederick Ivan Thompson,FL,288,1,2026-06-20,2026-06-20,3,,no
@@ -966,6 +1093,7 @@ tihpen_kalen_IA,Kalen Tihpen,IA,160,1,2026-06-03,2026-06-03,3,2,no
 tillman_deon_IL,Deon Tillman,IL,1000053,1,2025-01-04,2025-01-04,,,no
 tillman_garrien_NY,Garrien Ferrone Tillman,NY,1000350,1,2025-03-05,2025-03-05,,,no
 tillman_shawn_MN,Shawn Michael Tillman,MN,633,1,2022-05,2022-05,,,no
+tolbert_marquise_WA,Marquise Tolbert,WA,1000444,1,2023-06,2023-06,,2,no
 tomlinson_terry_AK,Terry Tomlinson,AK,1000218,1,2025-01-29,2025-01-29,,,no
 torrellas_eva_NC,Eva Marie Torrellas,NC,1000071,1,2025-01-07,2025-01-07,,1,no
 torres_florencio_NY,Florencio Torres,NY,643,1,2016-06-24,2016-06-24,1,,no
@@ -974,14 +1102,17 @@ torres_jose_CT,Jose Torres,CT,50,1,2025-07-20,2025-07-20,25,,yes
 torres_steven_IL,Steven Torres,IL,379,1,2025-08-27,2025-08-27,,6,yes
 townsel_joshua_TN,Joshua Townsel,TN,335,1,2026-01-19,2026-01-19,,3,yes
 traeger_rickie_IL,Rickie Traeger,IL,577,1,2026-04-10,2026-04-10,,,no
+trevino_david_IL,David Trevino,IL,1000502,1,2025-03-02,2025-03-02,,3,yes
 triplett_jamie_OH,Jamie Triplett,OH,654,1,2025-09-17,2025-09-17,,1,no
 troemner_nicholas_FL,Nicholas Munson Troemner,FL,1000050,1,2023-03,2023-03,1,,no
 true_bruce_NH,Bruce True,NH,238,1,2025-04-17,2025-04-17,,,no
 truelove_andrew_NY,Andrew Truelove,NY,179,1,2026-07-16,2026-07-16,,1,no
+trusty_antonio_NY,Antonio Trusty,NY,1000546,1,2025-04-06,2025-04-06,13,,yes
 turnbow_alisha_UT,Alisha Nicole Turnbow,UT,1000193,1,2025-02-03,2025-02-03,21,12,yes
 turner_caltaeviya_FL,Caltaeviya Turner,FL,1000217,1,2025-02-03,2025-02-03,,1,no
 turner_gordon_DE,Gordon Leon Turner III,DE,659,1,2025-04-28,2025-04-28,,4,no
 turner_julian_NY,Julian Turner,NY,84,1,2025-10-10,2025-10-10,20,,yes
+turner_ryan_CA,"Ryan Dwayne Turner, Jr.",CA,1000448,1,2025-03-17,2025-03-17,2,1,no
 tuve_richard_SD,Richard Tuve Jr.,SD,146,1,2021-11-05,2021-11-05,,18,yes
 tye_aiden_,Aiden David Tye,,346,1,2026-01-13,2026-01-13,,170,yes
 underdue_calvin_NC,Calvin Underdue,NC,317,1,2026-07-31,2026-07-31,,1,no
@@ -996,8 +1127,12 @@ vargas_oscar_TX,Oscar Vargas,TX,478,1,2026-02-25,2026-02-25,,,no
 varn_charles_SC,Charles Wesley Varn,SC,1000029,1,2023-08-13,2023-08-13,,,no
 vasquez_cornelio_ND,Cornelio Vasquez IV,ND,449,1,2026-08-20,2026-08-20,9,,yes
 vasquez_nathaniel_FL,Nathaniel Francisco Vasquez,FL,1000110,1,2025-01-19,2025-01-19,,1,no
+vasquez_priscilla_TX,Priscilla Marie Vasquez,TX,1000455,1,2024-01,2024-01,,1,yes
 vaughn_tryston_TX,Tryston Tremaine Vaughn,TX,450,1,2026,2026,,,no
+velez_julio_PA,Julio Torres-Velez,PA,1000436,1,2025-03-11,2025-03-11,,,no
+velez_valentin_CO,Valentin Velez,CO,1000545,1,2025-03-31,2025-03-31,,,no
 vinson_jonathan_CA,Jonathan Vinson,CA,570,1,2026-04-28,2026-04-28,,,no
+vogel_jackson_WI,Jackson Vogel,WI,1000517,1,2024-08-27,2024-08-27,,1,no
 vos_terrance_UT,Terrance Trent Vos,UT,279,1,2025-03-22,2025-03-22,,,no
 waggoner_william_TX,William Waggoner,TX,676,1,2025-12-11,2025-12-11,3,,no
 wagner_nicholas_FL,Nicholas Wagner,FL,1000172,1,2025-01-10,2025-01-10,1,,no
@@ -1006,6 +1141,7 @@ walker_aaron_NY,Aaron Walker,NY,86,1,2025-09-24,2025-09-24,18,1,yes
 walker_javarri_FL,Javarri Latre Walker,FL,1000216,1,2025-02-02,2025-02-02,1,1,no
 walker_mcdonald_SC,McDonald Walker,SC,94,1,2026-03-06,2026-03-06,,2,no
 wallace_amanda_NY,Amanda Wallace,NY,618,1,2024-03-15,2024-03-15,,,no
+wallace_juwan_IL,Juwan A. Wallace,IL,1000581,1,2025-03-28,2025-03-28,,,no
 wardlaw_ross_ID,Ross Allen Wardlaw Jr.,ID,203,1,2026-07-07,2026-07-07,,1,no
 wardlaw_rye_CA,Rye Daniel Wardlaw,CA,1000228,1,2024-11-17,2024-11-17,19,4,yes
 warfel_james_MO,James Warfel,MO,414,1,2026-08-28,2026-08-28,,,no
@@ -1015,12 +1151,14 @@ washington_timothy_NE,Timothy Washington,NE,1000266,1,2025-02-16,2025-02-16,,3,n
 washington_xavier_SC,Xavier Washington,SC,171,1,2026-04-13,2026-04-13,,,no
 watley_travis_IL,Travis L. Watley,IL,1000182,1,2025-01-22,2025-01-22,,3,no
 watson_albert_LA,"Albert Watson, Jr.",LA,247,1,2025-03,2025-03,,,no
+watson_emerson_IL,"Emerson Watson, Jr.",IL,1000440,1,2024-09-13,2024-09-13,,,no
 watts_bradley_NC,Bradley Justin Watts,NC,406,1,2016-05-29,2016-05-29,,2,no
 weaver_michael_NJ,Michael Weaver,NJ,1000358,1,,,,,no
 webb_bradford_ME,Bradford Webb,ME,1000253,1,2025-02-05,2025-02-05,,,no
 welch_kelly_FL,Kelly Nicholas Welch,FL,362,1,2025-11-15,2025-11-15,,65,yes
 welcome_dequon_FL,Dequon Chuck Welcome,FL,381,1,2022-12-04,2022-12-04,,2,no
 weldon_jeffery_SC,Jeffery Weldon,SC,2,1,2026-08-15,2026-08-15,1,1,no
+wells_dawn_IL,Dawn M. Wells,IL,1000492,1,2025-03-17,2025-03-17,,,no
 wells_gregory_WI,Gregory Wells,WI,150,1,2024-08-28,2024-08-28,,,no
 welty_brandon_KS,Brandon Lloyd Welty,KS,103,1,2026-07-25,2026-07-25,,5,yes
 weston_christopher_AR,Christopher Gerald Weston,AR,1000002,1,2017-06-10,2017-06-10,,,no
@@ -1034,12 +1172,14 @@ wilcox_antonio_FL,Antonio Wilcox Jr.,FL,1000240,1,2025-02-08,2025-02-08,2,,no
 wilder_joseph_ID,Joseph Adam Wilder,ID,1000136,1,2024-09-12,2024-09-12,,2,no
 wiley_andre_CA,Andre Wiley,CA,25,1,2026-07-20,2026-07-20,,,no
 wilkes_justin_NC,Justin Troy Wilkes,NC,173,1,2026-02-18,2026-02-18,,,no
+wilkins_larry_MN,Larry Connail Wilkins,MN,1000515,1,2025-03-28,2025-03-28,1,1,no
 willard_scarlett_FL,Scarlett Marie Willard,FL,474,1,2026-07-16,2026-07-16,1,,no
 williams_antonio_FL,Antonio Detron Williams,FL,1000139,1,2025-01-18,2025-01-18,,9,yes
 williams_brandon_AR,Brandon L. Williams,AR,312,1,2026-07-01,2026-07-01,,1,no
 williams_charles_FL,Charles Williams,FL,1000213,1,2025-02-04,2025-02-04,,,no
 williams_delmar_MI,Delmar Williams,MI,58,1,2026-07-26,2026-07-26,,,no
 williams_duane_SC,"Duane K. Williams, II",SC,476,1,2025-12-26,2025-12-26,,1,no
+williams_jamar_FL,Jamar Akeem Williams,FL,1000469,1,2025-03-23,2025-03-23,,12,yes
 williams_james_MN,James Brock Williams,MN,1000423,1,2025-03-06,2025-03-06,,,no
 williams_joequarius_TN,Joequarius Williams,TN,51,1,,,,1,no
 williams_keonte_GA,Keonte Williams,GA,469,1,2026-07-25,2026-07-25,,,no
@@ -1051,8 +1191,13 @@ willis_travion_MO,Travion Willis,MO,1000183,1,2025-02-01,2025-02-01,,1,no
 wilson_henry_TX,Henry Wilson,TX,277,1,2023-05,2023-05,,11,yes
 wingo_sterling_MS,Sterling Wingo,MS,250,1,2021-09-06,2021-09-06,,2,no
 woods_charles_WV,"Charles Woods, Sr.",WV,598,1,2023-02-22,2023-02-22,,,no
+woods_isack_IL,Isack A. Woods,IL,1000513,1,2025-03-11,2025-03-11,,1,no
 woods_tiger_FL,Tiger Woods,FL,441,1,2026-03-27,2026-03-27,1,1,no
+woolf_william_OH,William Woolf,OH,1000504,1,2025-03-22,2025-03-22,28,,yes
+worley_justin_RI,Justin Worley,RI,1000460,1,2019-12-31,2019-12-31,,1,no
+wright_jasmine_OR,Jasmine Wright,OR,1000538,1,2025-03,2025-03,,,no
 wunder_jeffrey_WA,Jeffrey Allan Wunder,WA,1000199,1,2021-11,2021-11,,2,no
+yakaitis_timothy_CA,Timothy Yakaitis,CA,1000434,1,2025-03-11,2025-03-11,1,,no
 yates_jacob_MI,Jacob Yates,MI,1000133,1,2025-01-23,2025-01-23,,1,no
 young_curtis_FL,Curtis Novell Young,FL,1000121,1,2025-01-09,2025-01-09,,,no
 young_jahquira_NY,Jahquira Young,NY,1000260,1,2025-02-16,2025-02-16,6,,yes
