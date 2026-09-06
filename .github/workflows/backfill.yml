@@ -6,11 +6,17 @@ on:
       start:
         description: "Start month (YYYY-MM)"
         required: true
-        default: "2024-01"
+        default: "2025-01"
       end:
         description: "End month (YYYY-MM)"
         required: true
-        default: "2024-03"
+        default: "2026-09"
+      max_per_week:
+        description: "Articles fetched and classified per week (0 = no cap)"
+        default: "150"
+      source:
+        description: "gnews (works from Actions) or gdelt"
+        default: "gnews"
 
 permissions:
   contents: write
@@ -46,7 +52,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PYTHONUNBUFFERED: "1"
-        run: python pipeline/backfill.py --start "${{ inputs.start }}" --end "${{ inputs.end }}" --push-progress
+        run: >-
+          python -u pipeline/backfill.py --start "${{ inputs.start }}" --end "${{ inputs.end }}"
+          --source "${{ inputs.source || 'gnews' }}" --max-per-week "${{ inputs.max_per_week || '150' }}"
+          --max-minutes 300 --push-progress
 
       - name: Upload decision log
         if: always()

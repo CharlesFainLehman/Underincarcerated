@@ -197,7 +197,13 @@ def _decode_google_news_url(url: str) -> str | None:
     return None
 
 
-def google_news_search(query: str) -> list[dict]:
+def google_news_search(query: str, start: datetime | None = None,
+                       end: datetime | None = None) -> list[dict]:
+    """Google News RSS search. With start/end, the query carries Google's
+    after:/before: date operators, which is what makes a backfill possible
+    without GDELT. Up to 100 results per query."""
+    if start and end:
+        query = f"{query} after:{start:%Y-%m-%d} before:{end:%Y-%m-%d}"
     feed_url = ("https://news.google.com/rss/search?q="
                 f"{quote(query)}&hl=en-US&gl=US&ceid=US:en")
     feed = feedparser.parse(feed_url)
@@ -222,6 +228,16 @@ def google_news_search(query: str) -> list[dict]:
         }))
     _hits(query)["gnews"] += len(out)
     return out
+
+
+def discover_window(start: datetime, end: datetime, sleep: float = 1.0) -> list[dict]:
+    """Google News candidates for one date window (the backfill's source)."""
+    candidates: dict[str, dict] = {}
+    for q in GOOGLE_NEWS_QUERIES:
+        for c in google_news_search(q, start, end):
+            candidates.setdefault(c["url"], c)
+        time.sleep(sleep)
+    return list(candidates.values())
 
 
 def discover_daily(days_back: int = 1, use_gdelt: bool | None = None) -> list[dict]:
