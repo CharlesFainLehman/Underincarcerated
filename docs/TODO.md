@@ -12,11 +12,8 @@ mentions mugshot, booking, jail, sheriff, or the offender's name), and asks Clau
 URL; blank when none. Runs on new stories in the daily job and once over the
 existing database.
 
-- **needs you:** hot-link the image from the outlet, or copy it into `site/mugshots/`?
-  Hot-linking breaks when outlets move images and some block it; copying raises the
-  rights question (booking photos are public records in most states, but the copy on
-  the outlet's server is theirs). Recommendation: store the URL, hot-link with a
-  fallback silhouette, and copy nothing.
+- **Decided (2026-09-06):** hot-link the image from the outlet, with a fallback
+  silhouette; copy nothing.
 - Expect coverage of maybe a third of stories; TV station pages usually have one,
   wire and aggregator pages usually don't.
 
@@ -26,10 +23,8 @@ A featured-story card above the table: mug shot, name, age, city/state, new offe
 prior record counts and named priors, status at offense, the summary, and source
 links. Selection rule to decide:
 
-- **needs you:** newest strict story with a mug shot? Hand-picked (a `featured` flag
-  or a list of ids in a small JSON file the page reads)? Rotate through the last N?
-  Recommendation: a `data/featured.json` list of ids you edit, falling back to the
-  newest strict story with a mug shot when the list is empty.
+- **Parked** pending the maintainer's decision on selection (hand-picked list vs.
+  newest strict story with a mug shot).
 
 Depends on 1.
 
@@ -59,15 +54,16 @@ sign-up form. The stories page moves to `site/stories.html`.
 
 GitHub Pages is static, so the form posts somewhere else. Options, cheapest first:
 
-| Option | Cost | Effort | Notes |
+| Option | Free tier (Sept 2026) | Effort | Notes |
 |---|---|---|---|
-| Buttondown form | free to 100 subscribers, then $9/mo | 10 min | plain HTML form POST; sends the newsletter too |
-| Substack embed | free | 10 min | if the commentary site already has one, reuse it |
-| Mailchimp embedded form | free to 500 | 20 min | heavier script |
-| Cloudflare Worker + KV + your own mailer | free tier | half a day | full control, more to maintain |
+| Kit (formerly ConvertKit) | 10,000 subscribers, unlimited sends | 10 min | embeddable HTML form; Kit branding on emails |
+| beehiiv | 2,500 subscribers | 10 min | embeddable form |
+| Substack embed | unlimited | 10 min | a publishing platform, not just a list |
+| MailerLite | 250 subscribers | 20 min | too small |
+| Buttondown | 100 subscribers | 10 min | too small |
 
-- **needs you:** which. Recommendation: Buttondown unless you already have a Substack
-  list, in which case that.
+- **needs you:** Kit or Substack. Recommendation: Kit unless the list should live with
+  an existing Substack.
 
 ## 6. Style the whole site
 
@@ -76,8 +72,7 @@ restrained palette (the current blue is a placeholder), consistent header and fo
 with navigation, responsive tables, and a dark mode that is chosen rather than
 inverted. Do this last so it covers all pages at once.
 
-- **needs you:** any brand constraints (colors, fonts, a logo) or a site you want it
-  to feel like.
+- **Parked** pending brand constraints from the maintainer.
 
 ## Pipeline items carried from the plan
 
