@@ -9,6 +9,8 @@ on:
     branches: [main]
     paths:
       - "pipeline/build_exports.py"
+      - "pipeline/build_pages.py"
+      - "content/**"
       - "data/**"
       - "site/**"
   workflow_dispatch:

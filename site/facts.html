@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Underincarceration Facts</title>
+<meta name="description" content="The evidence that the United States has an underincarceration problem, and what to do about it.">
+<meta property="og:title" content="Underincarceration Facts">
+<meta property="og:description" content="The evidence that the United States has an underincarceration problem, and what to do about it.">
+<meta property="og:type" content="article">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #f6f7f9; --card: #ffffff; --ink: #1f2937; --ink-strong: #0b0b0b;
+    --muted: #52514e; --hairline: #dfe3e8; --accent: #2a78d6; --accent-soft: #dbe8f8; --link: #1c5cab;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #131313; --card: #1a1a19; --ink: #e5e5e0; --ink-strong: #ffffff;
+      --muted: #c3c2b7; --hairline: #33332f; --accent: #3987e5; --accent-soft: #1f3552; --link: #7fb3f0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
+  nav.top { display: flex; gap: 18px; align-items: baseline; padding: 18px 0 0; font-size: 0.9rem; }
+  nav.top .brand { font-weight: 700; color: var(--ink-strong); text-decoration: none; margin-right: 8px; }
+  nav.top a { color: var(--muted); text-decoration: none; }
+  nav.top a.here { color: var(--ink-strong); border-bottom: 2px solid var(--accent); }
+  header { padding: 26px 0 10px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; color: var(--ink-strong); letter-spacing: -0.01em; }
+  .lede { color: var(--muted); margin: 0; max-width: 60em; }
+  .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; margin-top: 24px; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } aside { position: static; } }
+  aside { position: sticky; top: 20px; align-self: start; font-size: 0.88rem; }
+  aside h3 { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 6px; }
+  aside .toc ul { list-style: none; padding: 0; margin: 0; }
+  aside .toc ul ul { padding-left: 12px; }
+  aside .toc li { margin: 4px 0; }
+  aside .toc a { color: var(--ink); text-decoration: none; }
+  aside .toc a:hover { color: var(--link); }
+  article { max-width: 44em; }
+  article h2 { font-size: 1.45rem; margin: 34px 0 10px; color: var(--ink-strong); }
+  article h2:first-child { margin-top: 0; }
+  article h3 { font-size: 1.1rem; margin: 24px 0 8px; color: var(--ink-strong); }
+  article p, article li { font-size: 1.02rem; }
+  article a { color: var(--link); }
+  article blockquote { margin: 16px 0; padding: 8px 16px; border-left: 3px solid var(--accent-soft); color: var(--muted); }
+  article table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 12px 0; }
+  article th, article td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
+  article figure.chart { margin: 20px 0; background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; }
+  figure.chart h4 { margin: 0 0 8px; font-size: 0.95rem; color: var(--ink-strong); }
+  figure.chart svg { width: 100%; height: auto; display: block; }
+  figure.chart .bar { fill: var(--accent); }
+  figure.chart text { fill: var(--muted); font-size: 11px; }
+  figure.chart .lab { fill: var(--ink); font-size: 12px; }
+  figure.chart .grid { stroke: var(--hairline); }
+  figure.chart figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+  .footnote { border-top: 1px solid var(--hairline); margin-top: 30px; padding-top: 10px; font-size: 0.88rem; color: var(--muted); }
+  .footnote ol { padding-left: 20px; }
+  sup a { text-decoration: none; }
+  footer { font-size: 0.85rem; color: var(--muted); margin-top: 40px; border-top: 1px solid var(--hairline); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a class="brand" href="./">Underincarcerated</a>
+    <a href="./" data-nav="index">Stories</a>
+    <a href="facts.html" data-nav="facts">Facts</a>
+    <a href="stories.csv">Data</a>
+    <a href="https://github.com/CharlesFainLehman/Underincarcerated">Code</a>
+  </nav>
+  <header>
+    <h1>Underincarceration Facts</h1>
+    <p class="lede">The evidence that the United States has an underincarceration problem, and what to do about it.</p>
+  </header>
+  <div class="layout">
+    <aside>
+      <h3>Contents</h3>
+      <div class="toc">
+<ul>
+<li><a href="#the-problem">The problem</a></li>
+<li><a href="#who-is-committing-crimes-while-released">Who is committing crimes while released</a></li>
+<li><a href="#what-to-do-about-it">What to do about it</a></li>
+</ul>
+</div>
+
+    </aside>
+    <article>
+<!--
+This file is the whole Facts page. Write in Markdown; the build turns it into
+site/facts.html with the site's header, footer, and a table of contents built
+from the ## headings. Footnotes use the [^1] syntax. A line containing only
+{chart:release_status}, {chart:prior_arrests}, or {chart:by_month} inserts a
+chart drawn from the live database.
+-->
+
+<h2 id="the-problem">The problem</h2>
+<p>Placeholder. Replace this section with the argument: how many serious crimes are
+committed by people with long records, and what the data on this site shows.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+<figure class="chart" data-chart="prior_arrests"></figure>
+<h2 id="who-is-committing-crimes-while-released">Who is committing crimes while released</h2>
+<p>Placeholder. Release status at the time of the new offense, from the database:</p>
+<figure class="chart" data-chart="release_status"></figure>
+<h2 id="what-to-do-about-it">What to do about it</h2>
+<p>Placeholder.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Placeholder citation.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+  </div>
+  <footer>
+    <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
+  </footer>
+</div>
+<script>
+document.querySelector('nav.top a[data-nav="facts"]')?.classList.add('here');
+(async function () {
+  const figs = document.querySelectorAll('figure.chart[data-chart]');
+  if (!figs.length) return;
+  const [stats, stories] = await Promise.all([
+    fetch('stats.json').then(r => r.json()),
+    fetch('stories.json').then(r => r.json()),
+  ]);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function hbar(title, pairs, caption) {
+    const max = Math.max(1, ...pairs.map(p => p[1]));
+    const rowH = 26, W = 640, labW = 190, H = pairs.length * rowH + 6;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">`;
+    pairs.forEach(([k, v], i) => {
+      const y = i * rowH + 3, w = (W - labW - 60) * v / max;
+      svg += `<text class="lab" x="${labW - 8}" y="${y + 16}" text-anchor="end">${esc(k)}</text>` +
+             `<rect class="bar" x="${labW}" y="${y + 4}" width="${Math.max(w, 1)}" height="${rowH - 8}" rx="3"><title>${esc(k)}: ${v}</title></rect>` +
+             `<text x="${labW + w + 6}" y="${y + 16}">${v.toLocaleString()}</text>`;
+    });
+    return `<h4>${esc(title)}</h4>${svg}</svg>` + (caption ? `<figcaption>${esc(caption)}</figcaption>` : '');
+  }
+  const n = stats.stories.toLocaleString();
+  const charts = {
+    release_status() {
+      const pairs = Object.entries(stats.by_release_status).filter(([k]) => k !== 'none stated');
+      const stated = pairs.reduce((a, p) => a + p[1], 0);
+      return hbar('Status at the time of the new offense', pairs,
+        `${stated.toLocaleString()} of ${n} stories state a release status; the rest are silent.`);
+    },
+    prior_arrests() {
+      const bins = [['1–4', 0], ['5–9', 0], ['10–24', 0], ['25–49', 0], ['50+', 0]];
+      let stated = 0;
+      stories.forEach(s => { const a = s.prior_count_arrests; if (!a) return; stated++;
+        bins[a < 5 ? 0 : a < 10 ? 1 : a < 25 ? 2 : a < 50 ? 3 : 4][1]++; });
+      return hbar('Prior arrests, where the article states a number', bins,
+        `${stated.toLocaleString()} of ${n} stories give an arrest count.`);
+    },
+    by_month() {
+      const pairs = Object.entries(stats.by_month).slice(-12);
+      return hbar('Stories by month of new offense, last 12 months', pairs, '');
+    },
+  };
+  figs.forEach(f => { const fn = charts[f.dataset.chart]; f.innerHTML = fn ? fn() : `<p>Unknown chart ${esc(f.dataset.chart)}</p>`; });
+})();
+</script>
+</body>
+</html>

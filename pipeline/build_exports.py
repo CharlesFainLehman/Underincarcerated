@@ -15,6 +15,7 @@ import shutil
 from collections import Counter, defaultdict
 from datetime import date
 
+from build_pages import build_pages
 from config import CSV_COLUMNS, OFFENDER_COLUMNS, OFFENDERS_CSV, SITE_DIR
 from store import load_all_stories
 
@@ -113,7 +114,9 @@ def build_exports() -> None:
         json.dumps([_to_json_record(o) for o in offenders], ensure_ascii=False), encoding="utf-8")
     stats = build_stats(stories, offenders)
     (SITE_DIR / "stats.json").write_text(json.dumps(stats, indent=1), encoding="utf-8")
-    print(f"Exports built: {len(stories)} stories, {len(offenders)} offenders")
+    pages = build_pages()
+    print(f"Exports built: {len(stories)} stories, {len(offenders)} offenders, "
+          f"{len(pages)} content pages")
 
 
 if __name__ == "__main__":
