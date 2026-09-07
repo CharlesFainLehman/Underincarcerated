@@ -62,8 +62,8 @@ GitHub Pages is static, so the form posts somewhere else. Options, cheapest firs
 | MailerLite | 250 subscribers | 20 min | too small |
 | Buttondown | 100 subscribers | 10 min | too small |
 
-- **needs you:** Kit or Substack. Recommendation: Kit unless the list should live with
-  an existing Substack.
+- **Parked (2026-09-06)** until the initial list is built and content exists. Kit is the
+  likely pick (10,000 free subscribers) unless the list should live with a Substack.
 
 ## 6. Style the whole site
 

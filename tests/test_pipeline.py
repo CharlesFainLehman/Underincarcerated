@@ -613,3 +613,17 @@ def test_sweep_stores_url_and_marks_checked(monkeypatch, tmp_path):
     assert got["2"]["mugshot_url"] == "" and got["2"]["mugshot_checked"]
     # Second sweep skips checked rows.
     assert mugshots.sweep(SimpleNamespace(), path) == {"checked": 0, "found": 0}
+
+
+def test_build_pages_renders_markdown(monkeypatch, tmp_path):
+    import build_pages
+    content = tmp_path / "content"; content.mkdir()
+    site = tmp_path / "site"; site.mkdir()
+    (content / "facts.md").write_text("---\ntitle: T\ndescription: D\n---\n\n## One\n\nText.[^1]\n\n{chart:release_status}\n\n[^1]: Note.\n")
+    monkeypatch.setattr(build_pages, "CONTENT_DIR", content)
+    monkeypatch.setattr(build_pages, "SITE_DIR", site)
+    out = build_pages.build_pages()
+    html = (site / "facts.html").read_text()
+    assert out == [site / "facts.html"]
+    assert "<title>T</title>" in html and 'data-chart="release_status"' in html
+    assert 'href="#one"' in html and "footnote" in html
