@@ -83,7 +83,7 @@ inverted. Do this last so it covers all pages at once.
 
 - About 30% of fetched articles yield no text (paywalls, JavaScript-only pages). A
   second fetch path (AMP URL, or a text-only mirror) would recover some.
-- The daily schedule is paused (`daily.yml`); resume by uncommenting `schedule`.
+- The daily schedule resumed 2026-09-08 (`daily.yml`, 10:30 UTC).
   Runs are capped at 150 articles (`max_classify`), about $1/day. Only strict stories
   are stored since 2026-09-08 (`STRICT_ONLY`); a strict-only headline triage would cut
   cost further but lose about two thirds of strict stories, so it was not done.
