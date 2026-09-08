@@ -137,10 +137,25 @@ a. **Names.** Stored as printed.
 b. **Threshold.** Ingest every story with at least one concrete prior or a release-status
    condition. A `qualifies_strict` flag marks 5+ prior arrests, or 5+ prior convictions, or 3+
    prior felony convictions, as stated in the article. The front end filters on the flag.
+   **Revised 2026-09-08:** only strict stories are stored (`STRICT_ONLY`). Non-strict rows
+   were removed from both story files (682 to 205 daily, 3,727 to 871 backfill); they remain
+   in git history and in the decision logs. Daily runs are capped at 150 articles.
 c. **Scope.** US only. Non-US stories rejected at triage and again at classification.
 d. **Backfill depth.** 2017.
 e. **Person linking.** `offenders.csv` built from phase 1.
 g. **Juveniles** (settled 2026-09-05). Kept when the article gives offense detail.
+   **Reversed 2026-09-08:** no one under 18 is stored (`MIN_AGE`); the six existing rows
+   were moved to `data/removed.csv`.
+h. **Defamation guards** (2026-09-08). Only people reported arrested, charged, indicted,
+   convicted, or sentenced are stored (`STORED_OUTCOME_RE`); wanted, at-large, and
+   killed-by-police subjects are not. Every stated prior count must appear in the article
+   text (`check_counts`). Summaries of unproven allegations are attributed to the outlet
+   (`hedge_summary`). The deterministic same-incident merge also needs a matching city or
+   offense; cross-incident person links need ages consistent with the date gap
+   (`ages_consistent`), and `offenders.csv` reports the latest report's counts, not a
+   maximum. A mug shot is accepted only when the surname is attached to the image or it is
+   the page's sole candidate. Removed rows go to `data/removed.csv` with a reason; their
+   ids are reserved and the site shows a tombstone. Policy: `content/corrections.md`.
 f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `data/`, front
    end and exports in `site/`.
 

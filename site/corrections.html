@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}}</title>
-<meta name="description" content="{{description}}">
-<meta property="og:title" content="{{title}}">
-<meta property="og:description" content="{{description}}">
+<title>Corrections</title>
+<meta name="description" content="How to report an error in a record, what happens next, and what this database does and does not claim.">
+<meta property="og:title" content="Corrections">
+<meta property="og:description" content="How to report an error in a record, what happens next, and what this database does and does not claim.">
 <meta property="og:type" content="article">
 <style>
   :root {
@@ -75,16 +75,43 @@
     <a href="https://github.com/CharlesFainLehman/Underincarcerated">Code</a>
   </nav>
   <header>
-    <h1>{{title}}</h1>
-    <p class="lede">{{description}}</p>
+    <h1>Corrections</h1>
+    <p class="lede">How to report an error in a record, what happens next, and what this database does and does not claim.</p>
   </header>
   <div class="layout">
     <aside>
       <h3>Contents</h3>
-      {{toc}}
+      <div class="toc">
+<ul>
+<li><a href="#what-a-record-claims">What a record claims</a></li>
+<li><a href="#what-is-not-included">What is not included</a></li>
+<li><a href="#reporting-an-error">Reporting an error</a></li>
+<li><a href="#what-happens-next">What happens next</a></li>
+</ul>
+</div>
+
     </aside>
     <article>
-{{content}}
+<h2 id="what-a-record-claims">What a record claims</h2>
+<p>Each record restates what one named news outlet reported on the date shown, with the sentences that document the prior record and release status quoted verbatim from that article. A record does not claim that the underlying facts are true, only that the outlet reported them. News reports of arrests rely on police and prosecutor statements. Charges get dropped, cases end in acquittal, and outcomes change after publication. A record&rsquo;s outcome is the outcome at the time the article was written unless a later source was added.</p>
+<p>Classification is automated. The prior-record and release-status fields are backed by quotes checked against the article text, and every stated count must appear in the article, but errors in either direction remain possible, including a wrong person, a miscounted record, or two people with one name treated as one.</p>
+<h2 id="what-is-not-included">What is not included</h2>
+<ul>
+<li>Anyone under 18, whatever the article reports.</li>
+<li>Anyone the article does not report as arrested, charged, indicted, convicted, or sentenced. Suspects who are wanted or at large are not stored.</li>
+<li>Stories where the article does not state at least five prior arrests, five prior convictions, or three prior felony convictions. Counts are never estimated.</li>
+</ul>
+<h2 id="reporting-an-error">Reporting an error</h2>
+<p>Use the flag (⚑) on any record. It opens a form with the record id filled in. Say what is wrong and, if you can, link to a source. Reports are public on the issue tracker, get an automated first assessment, and are decided by the maintainer.</p>
+<p>If you are the person named in a record, or represent them, and would rather not post publicly, write to <strong>[email address to be added]</strong>. Say which record and what is wrong.</p>
+<h2 id="what-happens-next">What happens next</h2>
+<ul>
+<li>Reports are acknowledged within three business days and resolved within ten.</li>
+<li>A record that is wrong is corrected; a record that should not exist is removed. Either way the change is logged in the repository&rsquo;s history.</li>
+<li>A removed record keeps its id. Its address shows only the date and reason for removal, so a shared link never resolves to a different person.</li>
+<li>If the cited article has been taken down or changed so that it no longer supports the record, the record is removed.</li>
+<li>Corrections do not require proof of harm. A documented factual error is enough.</li>
+</ul>
     </article>
   </div>
   <footer>
@@ -93,7 +120,7 @@
   </footer>
 </div>
 <script>
-document.querySelector('nav.top a[data-nav="{{nav_here}}"]')?.classList.add('here');
+document.querySelector('nav.top a[data-nav="corrections"]')?.classList.add('here');
 (async function () {
   const figs = document.querySelectorAll('figure.chart[data-chart]');
   if (!figs.length) return;

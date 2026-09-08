@@ -50,7 +50,14 @@ _FIGCAP_RE = re.compile(r"<figcaption[^>]*>(.*?)</figcaption>", re.I | re.S)
 
 def candidate_images(html: str, page_url: str, last_name: str = "") -> list[str]:
     """Image URLs worth asking about, most promising first."""
+    return [u for u, _ in scored_candidates(html, page_url, last_name)]
+
+
+def scored_candidates(html: str, page_url: str, last_name: str = "") -> list[tuple[str, bool]]:
+    """(url, named) pairs, most promising first. `named` means the surname
+    appears in the image's alt text, title, or file name."""
     scored: dict[str, int] = {}
+    named: set[str] = set()
 
     def add(url: str, score: int):
         url = unescape(url.strip())
@@ -80,6 +87,7 @@ def candidate_images(html: str, page_url: str, last_name: str = "") -> list[str]
             score += 3
         if last_name and re.search(re.escape(last_name), text, re.I):
             score += 3
+            named.add(unescape(src.strip()))
         try:
             w = int(re.sub(r"\D", "", attrs.get("width", "") or "0") or 0)
             if 0 < w < 120:
@@ -93,7 +101,8 @@ def candidate_images(html: str, page_url: str, last_name: str = "") -> list[str]
             if scored[url] < 3:
                 scored[url] += 1
     ranked = sorted(scored.items(), key=lambda kv: -kv[1])
-    return [u for u, _ in ranked[:MAX_CANDIDATES]]
+    named_full = {urljoin(page_url, n) for n in named}
+    return [(u, u in named_full) for u, _ in ranked[:MAX_CANDIDATES]]
 
 
 def fetch_html(url: str) -> str | None:
@@ -156,7 +165,14 @@ def find_mugshot(client: anthropic.Anthropic, story: dict) -> str:
     if not html:
         return ""
     last = (story.get("offender_name") or "").split()[-1] if story.get("offender_name") else ""
-    for url in candidate_images(html, story["source_url"], last):
+    cands = scored_candidates(html, story["source_url"], last)
+    # Identity rule: the vision check only says "this is a booking photo",
+    # not whose. Accept an image only if the surname is attached to it, or
+    # it is the page's sole candidate. Pages with several booking photos
+    # (co-defendants) and no names yield nothing rather than a guess.
+    named = [u for u, n in cands if n]
+    tries = named if named else ([cands[0][0]] if len(cands) == 1 else [])
+    for url in tries:
         if is_mugshot(client, url):
             return url
     return ""

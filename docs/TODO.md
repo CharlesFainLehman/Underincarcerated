@@ -83,10 +83,29 @@ inverted. Do this last so it covers all pages at once.
 
 - About 30% of fetched articles yield no text (paywalls, JavaScript-only pages). A
   second fetch path (AMP URL, or a text-only mirror) would recover some.
-- The daily schedule is paused (`daily.yml`); resume when the backfill is done and
-  the cost is acceptable (~$3/day at current density).
+- The daily schedule resumed 2026-09-08 (`daily.yml`, 10:30 UTC).
+  Runs are capped at 150 articles (`max_classify`), about $1/day. Only strict stories
+  are stored since 2026-09-08 (`STRICT_ONLY`); a strict-only headline triage would cut
+  cost further but lose about two thirds of strict stories, so it was not done.
 - Feedback triage from public issues is ported (2026-09-08): every card and the hero
   carry a flag link to the `flag-error.yml` issue form with the record id filled in;
   `feedback.yml` runs `review_feedback.py` (Sonnet) on new `feedback` issues and posts
   an assessment plus a `triage:*` label. Needs the `ANTHROPIC_API_KEY` secret, which
   the other workflows already use.
+
+## Corrections email
+
+Set up a private address for correction requests (a person named in a record may not
+want to post on a public issue tracker) and put it in `content/corrections.md`, replacing "[email address to be added]". Retraction statutes in
+several states limit damages only when a correction follows promptly after a demand, so
+the address should be one that is actually read.
+
+## Defamation guards (done 2026-09-08)
+
+Attribution on every record; corrections page with a response window (email address
+still to be added by the maintainer, see `content/corrections.md`); tombstones for removed
+records (`remove_story.py`, `data/removed.csv`, `site/removed.json`); hedged summaries;
+prior counts verified against the article (`check_counts` at ingest, `verify_counts.py`
+for the existing rows); tighter merges and age-checked person links; photo identity rule;
+juveniles and un-arrested subjects excluded. Not done: periodic re-audit of outcomes and
+dead links, hand-picked hero, media liability insurance.

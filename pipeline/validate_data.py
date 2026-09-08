@@ -13,8 +13,9 @@ import sys
 from datetime import date, timedelta
 
 from classify import qualifies_strict
-from config import (BACKFILL_ID_BASE, BACKFILL_STORIES_CSV, DATA_DIR, NEW_OFFENSE_TYPES,
-                    OFFENSE_SEVERITIES, RELEASE_STATUSES, STORIES_CSV, US_STATES)
+from config import (BACKFILL_ID_BASE, BACKFILL_STORIES_CSV, DATA_DIR, MIN_AGE, NEW_OFFENSE_TYPES,
+                    OFFENSE_SEVERITIES, RELEASE_STATUSES, REMOVED_CSV, STORED_OUTCOME_RE,
+                    STORIES_CSV, US_STATES)
 
 MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 BAD_SOURCE = re.compile(r"prnewswire|businesswire|globenewswire|einpresswire|press_release|"
@@ -61,6 +62,10 @@ def row_problems(r: dict, horizon: str | None = None) -> list[str]:
         out.append("non-integer prior count")
     if BAD_SOURCE.search(r.get("source_url", "")):
         out.append("wire/blotter primary source")
+    if r.get("age") and r["age"].isdigit() and int(r["age"]) < MIN_AGE:
+        out.append(f"subject is {r['age']}, under {MIN_AGE}")
+    if not re.search(STORED_OUTCOME_RE, r.get("outcome") or "", re.I):
+        out.append(f"outcome {r.get('outcome')!r}: not arrested, charged, or convicted")
     return out
 
 
@@ -100,6 +105,10 @@ def main() -> None:
     all_ids = [r["id"] for r in rows]
     if len(all_ids) != len(set(all_ids)):
         fail("duplicate ids across stories.csv and backfill/stories.csv")
+    if REMOVED_CSV.exists():
+        removed = {r["id"] for r in csv.DictReader(open(REMOVED_CSV, newline="", encoding="utf-8"))}
+        if clash := sorted(removed & set(all_ids), key=int)[:5]:
+            fail(f"ids present in both removed.csv and a stories file: {clash}")
     if not rows:
         print("data validation OK (no stories yet)")
         return

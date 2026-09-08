@@ -17,7 +17,7 @@ from datetime import date
 
 from build_pages import build_pages
 from config import CSV_COLUMNS, OFFENDER_COLUMNS, OFFENDERS_CSV, SITE_DIR
-from store import load_all_stories
+from store import load_all_stories, load_removed
 
 INT_FIELDS = ("id", "age", "prior_count_arrests", "prior_count_convictions",
               "prior_count_felony_convictions")
@@ -47,8 +47,11 @@ def build_offenders(stories: list[dict]) -> list[dict]:
             "incident_count": str(len(rows)),
             "first_incident_date": dates[0] if dates else "",
             "last_incident_date": dates[-1] if dates else "",
-            "max_prior_arrests": _max_int(r["prior_count_arrests"] for r in rows),
-            "max_prior_convictions": _max_int(r["prior_count_convictions"] for r in rows),
+            # Counts as stated in the most recent report, not a maximum across
+            # linked incidents: a wrong link must not inflate anyone's record.
+            "latest_prior_arrests": rows[-1]["prior_count_arrests"],
+            "latest_prior_convictions": rows[-1]["prior_count_convictions"],
+            "latest_prior_felony_convictions": rows[-1]["prior_count_felony_convictions"],
             "qualifies_strict": "yes" if any(r["qualifies_strict"] == "yes" for r in rows) else "no",
         })
     out.sort(key=lambda o: (-int(o["incident_count"]), o["offender_key"]))
@@ -112,6 +115,10 @@ def build_exports() -> None:
         json.dumps([_to_json_record(s) for s in stories], ensure_ascii=False), encoding="utf-8")
     (SITE_DIR / "offenders.json").write_text(
         json.dumps([_to_json_record(o) for o in offenders], ensure_ascii=False), encoding="utf-8")
+    # Tombstones: a permalink to a removed record explains itself.
+    (SITE_DIR / "removed.json").write_text(json.dumps(
+        {r["id"]: {"date": r["removed_date"], "reason": r["removed_reason"]} for r in load_removed()},
+        ensure_ascii=False), encoding="utf-8")
     stats = build_stats(stories, offenders)
     (SITE_DIR / "stats.json").write_text(json.dumps(stats, indent=1), encoding="utf-8")
     pages = build_pages()

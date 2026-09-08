@@ -48,9 +48,30 @@ a **new offense in the United States**, and the article must state at least one 
 3. that the person had been released early, had charges dropped or reduced, or had been denied
    detention in a prior case that the article connects to the new offense.
 
-Every qualifying story is stored. The **strict** flag (`qualifies_strict`) marks the subset
-with 5+ prior arrests, or 5+ prior convictions, or 3+ prior felony convictions, as stated in
-the article. Counts are never estimated: "more than a dozen" is 13, "numerous" is blank.
+Only **strict** stories are stored (since 2026-09-08): 5+ prior arrests, or 5+ prior
+convictions, or 3+ prior felony convictions, as stated in the article. Counts are never
+estimated: "more than a dozen" is 13, "numerous" is blank. Stories that meet the conditions
+above but not the strict threshold are classified and logged, then dropped
+(`STRICT_ONLY` in `config.py`). The `qualifies_strict` column is therefore always `yes`; it
+is kept so older exports and tools keep working.
+
+Not stored: anyone under 18, and anyone the article does not report as arrested, charged,
+indicted, convicted, or sentenced. Every stated prior count must appear in the article text.
+Summaries of unproven allegations are attributed to the outlet. Rows removed after
+publication go to `data/removed.csv` with a reason (`python pipeline/remove_story.py --id N
+--reason "..."`); their ids are never reused and the site shows a tombstone. The corrections
+policy is `content/corrections.md`.
+
+A second-source search (`corroborate.py`) runs on new rows at the end of each daily run and
+on demand for the whole database: it queries Google News for the offender's name and place
+around the incident date, and adds another outlet's report to `additional_sources` when the
+model confirms it covers the same person and incident. `corroboration_checked` records the
+date of the last search. Rows whose primary source is on `TRUSTED_OUTLETS` in `config.py`
+(national outlets and metro dailies with professional newsrooms) skip the search. The stories page can filter to records with two or more outlets.
+
+The database is a collection of stories, not a census. It holds what the news covered, what
+the searches found, and what the article stated. Daily runs are capped at 150 articles
+(`max_classify`), ranked by headline signals, so a busy news day is sampled, not exhausted.
 
 **Excluded by rule:**
 - policy, statistics, editorial, and opinion pieces with no specific new incident

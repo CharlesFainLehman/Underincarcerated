@@ -136,7 +136,7 @@ def _run(monkeypatch, tmp_path, candidates, stories, classification, dedupe=None
     monkeypatch.setattr(process, "resolve_candidate", lambda cand: None)
     seen: set[str] = set()
     counts = process_candidates(FakeClient(), candidates, stories, seen,
-                                decision_log=tmp_path / "log.jsonl")
+                                decision_log=tmp_path / "log.jsonl", reserved=set())
     return counts, seen
 
 
@@ -146,9 +146,11 @@ def test_process_adds_verified_row(monkeypatch, tmp_path):
     counts, seen = _run(monkeypatch, tmp_path, cands, stories, _cls())
     assert counts["new"] == 1 and len(stories) == 1
     assert stories[0]["qualifies_strict"] == "yes"
+    # "Smith robbed a gas station" with outcome "charged" is attributed, not asserted.
+    assert stories[0]["summary"].startswith("According to x.com, Smith robbed")
     assert "https://x.com/a" in seen
     log = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
-    assert [r["stage"] for r in log] == ["triage", "classify"]
+    assert [r["stage"] for r in log] == ["triage", "hedge", "classify"]
 
 
 def test_process_rejects_unverifiable_quote(monkeypatch, tmp_path):
@@ -240,7 +242,7 @@ def test_exports_and_validation(monkeypatch, tmp_path):
     assert offenders[0]["offender_key"] == "smith_john_OH"
     assert offenders[0]["incident_count"] == "2"
     assert offenders[0]["story_ids"] == "2 1"  # ordered by incident_date
-    assert offenders[0]["max_prior_arrests"] == "11"
+    assert offenders[0]["latest_prior_arrests"] == "11"  # from the most recent incident
     assert offenders[0]["qualifies_strict"] == "yes"
     assert offenders[1]["qualifies_strict"] == "no"
     stats = json.loads((site / "stats.json").read_text())
@@ -412,13 +414,19 @@ def test_pack_decisions(tmp_path, monkeypatch):
 
 def test_obvious_same_incident_and_stateless_match():
     from dedupe import check_duplicate, obvious_same_incident, same_person
-    a = {"offender_key": "simpson_david_NC", "state": "NC", "incident_date": "2026-07-29", "id": "45"}
-    b = {"offender_key": "simpson_david_", "state": "", "incident_date": "2026-08-03"}
+    a = {"offender_key": "simpson_david_NC", "state": "NC", "city": "Raleigh", "new_offense_type": "assault",
+         "incident_date": "2026-07-29", "id": "45"}
+    b = {"offender_key": "simpson_david_", "state": "", "city": "raleigh", "new_offense_type": "robbery",
+         "incident_date": "2026-08-03"}
     c = {"offender_key": "simpson_david_TX", "state": "TX", "incident_date": "2026-07-29"}
-    d = {"offender_key": "simpson_david_NC", "state": "NC", "incident_date": "2026-01-01"}
+    d = {"offender_key": "simpson_david_NC", "state": "NC", "city": "Raleigh", "new_offense_type": "assault",
+         "incident_date": "2026-01-01"}
+    e = {"offender_key": "simpson_david_NC", "state": "NC", "city": "Charlotte", "new_offense_type": "robbery",
+         "incident_date": "2026-08-01"}
     assert same_person(a, b) and not same_person(a, c)
-    assert obvious_same_incident(b, a)
+    assert obvious_same_incident(b, a)            # same city (case-insensitive)
     assert not obvious_same_incident(d, a)        # same person, 7 months apart
+    assert not obvious_same_incident(e, a)        # same name and state, but a different city and offense: ask the model
     # Deterministic merge never calls the model.
     class NoCalls:
         class messages:
@@ -652,3 +660,188 @@ def test_extract_ids_free_text_needs_prefix():
     known = {"7", "99", "300"}
     assert extract_ids("record 99 is wrong; he has 300 arrests", known) == ["99"]
     assert extract_ids("see #7", known) == ["7"]
+
+
+def test_process_drops_non_strict_rows_when_strict_only(monkeypatch, tmp_path):
+    monkeypatch.setattr(process, "STRICT_ONLY", True)
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    weak = _cls(prior_count_arrests=2, prior_count_felony_convictions=None,
+                prior_evidence_quote="Court records show Smith has been arrested 11 times since 2015, "
+                                     "including three prior felony convictions for burglary and assault.")
+    counts, seen = _run(monkeypatch, tmp_path, cands, stories, weak)
+    assert counts["not_strict"] == 1 and counts["new"] == 0 and not stories
+    assert "https://x.com/a" in seen  # classified and judged; not retried
+    log = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+    assert log[-1]["stage"] == "strict" and log[-1]["kept"] is False
+
+
+def test_process_keeps_non_strict_rows_when_not_strict_only(monkeypatch, tmp_path):
+    monkeypatch.setattr(process, "STRICT_ONLY", False)
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    weak = _cls(prior_count_arrests=2, prior_count_felony_convictions=None)
+    counts, _ = _run(monkeypatch, tmp_path, cands, stories, weak)
+    assert counts["new"] == 1 and stories[0]["qualifies_strict"] == "no"
+
+
+# ---- defamation guards ------------------------------------------------------
+
+def test_count_in_text_forms():
+    from classify import count_in_text
+    assert count_in_text(11, "arrested 11 times")
+    assert count_in_text(3, "three prior felony convictions")
+    assert count_in_text(4, "charged with DUI, fifth offense")      # Nth offense = N-1 priors
+    assert count_in_text(13, "more than a dozen arrests")
+    assert count_in_text(24, "nearly two dozen arrests")
+    assert count_in_text(27, "27 prior arrests") and count_in_text(27, "twenty-seven arrests")
+    assert not count_in_text(11, "arrested 110 times")            # 110 is not 11
+    assert not count_in_text(12, "arrested many times in 2012")   # a year is not a count
+
+
+def test_check_evidence_rejects_count_not_in_article():
+    from classify import check_evidence
+    assert check_evidence(_cls(), ARTICLE) is None
+    bad = _cls(prior_count_convictions=9)
+    assert "prior_count_convictions=9" in check_evidence(bad, ARTICLE)
+
+
+def test_hedge_summary():
+    from classify import hedge_summary
+    assert hedge_summary("Smith robbed a store.", "arrested", "WXYZ") == "According to WXYZ, Smith robbed a store."
+    assert hedge_summary("Smith is accused of robbing a store.", "arrested", "WXYZ").startswith("Smith is")
+    assert hedge_summary("Smith robbed a store.", "convicted; sentenced to 5 years", "WXYZ") == "Smith robbed a store."
+    assert hedge_summary("Smith robbed a store.", "charged", "") == "According to the cited report, Smith robbed a store."
+
+
+def test_process_rejects_juveniles_and_unarrested(monkeypatch, tmp_path):
+    for override, needle in (({"age": 16}, "under 18"), ({"outcome": "at large"}, "not arrested")):
+        stories: list[dict] = []
+        cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+        counts, seen = _run(monkeypatch, tmp_path, cands, stories, _cls(**override))
+        assert counts["rejected"] == 1 and not stories
+        log = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+        assert needle in log[-1]["reason"]
+
+
+def test_ages_consistent():
+    from dedupe import ages_consistent
+    a = {"age": "34", "incident_date": "2026-09-01"}
+    assert ages_consistent(a, {"age": "33", "incident_date": "2025-06-01"})   # a year older a year later
+    assert ages_consistent(a, {"age": "", "incident_date": "2020-01-01"})     # unknown age: no evidence
+    assert not ages_consistent(a, {"age": "51", "incident_date": "2026-03-01"})  # not the same person
+    assert not ages_consistent(a, {"age": "34", "incident_date": "2016-09-01"})  # same age ten years apart
+
+
+def test_same_person_link_needs_consistent_ages(monkeypatch, tmp_path):
+    stories = [{"id": "1", "state": "OH", "city": "Springfield", "incident_date": "2016-09-01", "age": "34",
+                "offender_key": "smith_john_OH", "offender_name": "John Smith", "date_added": "2016-09-02",
+                "new_offense_type": "assault", "source_url": "https://y.com/old", "additional_sources": ""}]
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    counts, _ = _run(monkeypatch, tmp_path, cands, stories, _cls(),
+                     dedupe=DedupeResult(relation="same_person_new_incident", matching_id="1"))
+    assert counts["new"] == 1 and counts["same_person"] == 0
+    log = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+    assert any(r.get("reason") == "ages inconsistent" for r in log)
+
+
+def test_next_story_id_skips_reserved():
+    from store import next_story_id
+    assert next_story_id([{"id": "5"}], 0, reserved={9}) == 10
+    assert next_story_id([{"id": "5"}], 0, reserved=set()) == 6
+    assert next_story_id([], 1_000_000, reserved={1_000_003}) == 1_000_004
+
+
+def test_remove_story_moves_row_and_reserves_id(monkeypatch, tmp_path):
+    import remove_story, store, config, build_exports as be
+    data, site = tmp_path / "data", tmp_path / "site"
+    data.mkdir(); site.mkdir(); (data / "backfill").mkdir()
+    for mod in (store, config, remove_story, validate_data, be):
+        for name, val in (("STORIES_CSV", data / "stories.csv"), ("BACKFILL_STORIES_CSV", data / "backfill" / "stories.csv"),
+                          ("REMOVED_CSV", data / "removed.csv"), ("SITE_DIR", site), ("OFFENDERS_CSV", data / "offenders.csv")):
+            if hasattr(mod, name):
+                monkeypatch.setattr(mod, name, val)
+    monkeypatch.setattr(be, "build_pages", lambda: [])
+    r1 = make_row(1, _cls(), {"url": "https://x.com/a", "source": "x.com"})
+    r2 = make_row(2, _cls(offender_name="Ann Lee"), {"url": "https://x.com/b", "source": "x.com"})
+    store.save_stories([r1, r2])
+    moved = remove_story.remove_ids({"2"}, "wrong person", rebuild=True)
+    assert [m["id"] for m in moved] == ["2"] and moved[0]["removed_reason"] == "wrong person"
+    assert [s["id"] for s in store.load_stories()] == ["1"]
+    assert store.reserved_ids(0) == {2}
+    assert store.next_story_id(store.load_stories(), 0) == 3
+    assert json.loads((site / "removed.json").read_text())["2"]["reason"] == "wrong person"
+    validate_data.main()
+
+
+def test_mugshot_identity_rule(monkeypatch):
+    import mugshots
+    asked = []
+    monkeypatch.setattr(mugshots, "is_mugshot", lambda c, u: asked.append(u) or True)
+    two_unnamed = """<html><body><img src="/a.jpg" alt="booking photo" width="600">
+        <img src="/b.jpg" alt="booking photo" width="600"></body></html>"""
+    monkeypatch.setattr(mugshots, "fetch_html", lambda u: two_unnamed)
+    assert mugshots.find_mugshot(None, {"source_url": "https://x.com/s", "offender_name": "John Smith"}) == ""
+    assert asked == []                                        # two candidates, neither named: no guess
+    named = """<html><body><img src="/a.jpg" alt="booking photo" width="600">
+        <img src="/smith.jpg" alt="Booking photo of John Smith" width="600"></body></html>"""
+    monkeypatch.setattr(mugshots, "fetch_html", lambda u: named)
+    assert mugshots.find_mugshot(None, {"source_url": "https://x.com/s", "offender_name": "John Smith"}) == "https://x.com/smith.jpg"
+    sole = '<html><body><img src="/only.jpg" alt="mugshot" width="600"></body></html>'
+    monkeypatch.setattr(mugshots, "fetch_html", lambda u: sole)
+    assert mugshots.find_mugshot(None, {"source_url": "https://x.com/s", "offender_name": "John Smith"}) == "https://x.com/only.jpg"
+
+
+# ---- second-source search ---------------------------------------------------
+
+def test_corroborate_query_window_and_candidates():
+    import corroborate as co
+    row = {"id": "1", "offender_name": "John  M. Smith", "city": "Springfield", "state": "OH",
+           "incident_date": "2026-09-01", "source_url": "https://www.wxyz.com/2026/09/02/john-smith-arrested/",
+           "additional_sources": ""}
+    assert co.build_query(row) == '"John M. Smith" Springfield'
+    assert co.build_query({**row, "city": ""}) == '"John M. Smith" OH'
+    start, end = co.date_window(row)
+    assert (start.date().isoformat(), end.date().isoformat()) == ("2026-08-25", "2026-10-16")
+    assert co.date_window({**row, "incident_date": "2026"}) == (None, None)
+    hits = [
+        {"url": "https://wxyz.com/2026/09/02/john-smith-arrested/?utm_source=x", "source": "WXYZ"},  # primary itself
+        {"url": "https://www.wxyz.com/other", "source": "WXYZ"},                       # same outlet
+        {"url": "https://www.mugshots.com/john-smith", "source": "Mugshots"},         # blotter aggregator
+        {"url": "https://fox8.com/2026/09/02/john-smith-arrested/", "source": "FOX 8"},  # syndicated copy of primary
+        {"url": "https://nbc4i.com/news/john-smith", "source": "NBC4"},
+        {"url": "https://www.nbc4i.com/news/john-smith-2", "source": "NBC4"},          # second from same outlet
+        {"url": "https://news.google.com/rss/articles/xyz", "source": "Dispatch"},     # undecoded: keep
+    ]
+    out = co.find_candidates(row, hits)
+    assert [h["url"] for h in out] == ["https://nbc4i.com/news/john-smith", "https://news.google.com/rss/articles/xyz"]
+    assert co.needs_check(row) and not co.needs_check({**row, "corroboration_checked": "2026-09-08"})
+    assert not co.needs_check({**row, "additional_sources": "https://nbc4i.com/x"})
+    assert not co.needs_check({**row, "offender_name": ""})
+    trusted = {**row, "source_url": "https://www.nytimes.com/2026/09/02/nyregion/x.html"}
+    assert co.is_trusted(trusted["source_url"]) and co.is_trusted("https://abcnews.go.com/US/x")
+    assert not co.is_trusted("https://notnytimes.com/x") and not co.is_trusted("https://nytimes.com.evil.net/x")
+    assert not co.needs_check(trusted) and co.needs_check(trusted, include_trusted=True)
+
+
+def test_corroborate_sweep_adds_confirmed_source(monkeypatch, tmp_path):
+    import corroborate as co
+    import store
+    path = tmp_path / "stories.csv"
+    r1 = make_row(1, _cls(), {"url": "https://wxyz.com/a", "source": "WXYZ"})
+    r2 = make_row(2, _cls(offender_name="Ann Lee"), {"url": "https://wxyz.com/b", "source": "WXYZ"})
+    store.save_stories([r1, r2], path)
+    monkeypatch.setattr(co, "google_news_search", lambda q, s, e: [
+        {"url": "https://nbc4i.com/x", "source": "NBC4", "title": "t", "published": "2026-09-02"},
+        {"url": "https://fox8.com/y", "source": "FOX 8", "title": "t", "published": "2026-09-02"}])
+    monkeypatch.setattr(co, "fetch_article_text", lambda u: "text" if "nbc4i" in u else None)
+    monkeypatch.setattr(co, "confirm", lambda c, row, cand, text:
+                        co.Match(same_person=True, same_incident=row["offender_name"].startswith("John"), reason="r"))
+    log = process.DecisionLog(tmp_path / "log.jsonl")
+    counts = co.sweep(None, path, log=log)
+    rows = {r["id"]: r for r in store.load_stories(path)}
+    assert counts["checked"] == 2 and counts["corroborated"] == 1 and counts["sources_added"] == 1
+    assert rows["1"]["additional_sources"] == "https://nbc4i.com/x"
+    assert rows["2"]["additional_sources"] == "" and rows["2"]["corroboration_checked"]
+    # Second pass does nothing: both rows are stamped.
+    assert co.sweep(None, path, log=log)["checked"] == 0
