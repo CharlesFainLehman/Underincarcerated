@@ -129,6 +129,8 @@ An article does NOT qualify if it is:
 - A story about a crime outside the United States.
 - A police blotter, arrest log, or list of unrelated bookings.
 - A story about a wrongful arrest or exoneration.
+- A story whose subject is under 18.
+- A story whose subject has not been arrested or charged (a suspect who is wanted, at large, or was killed by police).
 
 A NAMED prior offense is concrete even without a count: "prior arrests for burglary and assault on a peace officer" qualifies under 2a; "three gun charges that prosecutors dismissed in 2022" qualifies under 2c. Only bare labels with no offense named, no number, and no sentence fail the rule.
 
@@ -148,7 +150,7 @@ Field guidance for qualifying articles:
 - release_evidence_quote: copy VERBATIM the sentence that documents that earlier-case release status. Required whenever release_status is not "none stated".
 - releasing_jurisdiction: the county, city, state, or court that released the person, if named.
 - outcome: short phrase for the new case: "arrested", "charged", "convicted", "sentenced", "killed by police", "at large".
-- summary: 1-2 factual sentences: who, what new offense, and what the prior record or release status was.
+- summary: 1-2 factual sentences: who, what new offense, and what the prior record or release status was. Unless the article reports a conviction or guilty plea on the new offense, describe it as an allegation: "is accused of", "was charged with", "allegedly", "according to police". Never state an unproven act as fact.
 - confidence: "high" if the article is explicit on both the new offense and the prior record or release; "medium" if reasonably clear; "low" if you are inferring.
 
 Always give a one-sentence reason for your decision.
@@ -217,7 +219,72 @@ def check_evidence(cls: StoryClassification, text: str) -> str | None:
             return "release_status set without a quote"
         if not quote_in_text(cls.release_evidence_quote, text):
             return "release_evidence_quote not found in article"
+    return check_counts(cls, text)
+
+
+_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven",
+          8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen",
+          14: "fourteen", 15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
+          19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty", 50: "fifty",
+          60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety", 100: "hundred"}
+_ORDINALS = {1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth",
+             7: "seventh", 8: "eighth", 9: "ninth", 10: "tenth", 11: "eleventh",
+             12: "twelfth"}
+
+
+def _number_forms(n: int) -> list[str]:
+    """Ways an article might print n: digits, a number word, an ordinal."""
+    out = [str(n), f"{n}th", f"{n}st", f"{n}nd", f"{n}rd"]
+    if n in _WORDS:
+        out.append(_WORDS[n])
+    elif 20 < n < 100 and n % 10 in _WORDS:
+        out.append(f"{_WORDS[n // 10 * 10]}-{_WORDS[n % 10]}")
+        out.append(f"{_WORDS[n // 10 * 10]} {_WORDS[n % 10]}")
+    if n in _ORDINALS:
+        out.append(_ORDINALS[n])
+    if n in (12, 13):
+        out.append("dozen")
+    if n == 24:
+        out.append("two dozen")
+    if n == 6:
+        out.append("half a dozen")
+    return out
+
+
+def count_in_text(n: int, text: str) -> bool:
+    """True if the article states n, or n+1 (an "Nth offense" charge documents
+    N-1 priors, so the printed number is one higher), in any common form."""
+    low = text.lower()
+    for m in (n, n + 1):
+        for form in _number_forms(m):
+            if re.search(rf"(?<![\w.])({re.escape(form)})(?![\w])", low):
+                return True
+    return False
+
+
+def check_counts(cls: StoryClassification, text: str) -> str | None:
+    """A prior count the article never prints is a hallucination, whatever the
+    quote says. Reject rather than store a number that cannot be sourced."""
+    for field in ("prior_count_arrests", "prior_count_convictions",
+                  "prior_count_felony_convictions"):
+        n = getattr(cls, field)
+        if n and not count_in_text(n, text):
+            return f"{field}={n} not stated in the article"
     return None
+
+
+CONVICTED_RE = re.compile(r"convict|sentenc|plead|guilty|found guilty", re.I)
+HEDGE_RE = re.compile(r"alleged|accus|charged|arrested|indicted|suspect|according to|"
+                      r"police sa|prosecutors|authorities|reportedly|booked|arraigned", re.I)
+
+
+def hedge_summary(summary: str, outcome: str, outlet: str) -> str:
+    """Attribute an unproven allegation. If the new case is not a conviction
+    and the summary has no allegation language, prefix an attribution to the
+    outlet: "According to WXYZ, ..." is true whatever the facts turn out to be."""
+    if not summary or CONVICTED_RE.search(outcome or "") or HEDGE_RE.search(summary):
+        return summary
+    return f"According to {outlet or 'the cited report'}, {summary}"
 
 
 def qualifies_strict(arrests: int | None, convictions: int | None,

@@ -55,13 +55,38 @@ def same_person(a: dict, b: dict) -> bool:
 
 
 def obvious_same_incident(new_row: dict, s: dict) -> bool:
-    """Same person and incident dates within the window (or one missing):
-    merged without asking the model. The model missed a third syndicated copy
-    of one arrest story in calibration; this is cheaper and stricter."""
+    """Same person, incident dates within the window (or one missing), and the
+    same city or the same offense type: merged without asking the model. The
+    model missed a third syndicated copy of one arrest story in calibration;
+    this is cheaper and stricter. Two people who share a common name in the
+    same state within three weeks still go to the model, which sees the full
+    rows."""
     if not same_person(new_row, s):
         return False
     a, b = _parse_date(new_row.get("incident_date", "")), _parse_date(s.get("incident_date", ""))
-    return not a or not b or abs((a - b).days) <= DATE_WINDOW_DAYS
+    if a and b and abs((a - b).days) > DATE_WINDOW_DAYS:
+        return False
+    same_city = bool(new_row.get("city")) and (new_row.get("city") or "").strip().lower() == (s.get("city") or "").strip().lower()
+    same_offense = bool(new_row.get("new_offense_type")) and new_row.get("new_offense_type") == s.get("new_offense_type")
+    return same_city or same_offense
+
+
+def ages_consistent(a: dict, b: dict) -> bool:
+    """False only when both rows give an age and the ages cannot belong to one
+    person given the gap between incidents (a year of slack for birthdays and
+    rounding). Used before linking two incidents to one offender: a wrong link
+    gives someone another person's record."""
+    try:
+        age_a, age_b = int(a.get("age") or 0), int(b.get("age") or 0)
+    except ValueError:
+        return True
+    if not age_a or not age_b:
+        return True
+    da, db = _parse_date(a.get("incident_date", "")), _parse_date(b.get("incident_date", ""))
+    if not da or not db:
+        return abs(age_a - age_b) <= 2
+    years = abs((da - db).days) / 365.25
+    return abs(abs(age_a - age_b) - years) <= 1.5
 
 
 def find_candidates(new_row: dict, stories: list[dict]) -> list[dict]:

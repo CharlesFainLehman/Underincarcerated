@@ -99,6 +99,21 @@ STRICT_MIN_FELONY_CONVICTIONS = 3
 # dropped before storage; the decision log records them.
 STRICT_ONLY = True
 
+# Rows removed after publication (corrections, policy removals) live here with
+# a date and reason. Their ids are never reused, so a shared permalink to a
+# removed record never resolves to a different person.
+REMOVED_CSV = DATA_DIR / "removed.csv"
+REMOVED_COLUMNS = ["removed_date", "removed_reason"]
+
+# Only people the article says were arrested, charged, indicted, arraigned,
+# convicted, or sentenced are stored. Suspects who are "wanted", "at large",
+# or "killed by police" are excluded: identification is weakest there.
+STORED_OUTCOME_RE = (r"arrest|charg|indict|arraign|convict|sentenc|plead|guilty|booked|jailed|detain|"
+                     r"held|custody|accused|apprehend|extradit|bond|bail|recognizance|bound over|"
+                     r"stand trial|incompetent|pending (trial|hearing)")
+# No one under 18 is stored, whatever the article gives.
+MIN_AGE = 18
+
 CSV_COLUMNS = [
     "id",
     "date_added",
@@ -137,8 +152,9 @@ OFFENDER_COLUMNS = [
     "incident_count",
     "first_incident_date",
     "last_incident_date",
-    "max_prior_arrests",
-    "max_prior_convictions",
+    "latest_prior_arrests",
+    "latest_prior_convictions",
+    "latest_prior_felony_convictions",
     "qualifies_strict",
 ]
 

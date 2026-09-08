@@ -92,6 +92,9 @@
   .story .where { color: var(--muted); font-size: 0.85rem; margin: 2px 0 6px; font-variant-numeric: tabular-nums; }
   .story .tags { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; font-size: 0.88rem; }
   .story .priors { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
+  .attrib { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; }
+  .attrib a { color: var(--muted); }
+  .tomb { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px 18px; }
   .story .teaser { margin: 10px 0 0; font-size: 0.9rem; color: var(--ink); }
   .story .body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); cursor: auto; }
   .story .body p { margin: 0 0 6px; }
@@ -116,6 +119,7 @@
     <a class="brand" href="./">Underincarcerated</a>
     <a class="here" href="./">Stories</a>
     <a href="facts.html">Facts</a>
+    <a href="corrections.html">Corrections</a>
     <a href="stories.csv">Data</a>
     <a href="https://github.com/CharlesFainLehman/Underincarcerated">Code</a>
   </nav>
@@ -149,8 +153,8 @@
   <p class="more"><button id="more" hidden>Load 20 more</button></p>
 
   <footer>
-    <p><b>Inclusion rule.</b> A story is kept only when the article states at least five prior arrests, five prior convictions, or three prior felony convictions. Counts are never estimated; "a lengthy record" with no number does not qualify. Stories that describe a prior record or a release status without meeting that threshold are classified but not stored.</p>
-    <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible. Photos are linked from the cited outlet and not stored here.</p>
+    <p><b>Inclusion rule.</b> A story is kept only when the article states at least five prior arrests, five prior convictions, or three prior felony convictions, and reports the person arrested, charged, or convicted. Counts are never estimated, and every count must appear in the article. No one under 18 is included.</p>
+    <p><b>What a record claims.</b> Each record restates what the cited outlet reported on the date shown, with the documenting sentences quoted verbatim. It does not claim the underlying facts are true. Reports rely on police and prosecutor statements; charges are dropped and cases end in acquittal after publication, and the outcome shown is as of the report. Classification is automated and errors in either direction are possible. Photos are linked from the cited outlet and not stored here. See the <a href="corrections.html">corrections policy</a>.</p>
     <p>Spotted a mistake? Use the &#9873; on a card to <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=flag-error.yml">flag an error in that record</a>, or <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=missing-incident.yml">submit a missing story</a>. Reports get an automated first review and are public in the <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues?q=label%3Afeedback">issue tracker</a>; the maintainer makes the final call.</p>
     <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
   </footer>
@@ -164,9 +168,10 @@ const HERO_ID = null;
 const PAGE = 20;
 
 (async function () {
-  const [stories, stats] = await Promise.all([
+  const [stories, stats, removed] = await Promise.all([
     fetch('stories.json').then(r => r.json()),
     fetch('stats.json').then(r => r.json()),
+    fetch('removed.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ]);
   const byId = new Map(stories.map(s => [s.id, s]));
 
@@ -199,6 +204,7 @@ const PAGE = 20;
   const tags = s => `<span class="badge">${esc(s.new_offense_type || 'other')}</span>` +
     (s.release_status && s.release_status !== 'none stated' ? ` <span class="badge">${esc(s.release_status)}</span>` : '');
   const permalink = s => `${location.origin}${location.pathname}#id=${s.id}`;
+  const attrib = s => `<p class="attrib">As reported by <a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_name || host(s.source_url))}</a>; recorded ${esc(s.date_added)}. Outcome shown is as of that report and may have changed.</p>`;
   const REPO = 'https://github.com/CharlesFainLehman/Underincarcerated';
   const flagUrl = s => `${REPO}/issues/new?template=flag-error.yml&record-id=${s.id}`;
   const flagLink = (s, text) => `<a class="flag" href="${flagUrl(s)}" target="_blank" rel="nofollow noopener" title="Flag an error in this record">&#9873;${text ? ' ' + text : ''}</a>`;
@@ -234,6 +240,7 @@ const PAGE = 20;
         <p class="meta">${esc(where(s))}${s.outcome ? ` · ${esc(s.outcome)}` : ''}</p>
         <div class="facts">${facts.map(([l, v]) => `<div><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}</div>
         <p class="summary">${esc(s.summary)}</p>
+        ${attrib(s)}
         <p class="cta">
           <a class="primary" href="${esc(s.source_url)}" target="_blank" rel="noopener">Read the story at ${esc(host(s.source_url))} →</a>
           <a href="#id=${s.id}" data-open="${s.id}">Full record</a>
@@ -290,7 +297,7 @@ const PAGE = 20;
           ${priorsShort(s) ? `<p class="priors">${priorsShort(s)}</p>` : ''}
         </div>
       </div>
-      ${isOpen ? '' : `<p class="teaser">${esc(teaser)}</p>`}
+      ${isOpen ? '' : `<p class="teaser">${esc(teaser)}</p>${attrib(s)}`}
       ${isOpen ? `<div class="body">
         <div>
           <p>${esc(s.summary)}</p>
@@ -299,6 +306,7 @@ const PAGE = 20;
           ${s.prior_evidence_quote ? `<blockquote>“${esc(s.prior_evidence_quote)}”</blockquote>` : ''}
           ${s.release_status !== 'none stated' ? `<h4 class="k">Status at the time of the new offense</h4><p>${esc(s.release_status)}${s.releasing_jurisdiction ? ` (${esc(s.releasing_jurisdiction)})` : ''}</p>` : ''}
           ${s.release_evidence_quote ? `<blockquote>“${esc(s.release_evidence_quote)}”</blockquote>` : ''}
+          ${attrib(s)}
         </div>
         <div>
           <h4 class="k" style="margin-top:0">Sources</h4><div class="links">${sourcesHtml(s)}</div>
@@ -360,6 +368,16 @@ const PAGE = 20;
 
   function apply() {
     const notice = document.getElementById('notice');
+    if (pinned && !byId.has(pinned) && removed[String(pinned)]) {
+      const t = removed[String(pinned)];
+      filtered = [];
+      notice.innerHTML = `Record ${pinned} was removed on ${esc(t.date)}: ${esc(t.reason)}. <a href="#" data-clear>Show all stories</a>`;
+      notice.hidden = false;
+      document.getElementById('count').textContent = '';
+      grid.innerHTML = '';
+      more.hidden = true;
+      return;
+    }
     if (pinned && byId.has(pinned)) {
       filtered = [byId.get(pinned)];
       notice.innerHTML = `Showing one shared record. <a href="#" data-clear>Show all stories</a>`;
@@ -386,7 +404,7 @@ const PAGE = 20;
   renderHero();
   const fromHash = () => {
     const m = location.hash.match(/id=(\d+)/);
-    if (m && byId.has(Number(m[1]))) { pinned = Number(m[1]); open.add(pinned); return true; }
+    if (m && (byId.has(Number(m[1])) || removed[m[1]])) { pinned = Number(m[1]); open.add(pinned); return true; }
     return false;
   };
   window.addEventListener('hashchange', () => { if (fromHash()) apply(); });

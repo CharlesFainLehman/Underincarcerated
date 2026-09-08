@@ -55,6 +55,13 @@ above but not the strict threshold are classified and logged, then dropped
 (`STRICT_ONLY` in `config.py`). The `qualifies_strict` column is therefore always `yes`; it
 is kept so older exports and tools keep working.
 
+Not stored: anyone under 18, and anyone the article does not report as arrested, charged,
+indicted, convicted, or sentenced. Every stated prior count must appear in the article text.
+Summaries of unproven allegations are attributed to the outlet. Rows removed after
+publication go to `data/removed.csv` with a reason (`python pipeline/remove_story.py --id N
+--reason "..."`); their ids are never reused and the site shows a tombstone. The corrections
+policy is `content/corrections.md`.
+
 The database is a collection of stories, not a census. It holds what the news covered, what
 the searches found, and what the article stated. Daily runs are capped at 150 articles
 (`max_classify`), ranked by headline signals, so a busy news day is sampled, not exhausted.

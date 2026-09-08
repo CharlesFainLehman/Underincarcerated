@@ -9,7 +9,8 @@ from datetime import date
 from classify import qualifies_strict
 from pathlib import Path
 
-from config import BACKFILL_STORIES_CSV, CSV_COLUMNS, SEEN_URLS_JSON, STORIES_CSV
+from config import (BACKFILL_STORIES_CSV, CSV_COLUMNS, REMOVED_COLUMNS, REMOVED_CSV,
+                    SEEN_URLS_JSON, STORIES_CSV)
 
 _SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
 
@@ -51,8 +52,31 @@ def save_stories(stories: list[dict], path: Path | None = None) -> None:
         writer.writerows(stories)
 
 
-def next_story_id(stories: list[dict], base: int = 0) -> int:
-    return max((int(s["id"]) for s in stories), default=base) + 1
+def load_removed() -> list[dict]:
+    if not REMOVED_CSV.exists():
+        return []
+    with open(REMOVED_CSV, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def save_removed(rows: list[dict]) -> None:
+    REMOVED_CSV.parent.mkdir(parents=True, exist_ok=True)
+    with open(REMOVED_CSV, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=CSV_COLUMNS + REMOVED_COLUMNS, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+
+
+def reserved_ids(base: int = 0, span: int = 1_000_000) -> set[int]:
+    """Ids of removed rows in this id range. Never reused: a permalink to a
+    removed record must not resolve to a different person."""
+    return {int(r["id"]) for r in load_removed() if base <= int(r["id"]) < base + span}
+
+
+def next_story_id(stories: list[dict], base: int = 0, reserved: set[int] | None = None) -> int:
+    if reserved is None:
+        reserved = reserved_ids(base)
+    return max(max((int(s["id"]) for s in stories), default=base), max(reserved, default=base)) + 1
 
 
 def load_seen_urls(path: Path | None = None) -> set[str]:

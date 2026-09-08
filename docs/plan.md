@@ -144,6 +144,18 @@ c. **Scope.** US only. Non-US stories rejected at triage and again at classifica
 d. **Backfill depth.** 2017.
 e. **Person linking.** `offenders.csv` built from phase 1.
 g. **Juveniles** (settled 2026-09-05). Kept when the article gives offense detail.
+   **Reversed 2026-09-08:** no one under 18 is stored (`MIN_AGE`); the six existing rows
+   were moved to `data/removed.csv`.
+h. **Defamation guards** (2026-09-08). Only people reported arrested, charged, indicted,
+   convicted, or sentenced are stored (`STORED_OUTCOME_RE`); wanted, at-large, and
+   killed-by-police subjects are not. Every stated prior count must appear in the article
+   text (`check_counts`). Summaries of unproven allegations are attributed to the outlet
+   (`hedge_summary`). The deterministic same-incident merge also needs a matching city or
+   offense; cross-incident person links need ages consistent with the date gap
+   (`ages_consistent`), and `offenders.csv` reports the latest report's counts, not a
+   maximum. A mug shot is accepted only when the surname is attached to the image or it is
+   the page's sole candidate. Removed rows go to `data/removed.csv` with a reason; their
+   ids are reserved and the site shows a tombstone. Policy: `content/corrections.md`.
 f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `data/`, front
    end and exports in `site/`.
 

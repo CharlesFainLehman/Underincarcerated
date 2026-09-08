@@ -29,11 +29,11 @@ from pathlib import Path
 
 import anthropic
 
-from classify import check_evidence, classify_article
-from config import DECISIONS_DIR, STRICT_ONLY, US_STATES
-from dedupe import check_duplicate
+from classify import check_evidence, classify_article, hedge_summary
+from config import DECISIONS_DIR, MIN_AGE, STORED_OUTCOME_RE, STRICT_ONLY, US_STATES
+from dedupe import ages_consistent, check_duplicate
 from fetch import fetch_article_text, is_vendor_or_wire, resolve_candidate
-from store import make_row, next_story_id
+from store import make_row, next_story_id, reserved_ids
 from triage import triage_candidates
 
 _VARIANT_SEGMENTS = ("/gallery/", "/newsletter/gallery/", "/newsletter/", "/amp/", "/photos/")
@@ -156,7 +156,8 @@ def _fetch_and_classify(client, candidate: dict) -> dict:
 def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                        stories: list[dict], seen_urls: set[str],
                        decision_log: Path | None = None,
-                       checkpoint=None, max_classify: int = 0, id_base: int = 0) -> dict:
+                       checkpoint=None, max_classify: int = 0, id_base: int = 0,
+                       reserved: set[int] | None = None) -> dict:
     """Classify candidates and append qualifying, non-duplicate rows to stories.
 
     Mutates `stories` and `seen_urls` in place. Returns counts for logging.
@@ -169,6 +170,8 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
               "rejected": 0, "no_text": 0, "unresolved": 0, "skipped_seen": 0, "errors": 0,
               "not_strict": 0}
     log = DecisionLog(decision_log)
+    if reserved is None:
+        reserved = reserved_ids(id_base)
 
     stored = {canonical_url(s_["source_url"]) for s_ in stories}
     stored |= {canonical_url(u) for s_ in stories
@@ -317,14 +320,22 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                     # A misread date, not a reason to drop the story.
                     print(f"  future incident_date {cls.incident_date!r} blanked")
                     cls.incident_date = None
+                if not problem and cls.age is not None and cls.age < MIN_AGE:
+                    problem = f"subject is {cls.age}, under {MIN_AGE}"
+                if not problem and not re.search(STORED_OUTCOME_RE, cls.outcome or "", re.I):
+                    problem = f"outcome {cls.outcome!r}: not arrested, charged, or convicted"
                 if problem:
                     log.write(stage="verify", url=url, qualifies=False, reason=problem,
                               classification=cls.model_dump())
                     print(f"  rejected on verification: {problem}")
                     counts["rejected"] += 1
                     continue
+                hedged = hedge_summary(cls.summary or "", cls.outcome or "", candidate.get("source") or "")
+                if hedged != cls.summary:
+                    log.write(stage="hedge", url=url, before=cls.summary, after=hedged)
+                    cls.summary = hedged
 
-                row = make_row(next_story_id(stories, id_base), cls, candidate)
+                row = make_row(next_story_id(stories, id_base, reserved), cls, candidate)
                 log.write(stage="classify", url=url, qualifies=True, row=row)
                 try:
                     dup = check_duplicate(client, row, stories)
@@ -359,13 +370,19 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                     continue
 
                 if dup and dup.relation == "same_person_new_incident":
-                    for s in stories:
-                        if s["id"] == dup.matching_id and s.get("offender_key"):
-                            row["offender_key"] = s["offender_key"]
-                    log.write(stage="dedupe", url=url, relation="same_person_new_incident",
-                              matching_id=dup.matching_id)
-                    print(f"  same person as id {dup.matching_id}, new incident")
-                    counts["same_person"] += 1
+                    match = next((s for s in stories if s["id"] == dup.matching_id), None)
+                    if match and not ages_consistent(row, match):
+                        # Ages rule out one person: keep both rows, do not link.
+                        log.write(stage="dedupe", url=url, relation="unrelated",
+                                  matching_id=dup.matching_id, reason="ages inconsistent")
+                        print(f"  model linked id {dup.matching_id} but ages disagree; not linked")
+                    else:
+                        if match and match.get("offender_key"):
+                            row["offender_key"] = match["offender_key"]
+                        log.write(stage="dedupe", url=url, relation="same_person_new_incident",
+                                  matching_id=dup.matching_id)
+                        print(f"  same person as id {dup.matching_id}, new incident")
+                        counts["same_person"] += 1
 
                 if STRICT_ONLY and row["qualifies_strict"] != "yes":
                     # Qualifies, but below the strict threshold: not stored.

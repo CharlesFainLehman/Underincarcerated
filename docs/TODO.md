@@ -92,3 +92,13 @@ inverted. Do this last so it covers all pages at once.
   `feedback.yml` runs `review_feedback.py` (Sonnet) on new `feedback` issues and posts
   an assessment plus a `triage:*` label. Needs the `ANTHROPIC_API_KEY` secret, which
   the other workflows already use.
+
+## Defamation guards (done 2026-09-08)
+
+Attribution on every record; corrections page with a response window (email address
+still to be added by the maintainer, see `content/corrections.md`); tombstones for removed
+records (`remove_story.py`, `data/removed.csv`, `site/removed.json`); hedged summaries;
+prior counts verified against the article (`check_counts` at ingest, `verify_counts.py`
+for the existing rows); tighter merges and age-checked person links; photo identity rule;
+juveniles and un-arrested subjects excluded. Not done: periodic re-audit of outcomes and
+dead links, hand-picked hero, media liability insurance.
