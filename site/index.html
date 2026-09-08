@@ -36,6 +36,7 @@
   h1 { font-size: 2rem; margin: 0 0 4px; color: var(--ink-strong); letter-spacing: -0.01em; }
   .subtitle { color: var(--muted); margin: 0 0 4px; max-width: 60em; }
   .updated { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  .scope { margin: 8px 0 6px; padding: 8px 12px; border-left: 3px solid var(--strict); background: var(--strict-soft); color: var(--ink); font-size: 0.92rem; max-width: 60em; border-radius: 0 6px 6px 0; }
 
   /* Shared bits */
   .badge { display: inline-block; font-size: 0.72rem; padding: 1px 7px; border-radius: 10px;
@@ -120,7 +121,8 @@
   </nav>
   <header>
     <h1>Underincarceration Stories</h1>
-    <p class="subtitle">News stories about repeat offenders: people arrested, charged, or convicted for a new crime who had a documented prior record, or who were free at the time because of a release decision. Automatically collected and classified; every record cites its source.</p>
+    <p class="subtitle">News stories about serious repeat offenders: people arrested, charged, or convicted for a new crime after at least five prior arrests, five prior convictions, or three prior felony convictions, as stated in the article. Automatically collected and classified; every record cites its source.</p>
+    <p class="scope"><b>This is a collection of stories, not a census.</b> It holds only the cases that news outlets covered, that our searches found, and where the article states the prior record. It is not a count of repeat offending, and no place with more stories necessarily has more of it.</p>
     <p class="updated" id="updated">Loading…</p>
   </header>
 
@@ -138,7 +140,6 @@
       <option value="arrests">Most prior arrests</option>
       <option value="convictions">Most prior convictions</option>
     </select>
-    <label class="chk"><input type="checkbox" id="strict"> Strict only</label>
     <label class="chk"><input type="checkbox" id="photo"> With photo</label>
     <span class="n" id="count"></span>
   </div>
@@ -148,7 +149,7 @@
   <p class="more"><button id="more" hidden>Load 20 more</button></p>
 
   <footer>
-    <p><b>Strict</b> marks stories where the article states 5+ prior arrests, 5+ prior convictions, or 3+ prior felony convictions. Counts are never estimated.</p>
+    <p><b>Inclusion rule.</b> A story is kept only when the article states at least five prior arrests, five prior convictions, or three prior felony convictions. Counts are never estimated; "a lengthy record" with no number does not qualify. Stories that describe a prior record or a release status without meeting that threshold are classified but not stored.</p>
     <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible. Photos are linked from the cited outlet and not stored here.</p>
     <p>Spotted a mistake? Use the &#9873; on a card to <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=flag-error.yml">flag an error in that record</a>, or <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=missing-incident.yml">submit a missing story</a>. Reports get an automated first review and are public in the <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues?q=label%3Afeedback">issue tracker</a>; the maintainer makes the final call.</p>
     <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
@@ -157,7 +158,7 @@
 
 <script>
 // Featured story. Set HERO_ID to a story id to hand-pick it; null picks
-// automatically: the newest strict, violent story that has a photo.
+// automatically: the newest violent story that has a photo.
 // Preview any story as the hero with ?hero=ID.
 const HERO_ID = null;
 const PAGE = 20;
@@ -170,7 +171,7 @@ const PAGE = 20;
   const byId = new Map(stories.map(s => [s.id, s]));
 
   document.getElementById('updated').textContent =
-    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.stories_strict.toLocaleString()} meeting the strict threshold, ${stats.offenders.toLocaleString()} named offenders.`;
+    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.offenders.toLocaleString()} named offenders, ${(stats.offenders_multiple_incidents || 0).toLocaleString()} with more than one incident.`;
 
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'source'; } };
@@ -196,8 +197,7 @@ const PAGE = 20;
     return s.prior_offenses ? 'Prior: ' + esc(s.prior_offenses.length > 70 ? s.prior_offenses.slice(0, 70) + '…' : s.prior_offenses) : '';
   };
   const tags = s => `<span class="badge">${esc(s.new_offense_type || 'other')}</span>` +
-    (s.release_status && s.release_status !== 'none stated' ? ` <span class="badge">${esc(s.release_status)}</span>` : '') +
-    (s.qualifies_strict ? ' <span class="badge strict">strict</span>' : '');
+    (s.release_status && s.release_status !== 'none stated' ? ` <span class="badge">${esc(s.release_status)}</span>` : '');
   const permalink = s => `${location.origin}${location.pathname}#id=${s.id}`;
   const REPO = 'https://github.com/CharlesFainLehman/Underincarcerated';
   const flagUrl = s => `${REPO}/issues/new?template=flag-error.yml&record-id=${s.id}`;
@@ -210,7 +210,7 @@ const PAGE = 20;
     const q = new URLSearchParams(location.search).get('hero');
     if (q && byId.has(Number(q))) return byId.get(Number(q));
     if (HERO_ID && byId.has(HERO_ID)) return byId.get(HERO_ID);
-    const pool = stories.filter(s => s.qualifies_strict && s.mugshot_url && s.incident_date && s.offender_name);
+    const pool = stories.filter(s => s.mugshot_url && s.incident_date && s.offender_name);
     const ranked = pool.filter(s => s.new_offense_severity === 'violent').length ? pool.filter(s => s.new_offense_severity === 'violent') : pool;
     ranked.sort((a, b) => (b.incident_date || '').localeCompare(a.incident_date || '') || (b.date_added || '').localeCompare(a.date_added || '') || b.id - a.id);
     return ranked[0] || null;
@@ -229,7 +229,7 @@ const PAGE = 20;
     el.innerHTML = `
       ${pic(s)}
       <div>
-        <p class="kicker">Featured story${s.qualifies_strict ? ' · <span class="badge strict">strict</span>' : ''}</p>
+        <p class="kicker">Featured story</p>
         <h2>${nameHtml(s)}</h2>
         <p class="meta">${esc(where(s))}${s.outcome ? ` · ${esc(s.outcome)}` : ''}</p>
         <div class="facts">${facts.map(([l, v]) => `<div><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}</div>
@@ -368,18 +368,18 @@ const PAGE = 20;
       notice.hidden = true;
       const q = document.getElementById('q').value.trim().toLowerCase();
       const st = document.getElementById('state').value, rel = document.getElementById('release').value,
-            off = document.getElementById('offense').value, strict = document.getElementById('strict').checked,
+            off = document.getElementById('offense').value,
             photo = document.getElementById('photo').checked, sort = document.getElementById('sort').value;
       filtered = stories.filter(s =>
         (!st || s.state === st) && (!rel || s.release_status === rel) && (!off || s.new_offense_type === off) &&
-        (!strict || s.qualifies_strict) && (!photo || s.mugshot_url) &&
+        (!photo || s.mugshot_url) &&
         (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)))
         .sort(sorters[sort]);
     }
     document.getElementById('count').textContent = `${filtered.length.toLocaleString()} of ${stories.length.toLocaleString()} stories`;
     renderCards(true);
   }
-  ['q', 'state', 'release', 'offense', 'sort', 'strict', 'photo'].forEach(id =>
+  ['q', 'state', 'release', 'offense', 'sort', 'photo'].forEach(id =>
     document.getElementById(id).addEventListener('input', () => { pinned = null; history.replaceState(null, '', location.pathname + location.search); apply(); }));
   more.addEventListener('click', () => renderCards(false));
 

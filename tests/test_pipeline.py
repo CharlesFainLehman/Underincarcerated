@@ -652,3 +652,26 @@ def test_extract_ids_free_text_needs_prefix():
     known = {"7", "99", "300"}
     assert extract_ids("record 99 is wrong; he has 300 arrests", known) == ["99"]
     assert extract_ids("see #7", known) == ["7"]
+
+
+def test_process_drops_non_strict_rows_when_strict_only(monkeypatch, tmp_path):
+    monkeypatch.setattr(process, "STRICT_ONLY", True)
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    weak = _cls(prior_count_arrests=2, prior_count_felony_convictions=None,
+                prior_evidence_quote="Court records show Smith has been arrested 11 times since 2015, "
+                                     "including three prior felony convictions for burglary and assault.")
+    counts, seen = _run(monkeypatch, tmp_path, cands, stories, weak)
+    assert counts["not_strict"] == 1 and counts["new"] == 0 and not stories
+    assert "https://x.com/a" in seen  # classified and judged; not retried
+    log = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+    assert log[-1]["stage"] == "strict" and log[-1]["kept"] is False
+
+
+def test_process_keeps_non_strict_rows_when_not_strict_only(monkeypatch, tmp_path):
+    monkeypatch.setattr(process, "STRICT_ONLY", False)
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    weak = _cls(prior_count_arrests=2, prior_count_felony_convictions=None)
+    counts, _ = _run(monkeypatch, tmp_path, cands, stories, weak)
+    assert counts["new"] == 1 and stories[0]["qualifies_strict"] == "no"

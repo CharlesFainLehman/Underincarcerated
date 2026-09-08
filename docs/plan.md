@@ -137,6 +137,9 @@ a. **Names.** Stored as printed.
 b. **Threshold.** Ingest every story with at least one concrete prior or a release-status
    condition. A `qualifies_strict` flag marks 5+ prior arrests, or 5+ prior convictions, or 3+
    prior felony convictions, as stated in the article. The front end filters on the flag.
+   **Revised 2026-09-08:** only strict stories are stored (`STRICT_ONLY`). Non-strict rows
+   were removed from both story files (682 to 205 daily, 3,727 to 871 backfill); they remain
+   in git history and in the decision logs. Daily runs are capped at 150 articles.
 c. **Scope.** US only. Non-US stories rejected at triage and again at classification.
 d. **Backfill depth.** 2017.
 e. **Person linking.** `offenders.csv` built from phase 1.

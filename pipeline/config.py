@@ -94,6 +94,10 @@ BACKFILL_QUERIES = GDELT_QUERIES
 STRICT_MIN_ARRESTS = 5
 STRICT_MIN_CONVICTIONS = 5
 STRICT_MIN_FELONY_CONVICTIONS = 3
+# Since 2026-09-08 only strict stories are kept. Non-strict stories are still
+# classified (the counts are only known after reading the article) but are
+# dropped before storage; the decision log records them.
+STRICT_ONLY = True
 
 CSV_COLUMNS = [
     "id",

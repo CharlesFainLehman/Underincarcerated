@@ -30,7 +30,7 @@ from pathlib import Path
 import anthropic
 
 from classify import check_evidence, classify_article
-from config import DECISIONS_DIR, US_STATES
+from config import DECISIONS_DIR, STRICT_ONLY, US_STATES
 from dedupe import check_duplicate
 from fetch import fetch_article_text, is_vendor_or_wire, resolve_candidate
 from store import make_row, next_story_id
@@ -166,7 +166,8 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
     left unseen and picked up next run.
     """
     counts = {"new": 0, "duplicates": 0, "same_person": 0, "triaged_out": 0,
-              "rejected": 0, "no_text": 0, "unresolved": 0, "skipped_seen": 0, "errors": 0}
+              "rejected": 0, "no_text": 0, "unresolved": 0, "skipped_seen": 0, "errors": 0,
+              "not_strict": 0}
     log = DecisionLog(decision_log)
 
     stored = {canonical_url(s_["source_url"]) for s_ in stories}
@@ -365,6 +366,16 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                               matching_id=dup.matching_id)
                     print(f"  same person as id {dup.matching_id}, new incident")
                     counts["same_person"] += 1
+
+                if STRICT_ONLY and row["qualifies_strict"] != "yes":
+                    # Qualifies, but below the strict threshold: not stored.
+                    # Dedupe ran first so a weaker report of a stored incident
+                    # still attaches as an additional source above.
+                    log.write(stage="strict", url=url, qualifies=True, kept=False, row=row)
+                    print(f"  below strict threshold: {row['offender_name'] or '(unnamed)'} | "
+                          f"{row['city']}, {row['state']} | not stored")
+                    counts["not_strict"] += 1
+                    continue
 
                 stories.append(row)
                 stored.add(canonical_url(url))
