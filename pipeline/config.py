@@ -114,6 +114,33 @@ STORED_OUTCOME_RE = (r"arrest|charg|indict|arraign|convict|sentenc|plead|guilty|
 # No one under 18 is stored, whatever the article gives.
 MIN_AGE = 18
 
+# Outlets with professional newsrooms and legal review. A story whose primary
+# source is one of these is not sent through the second-source search; a
+# subdomain matches too (e.g. abcnews.go.com). Edit freely.
+TRUSTED_OUTLETS = (
+    # national
+    "nytimes.com", "washingtonpost.com", "wsj.com", "usatoday.com", "nypost.com",
+    "nydailynews.com", "cbsnews.com", "nbcnews.com", "abcnews.go.com", "foxnews.com",
+    "cnn.com", "npr.org", "pbs.org", "reuters.com", "bloomberg.com", "politico.com",
+    "axios.com", "propublica.org", "themarshallproject.org",
+    # metro dailies
+    "latimes.com", "chicagotribune.com", "suntimes.com", "bostonglobe.com", "bostonherald.com",
+    "inquirer.com", "baltimoresun.com", "washingtontimes.com", "newsday.com", "courant.com",
+    "providencejournal.com", "ajc.com", "miamiherald.com", "tampabay.com", "orlandosentinel.com",
+    "sun-sentinel.com", "jacksonville.com", "tennessean.com", "courier-journal.com", "nola.com",
+    "theadvocate.com", "dallasnews.com", "star-telegram.com", "houstonchronicle.com", "chron.com",
+    "expressnews.com", "statesman.com", "azcentral.com", "reviewjournal.com", "sltrib.com",
+    "denverpost.com", "seattletimes.com", "oregonlive.com", "sfchronicle.com", "mercurynews.com",
+    "sandiegouniontribune.com", "sacbee.com", "fresnobee.com", "ocregister.com", "startribune.com",
+    "jsonline.com", "detroitnews.com", "freep.com", "cleveland.com", "dispatch.com",
+    "cincinnati.com", "indystar.com", "stltoday.com", "kansascity.com", "omaha.com",
+    "charlotteobserver.com", "newsobserver.com", "postandcourier.com", "richmond.com",
+    "pilotonline.com", "buffalonews.com", "syracuse.com", "post-gazette.com", "triblive.com",
+    "pennlive.com", "nj.com", "staradvertiser.com", "adn.com", "desmoinesregister.com",
+    "oklahoman.com", "tulsaworld.com", "arkansasonline.com", "al.com", "clarionledger.com",
+    "knoxnews.com", "commercialappeal.com", "ksl.com", "wral.com", "deseret.com",
+)
+
 CSV_COLUMNS = [
     "id",
     "date_added",
