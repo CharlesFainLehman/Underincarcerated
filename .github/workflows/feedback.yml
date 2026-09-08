@@ -1,0 +1,47 @@
+name: Feedback triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: feedback-${{ github.event.issue.number }}
+
+jobs:
+  triage:
+    if: contains(github.event.issue.labels.*.name, 'feedback')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Triage submission
+        id: triage
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          PYTHONUNBUFFERED: "1"
+        run: python pipeline/review_feedback.py
+
+      - name: Comment and label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERDICT: ${{ steps.triage.outputs.verdict }}
+          COMMENT: ${{ steps.triage.outputs.comment }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -R ${{ github.repository }} --body "$COMMENT"
+          gh issue edit ${{ github.event.issue.number }} -R ${{ github.repository }} --add-label "triage:$VERDICT" || true

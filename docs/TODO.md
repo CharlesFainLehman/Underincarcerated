@@ -85,5 +85,8 @@ inverted. Do this last so it covers all pages at once.
   second fetch path (AMP URL, or a text-only mirror) would recover some.
 - The daily schedule is paused (`daily.yml`); resume when the backfill is done and
   the cost is acceptable (~$3/day at current density).
-- Feedback triage from public issues (`review_feedback.py` in the Flock repo) is not
-  ported yet.
+- Feedback triage from public issues is ported (2026-09-08): every card and the hero
+  carry a flag link to the `flag-error.yml` issue form with the record id filled in;
+  `feedback.yml` runs `review_feedback.py` (Sonnet) on new `feedback` issues and posts
+  an assessment plus a `triage:*` label. Needs the `ANTHROPIC_API_KEY` secret, which
+  the other workflows already use.
