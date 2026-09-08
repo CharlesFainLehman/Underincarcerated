@@ -627,3 +627,28 @@ def test_build_pages_renders_markdown(monkeypatch, tmp_path):
     assert out == [site / "facts.html"]
     assert "<title>T</title>" in html and 'data-chart="release_status"' in html
     assert 'href="#one"' in html and "footnote" in html
+
+
+# ---- feedback triage -------------------------------------------------------
+
+def test_extract_ids_prefers_form_field_and_ignores_dates_and_counts():
+    from review_feedback import extract_ids
+    known = {"412", "1002151", "8", "15", "2026", "12"}
+    body = ("### Record ID\n\n412\n\n### What's wrong?\n\nFactual error (wrong date, location, offense, counts, or release status)\n\n"
+            "### Explain the problem\n\nThe arrest was 8/15/2026 and he had 12 priors, not 6.\n")
+    assert extract_ids(body, known) == ["412"]
+
+
+def test_extract_ids_takes_bare_numbers_in_duplicate_reports():
+    from review_feedback import extract_ids
+    known = {"412", "1002151", "15"}
+    body = ("### Record ID\n\n412\n\n### What's wrong?\n\nDuplicate of another record\n\n"
+            "### Explain the problem\n\nSame as 1002151, filed 8/15/2026.\n")
+    assert extract_ids(body, known) == ["412", "1002151"]
+
+
+def test_extract_ids_free_text_needs_prefix():
+    from review_feedback import extract_ids
+    known = {"7", "99", "300"}
+    assert extract_ids("record 99 is wrong; he has 300 arrests", known) == ["99"]
+    assert extract_ids("see #7", known) == ["7"]

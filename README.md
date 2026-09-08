@@ -91,8 +91,11 @@ first and last incident date, max prior counts, strict flag. Never edit it by ha
 - Entries reflect claims made in news reports, which typically rely on police and prosecutor
   statements. Inclusion is not independent verification of the record.
 - Coverage is limited to English-language US outlets indexed by GDELT and Google News.
-- Classification is automated. Corrections can be made by editing `data/stories.csv` directly;
-  `validate_data.py` runs before every commit.
+- Classification is automated. Every record on the site has a flag link that opens a
+  pre-filled issue; new feedback issues get an automated first review (`review_feedback.py`)
+  and a `triage:*` label, and the maintainer makes the final call. Corrections are made by
+  editing `data/stories.csv` or `data/backfill/stories.csv` directly; `validate_data.py`
+  runs before every commit.
 
 ## Running locally
 

@@ -97,6 +97,10 @@
   .story .body .links a { display: block; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .story .body .rec { font-size: 0.82rem; color: var(--muted); }
   .story .close { font-size: 0.85rem; margin-top: 10px; }
+  .story { position: relative; }
+  a.flag { position: absolute; top: 10px; right: 12px; color: var(--muted); opacity: 0.55; text-decoration: none; font-size: 0.95rem; line-height: 1; }
+  a.flag:hover { opacity: 1; color: var(--strict); }
+  .hero .cta a.flag { position: static; font-size: 0.88rem; }
   @media (max-width: 720px) { .story .body { grid-template-columns: 1fr; } }
   .more { margin: 18px 0 0; text-align: center; }
   .empty { color: var(--muted); padding: 20px 0; }
@@ -146,6 +150,7 @@
   <footer>
     <p><b>Strict</b> marks stories where the article states 5+ prior arrests, 5+ prior convictions, or 3+ prior felony convictions. Counts are never estimated.</p>
     <p>Entries reflect claims in news reports, which typically rely on police and prosecutor statements. Classification is automated; the prior-record and release-status fields are backed by verbatim quotes checked against the article text. Errors in either direction are possible. Photos are linked from the cited outlet and not stored here.</p>
+    <p>Spotted a mistake? Use the &#9873; on a card to <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=flag-error.yml">flag an error in that record</a>, or <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=missing-incident.yml">submit a missing story</a>. Reports get an automated first review and are public in the <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues?q=label%3Afeedback">issue tracker</a>; the maintainer makes the final call.</p>
     <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
   </footer>
 </div>
@@ -194,6 +199,9 @@ const PAGE = 20;
     (s.release_status && s.release_status !== 'none stated' ? ` <span class="badge">${esc(s.release_status)}</span>` : '') +
     (s.qualifies_strict ? ' <span class="badge strict">strict</span>' : '');
   const permalink = s => `${location.origin}${location.pathname}#id=${s.id}`;
+  const REPO = 'https://github.com/CharlesFainLehman/Underincarcerated';
+  const flagUrl = s => `${REPO}/issues/new?template=flag-error.yml&record-id=${s.id}`;
+  const flagLink = (s, text) => `<a class="flag" href="${flagUrl(s)}" target="_blank" rel="nofollow noopener" title="Flag an error in this record">&#9873;${text ? ' ' + text : ''}</a>`;
   const sourcesHtml = s => [s.source_url, ...s.additional_sources].map(u =>
     `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(host(u))}<span class="dim"> — ${esc(u.replace(/^https?:\/\/(www\.)?[^/]+/, '').slice(0, 48))}${u.length > 60 ? '…' : ''}</span></a>`).join('');
 
@@ -229,6 +237,7 @@ const PAGE = 20;
         <p class="cta">
           <a class="primary" href="${esc(s.source_url)}" target="_blank" rel="noopener">Read the story at ${esc(host(s.source_url))} →</a>
           <a href="#id=${s.id}" data-open="${s.id}">Full record</a>
+          ${flagLink(s, 'Flag an error')}
         </p>
       </div>`;
     el.hidden = false;
@@ -271,6 +280,7 @@ const PAGE = 20;
     const teaser = s.summary.length > 170 ? s.summary.slice(0, 170).replace(/\s+\S*$/, '') + '…' : s.summary;
     const counts = countsLong(s);
     return `<article class="story${isOpen ? ' open' : ''}" data-id="${s.id}" tabindex="0" aria-expanded="${isOpen}">
+      ${flagLink(s)}
       <div class="head">
         ${pic(s)}
         <div style="min-width:0">
@@ -293,7 +303,7 @@ const PAGE = 20;
         <div>
           <h4 class="k" style="margin-top:0">Sources</h4><div class="links">${sourcesHtml(s)}</div>
           <h4 class="k">Record</h4>
-          <p class="rec">id ${s.id} · outcome: ${esc(s.outcome || '—')} · confidence: ${esc(s.confidence)} · added ${esc(s.date_added)}<br><a href="${esc(permalink(s))}">permalink</a></p>
+          <p class="rec">id ${s.id} · outcome: ${esc(s.outcome || '—')} · confidence: ${esc(s.confidence)} · added ${esc(s.date_added)}<br><a href="${esc(permalink(s))}">permalink</a> · <a href="${flagUrl(s)}" target="_blank" rel="nofollow noopener">flag an error</a></p>
           <p class="close"><a href="#" data-close>Collapse</a></p>
         </div>
       </div>` : ''}
