@@ -16,7 +16,8 @@ from collections import Counter, defaultdict
 from datetime import date
 
 from build_pages import build_pages
-from config import CSV_COLUMNS, OFFENDER_COLUMNS, OFFENDERS_CSV, SITE_DIR
+from config import CSV_COLUMNS, OFFENDER_COLUMNS, OFFENDERS_CSV, REQUIRE_CORROBORATION, SITE_DIR
+from corroborate import pending, publishable
 from store import load_all_stories, load_removed
 
 INT_FIELDS = ("id", "age", "prior_count_arrests", "prior_count_convictions",
@@ -96,6 +97,14 @@ def build_stats(stories: list[dict], offenders: list[dict]) -> dict:
 
 def build_exports() -> None:
     stories = load_all_stories()
+    if REQUIRE_CORROBORATION:
+        # Single-source rows wait for the second-source search; they are in
+        # the data files but not on the site.
+        held = [s for s in stories if not publishable(s)]
+        stories = [s for s in stories if publishable(s)]
+        if held:
+            print(f"{len(held)} single-source rows held back from the exports"
+                  f" ({sum(1 for s in held if pending(s))} awaiting the second-source search)")
     stories.sort(key=lambda r: (r.get("incident_date") or "", int(r["id"])))
     offenders = build_offenders(stories)
     SITE_DIR.mkdir(parents=True, exist_ok=True)

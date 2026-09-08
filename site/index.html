@@ -36,7 +36,6 @@
   h1 { font-size: 2rem; margin: 0 0 4px; color: var(--ink-strong); letter-spacing: -0.01em; }
   .subtitle { color: var(--muted); margin: 0 0 4px; max-width: 60em; }
   .updated { font-size: 0.85rem; color: var(--muted); margin: 0; }
-  .scope { margin: 8px 0 6px; padding: 8px 12px; border-left: 3px solid var(--strict); background: var(--strict-soft); color: var(--ink); font-size: 0.92rem; max-width: 60em; border-radius: 0 6px 6px 0; }
 
   /* Shared bits */
   .badge { display: inline-block; font-size: 0.72rem; padding: 1px 7px; border-radius: 10px;
@@ -128,7 +127,6 @@
   <header>
     <h1>Underincarceration Stories</h1>
     <p class="subtitle">News stories about serious repeat offenders: people arrested, charged, or convicted for a new crime after at least five prior arrests, five prior convictions, or three prior felony convictions, as stated in the article. Automatically collected and classified; every record cites its source.</p>
-    <p class="scope"><b>This is a collection of stories, not a census.</b> It holds only the cases that news outlets covered, that our searches found, and where the article states the prior record. It is not a count of repeat offending, and no place with more stories necessarily has more of it.</p>
     <p class="updated" id="updated">Loading…</p>
   </header>
 
@@ -148,7 +146,6 @@
     </select>
     <label class="chk"><input type="checkbox" id="photo"> With photo</label>
     <label class="chk"><input type="checkbox" id="multi"> Two or more outlets</label>
-    <span class="n" id="count"></span>
   </div>
 
   <div class="notice" id="notice" hidden></div>
@@ -156,7 +153,8 @@
   <p class="more"><button id="more" hidden>Load 20 more</button></p>
 
   <footer>
-    <p><b>Inclusion rule.</b> A story is kept only when the article states at least five prior arrests, five prior convictions, or three prior felony convictions, and reports the person arrested, charged, or convicted. Counts are never estimated, and every count must appear in the article. No one under 18 is included.</p>
+    <p><b>This is a collection of stories, not a census.</b> It holds only the cases that news outlets covered, that our searches found, and where the article states the prior record. It is not a count of repeat offending, and no place with more stories necessarily has more of it.</p>
+    <p><b>Inclusion rule.</b> A story is kept only when the article states at least five prior arrests, five prior convictions, or three prior felony convictions, and reports the person arrested, charged, or convicted. Counts are never estimated, and every count must appear in the article. No one under 18 is included. Every story is either reported by two or more outlets or comes from an outlet with a professional newsroom (national outlets and metro dailies).</p>
     <p><b>What a record claims.</b> Each record restates what the cited outlet reported on the date shown, with the documenting sentences quoted verbatim. It does not claim the underlying facts are true. Reports rely on police and prosecutor statements; charges are dropped and cases end in acquittal after publication, and the outcome shown is as of the report. Classification is automated and errors in either direction are possible. Photos are linked from the cited outlet and not stored here. See the <a href="corrections.html">corrections policy</a>.</p>
     <p>Spotted a mistake? Use the &#9873; on a card to <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=flag-error.yml">flag an error in that record</a>, or <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues/new?template=missing-incident.yml">submit a missing story</a>. Reports get an automated first review and are public in the <a href="https://github.com/CharlesFainLehman/Underincarcerated/issues?q=label%3Afeedback">issue tracker</a>; the maintainer makes the final call.</p>
     <p>Data: <a href="stories.csv">stories.csv</a> · <a href="stories.json">stories.json</a> · <a href="offenders.csv">offenders.csv</a> · <a href="stats.json">stats.json</a> · <a href="https://github.com/CharlesFainLehman/Underincarcerated">source code and methodology</a></p>
@@ -178,8 +176,7 @@ const PAGE = 20;
   ]);
   const byId = new Map(stories.map(s => [s.id, s]));
 
-  document.getElementById('updated').textContent =
-    `Updated ${stats.updated}. ${stats.stories.toLocaleString()} stories, ${stats.offenders.toLocaleString()} named offenders, ${(stats.offenders_multiple_incidents || 0).toLocaleString()} with more than one incident.`;
+  document.getElementById('updated').textContent = `Updated ${stats.updated}.`;
 
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'source'; } };
@@ -328,7 +325,7 @@ const PAGE = 20;
     grid.insertAdjacentHTML('beforeend', slice.map(cardHtml).join(''));
     shown += slice.length;
     more.hidden = shown >= filtered.length;
-    more.textContent = `Load ${Math.min(PAGE, filtered.length - shown)} more (${(filtered.length - shown).toLocaleString()} left)`;
+    more.textContent = 'Load more';
     if (!filtered.length) grid.innerHTML = '<p class="empty">No stories match.</p>';
   }
   function rerender(id) {
@@ -377,7 +374,6 @@ const PAGE = 20;
       filtered = [];
       notice.innerHTML = `Record ${pinned} was removed on ${esc(t.date)}: ${esc(t.reason)}. <a href="#" data-clear>Show all stories</a>`;
       notice.hidden = false;
-      document.getElementById('count').textContent = '';
       grid.innerHTML = '';
       more.hidden = true;
       return;
@@ -399,7 +395,6 @@ const PAGE = 20;
         (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)))
         .sort(sorters[sort]);
     }
-    document.getElementById('count').textContent = `${filtered.length.toLocaleString()} of ${stories.length.toLocaleString()} stories`;
     renderCards(true);
   }
   ['q', 'state', 'release', 'offense', 'sort', 'photo', 'multi'].forEach(id =>

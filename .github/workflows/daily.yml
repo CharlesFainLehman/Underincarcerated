@@ -62,6 +62,10 @@ jobs:
           PYTHONUNBUFFERED: "1"
         run: python pipeline/corroborate.py --limit 200 --max-minutes 30
 
+      - name: Remove stories the search left single-sourced
+        if: always()
+        run: python pipeline/enforce_sources.py
+
       - name: Upload decision log
         if: always()
         uses: actions/upload-artifact@v4

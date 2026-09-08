@@ -217,6 +217,7 @@ def test_process_skips_stored_url_variants(monkeypatch, tmp_path):
 
 
 def test_exports_and_validation(monkeypatch, tmp_path):
+    monkeypatch.setattr(build_exports, "REQUIRE_CORROBORATION", False)  # merging and validation, not the source rule
     data = tmp_path / "data"
     site = tmp_path / "site"
     data.mkdir()
@@ -455,6 +456,7 @@ def test_fetch_skips_video_pages(monkeypatch):
 
 
 def test_exports_merge_daily_and_backfill(monkeypatch, tmp_path):
+    monkeypatch.setattr(build_exports, "REQUIRE_CORROBORATION", False)
     data = tmp_path / "data"
     (data / "backfill").mkdir(parents=True)
     site = tmp_path / "site"
@@ -845,3 +847,40 @@ def test_corroborate_sweep_adds_confirmed_source(monkeypatch, tmp_path):
     assert rows["2"]["additional_sources"] == "" and rows["2"]["corroboration_checked"]
     # Second pass does nothing: both rows are stamped.
     assert co.sweep(None, path, log=log)["checked"] == 0
+
+
+def test_publishable_and_pending():
+    import corroborate as co
+    one = {"source_url": "https://wxyz.com/a", "additional_sources": "", "corroboration_checked": ""}
+    assert not co.publishable(one) and co.pending(one)
+    checked = {**one, "corroboration_checked": "2026-09-08"}
+    assert not co.publishable(checked) and not co.pending(checked)
+    two = {**one, "additional_sources": "https://nbc4i.com/x"}
+    assert co.publishable(two) and not co.pending(two)
+    same_host = {**one, "additional_sources": "https://www.wxyz.com/b"}
+    assert not co.publishable(same_host)
+    trusted = {**one, "source_url": "https://www.nytimes.com/x"}
+    assert co.publishable(trusted)
+
+
+def test_exports_hold_back_single_source_rows(monkeypatch, tmp_path):
+    import build_exports as be
+    import store, config
+    data, site = tmp_path / "data", tmp_path / "site"
+    data.mkdir(); site.mkdir(); (data / "backfill").mkdir()
+    for mod in (store, config, be, validate_data):
+        for name, val in (("STORIES_CSV", data / "stories.csv"), ("BACKFILL_STORIES_CSV", data / "backfill" / "stories.csv"),
+                          ("REMOVED_CSV", data / "removed.csv"), ("SITE_DIR", site), ("OFFENDERS_CSV", data / "offenders.csv")):
+            if hasattr(mod, name):
+                monkeypatch.setattr(mod, name, val)
+    monkeypatch.setattr(be, "build_pages", lambda: [])
+    monkeypatch.setattr(be, "REQUIRE_CORROBORATION", True)
+    r1 = make_row(1, _cls(), {"url": "https://wxyz.com/a", "source": "WXYZ"})                      # single source
+    r2 = make_row(2, _cls(offender_name="Ann Lee"), {"url": "https://www.nytimes.com/b", "source": "NYT"})  # trusted
+    r3 = make_row(3, _cls(offender_name="Bo Park"), {"url": "https://wxyz.com/c", "source": "WXYZ"})
+    r3["additional_sources"] = "https://nbc4i.com/c"                                                 # corroborated
+    store.save_stories([r1, r2, r3])
+    be.build_exports()
+    ids = [r["id"] for r in json.loads((site / "stories.json").read_text())]
+    assert ids == [2, 3]
+    assert json.loads((site / "stats.json").read_text())["stories"] == 2

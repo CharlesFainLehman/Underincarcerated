@@ -114,6 +114,13 @@ STORED_OUTCOME_RE = (r"arrest|charg|indict|arraign|convict|sentenc|plead|guilty|
 # No one under 18 is stored, whatever the article gives.
 MIN_AGE = 18
 
+# Publication rule (2026-09-08): a story is published only when reported by
+# two or more distinct outlets, or when its primary source is on
+# TRUSTED_OUTLETS. New rows wait, unpublished, until the second-source search
+# has run on them; rows the search leaves single-sourced are removed
+# (enforce_sources.py).
+REQUIRE_CORROBORATION = True
+
 # Outlets with professional newsrooms and legal review. A story whose primary
 # source is one of these is not sent through the second-source search; a
 # subdomain matches too (e.g. abcnews.go.com). Edit freely.

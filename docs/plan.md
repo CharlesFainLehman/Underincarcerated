@@ -156,6 +156,10 @@ h. **Defamation guards** (2026-09-08). Only people reported arrested, charged, i
    maximum. A mug shot is accepted only when the surname is attached to the image or it is
    the page's sole candidate. Removed rows go to `data/removed.csv` with a reason; their
    ids are reserved and the site shows a tombstone. Policy: `content/corrections.md`.
+i. **Publication rule** (2026-09-08). Two or more distinct outlets, or a primary source on
+   `TRUSTED_OUTLETS` (`REQUIRE_CORROBORATION`). 495 single-source rows from other outlets
+   were removed after the second-source search found nothing; 455 remain. New rows are held
+   off the site until the search has run on them.
 f. **Repo layout.** Everything in this repo. Pipeline in `pipeline/`, data in `data/`, front
    end and exports in `site/`.
 
