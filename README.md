@@ -69,6 +69,11 @@ model confirms it covers the same person and incident. `corroboration_checked` r
 date of the last search. Rows whose primary source is on `TRUSTED_OUTLETS` in `config.py`
 (national outlets and metro dailies with professional newsrooms) skip the search. The stories page can filter to records with two or more outlets.
 
+**Publication rule** (`REQUIRE_CORROBORATION`, 2026-09-08): a story is published only when two
+or more distinct outlets report it, or its primary source is on `TRUSTED_OUTLETS`. New rows
+stay in the data files but off the site until the second-source search has run on them;
+`enforce_sources.py` then moves rows the search left single-sourced to `data/removed.csv`.
+
 The database is a collection of stories, not a census. It holds what the news covered, what
 the searches found, and what the article stated. Daily runs are capped at 150 articles
 (`max_classify`), ranked by headline signals, so a busy news day is sampled, not exhausted.

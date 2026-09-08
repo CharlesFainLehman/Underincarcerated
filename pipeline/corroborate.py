@@ -62,6 +62,16 @@ def is_trusted(url: str) -> bool:
     return any(host == d or host.endswith("." + d) for d in TRUSTED_OUTLETS)
 
 
+def publishable(row: dict) -> bool:
+    """Two or more distinct outlets, or a trusted primary source."""
+    return is_trusted(row.get("source_url", "")) or len(outlets(row)) >= 2
+
+
+def pending(row: dict) -> bool:
+    """Not yet publishable, but the second-source search has not run on it."""
+    return not publishable(row) and not row.get("corroboration_checked")
+
+
 def needs_check(row: dict, recheck: bool = False, include_trusted: bool = False) -> bool:
     if not row.get("offender_name"):
         return False

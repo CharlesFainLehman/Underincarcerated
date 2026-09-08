@@ -14,6 +14,7 @@ Classification is automated. The prior-record and release-status fields are back
 - Anyone under 18, whatever the article reports.
 - Anyone the article does not report as arrested, charged, indicted, convicted, or sentenced. Suspects who are wanted or at large are not stored.
 - Stories where the article does not state at least five prior arrests, five prior convictions, or three prior felony convictions. Counts are never estimated.
+- Stories reported by only one outlet, unless that outlet is a national news organization or a metro daily with a professional newsroom. Other stories are published only after a second outlet's report is found.
 
 ## Reporting an error
 
