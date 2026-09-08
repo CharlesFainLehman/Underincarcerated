@@ -23,12 +23,17 @@ A featured-story card above the table: mug shot, name, age, city/state, new offe
 prior record counts and named priors, status at offense, the summary, and source
 links. Selection rule to decide:
 
-- **Parked** pending the maintainer's decision on selection (hand-picked list vs.
-  newest strict story with a mug shot).
-
-Depends on 1.
+- **Done (2026-09-08)** as the hero on the stories page. Auto-selects the newest
+  strict, violent story with a photo. Hand-pick with `HERO_ID` at the top of the
+  script in `site/index.html`; preview any record as the hero with `?hero=ID`.
 
 ## 3. Clean up the stories page; title it "Underincarceration Stories"
+
+**Redesigned (2026-09-08):** hero story, then filters, then expandable cards, 20 at a
+time, newest incident first. Sort options: newest, oldest, recently added, most prior
+arrests, most prior convictions. `#id=N` pins one record with a "show all" link. The
+summary tiles and monthly chart moved off this page (the chart is available on the
+Facts page via `{chart:by_month}`).
 
 Rename, tighten the table (fewer columns by default, an expandable row for the full
 record), sortable columns, a per-story permalink (`stories.html#id=123`) so a single
