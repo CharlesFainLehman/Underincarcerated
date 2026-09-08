@@ -66,7 +66,8 @@ A second-source search (`corroborate.py`) runs on new rows at the end of each da
 on demand for the whole database: it queries Google News for the offender's name and place
 around the incident date, and adds another outlet's report to `additional_sources` when the
 model confirms it covers the same person and incident. `corroboration_checked` records the
-date of the last search. The stories page can filter to records with two or more outlets.
+date of the last search. Rows whose primary source is on `TRUSTED_OUTLETS` in `config.py`
+(national outlets and metro dailies with professional newsrooms) skip the search. The stories page can filter to records with two or more outlets.
 
 The database is a collection of stories, not a census. It holds what the news covered, what
 the searches found, and what the article stated. Daily runs are capped at 150 articles

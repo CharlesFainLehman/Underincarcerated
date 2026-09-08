@@ -13,7 +13,8 @@ stamped. Stops early, without stamping, when Google throttles redirect
 decoding, so the next run resumes where this one stopped.
 
 The daily run calls this for new rows only; the manual workflow sweeps the
-whole database.
+whole database. Rows whose primary source is on TRUSTED_OUTLETS (config)
+are skipped unless --include-trusted is given.
 """
 
 import argparse
@@ -29,7 +30,7 @@ from urllib.parse import urlsplit
 import anthropic
 from pydantic import BaseModel, ValidationError
 
-from config import BACKFILL_STORIES_CSV, DEDUPE_MODEL, STORIES_CSV
+from config import BACKFILL_STORIES_CSV, DEDUPE_MODEL, STORIES_CSV, TRUSTED_OUTLETS
 from fetch import fetch_article_text, google_news_search, is_vendor_or_wire, resolve_candidate
 from process import DecisionLog, canonical_url, default_decision_log, syndication_path
 from store import load_stories, save_stories
@@ -55,8 +56,16 @@ def outlets(row: dict) -> set[str]:
     return {_host(u) for u in [row.get("source_url", "")] + (row.get("additional_sources") or "").split() if u}
 
 
-def needs_check(row: dict, recheck: bool = False) -> bool:
+def is_trusted(url: str) -> bool:
+    """Primary source is an outlet on the trusted list (or a subdomain of one)."""
+    host = _host(url)
+    return any(host == d or host.endswith("." + d) for d in TRUSTED_OUTLETS)
+
+
+def needs_check(row: dict, recheck: bool = False, include_trusted: bool = False) -> bool:
     if not row.get("offender_name"):
+        return False
+    if not include_trusted and is_trusted(row.get("source_url", "")):
         return False
     if recheck:
         return True
@@ -177,10 +186,11 @@ def corroborate_row(client: anthropic.Anthropic, row: dict, log: DecisionLog,
 
 
 def sweep(client: anthropic.Anthropic, path, limit: int = 0, recheck: bool = False,
-          max_minutes: float = 0, log: DecisionLog | None = None) -> dict:
+          max_minutes: float = 0, log: DecisionLog | None = None,
+          include_trusted: bool = False) -> dict:
     log = log or DecisionLog(default_decision_log())
     stories = load_stories(path)
-    todo = [s for s in stories if needs_check(s, recheck)]
+    todo = [s for s in stories if needs_check(s, recheck, include_trusted)]
     if limit:
         todo = todo[:limit]
     counts = {"checked": 0, "corroborated": 0, "sources_added": 0, "throttled": False}
@@ -233,6 +243,8 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0, help="rows per file (0 = all that need it)")
     ap.add_argument("--recheck", action="store_true", help="search again for rows already checked")
     ap.add_argument("--max-minutes", type=float, default=0, help="stop after this long (0 = no limit)")
+    ap.add_argument("--include-trusted", action="store_true",
+                    help="also search rows whose primary source is on TRUSTED_OUTLETS")
     a = ap.parse_args()
     if not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY is not set; refusing to run.")
@@ -242,7 +254,7 @@ def main() -> None:
     for path in (STORIES_CSV, BACKFILL_STORIES_CSV):
         if not path.exists():
             continue
-        c = sweep(client, path, a.limit, a.recheck, a.max_minutes)
+        c = sweep(client, path, a.limit, a.recheck, a.max_minutes, include_trusted=a.include_trusted)
         for k in total:
             total[k] += c[k]
         if c["throttled"]:

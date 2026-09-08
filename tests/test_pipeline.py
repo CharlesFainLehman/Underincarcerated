@@ -818,6 +818,10 @@ def test_corroborate_query_window_and_candidates():
     assert co.needs_check(row) and not co.needs_check({**row, "corroboration_checked": "2026-09-08"})
     assert not co.needs_check({**row, "additional_sources": "https://nbc4i.com/x"})
     assert not co.needs_check({**row, "offender_name": ""})
+    trusted = {**row, "source_url": "https://www.nytimes.com/2026/09/02/nyregion/x.html"}
+    assert co.is_trusted(trusted["source_url"]) and co.is_trusted("https://abcnews.go.com/US/x")
+    assert not co.is_trusted("https://notnytimes.com/x") and not co.is_trusted("https://nytimes.com.evil.net/x")
+    assert not co.needs_check(trusted) and co.needs_check(trusted, include_trusted=True)
 
 
 def test_corroborate_sweep_adds_confirmed_source(monkeypatch, tmp_path):
