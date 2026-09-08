@@ -93,6 +93,13 @@ inverted. Do this last so it covers all pages at once.
   an assessment plus a `triage:*` label. Needs the `ANTHROPIC_API_KEY` secret, which
   the other workflows already use.
 
+## Corrections email
+
+Set up a private address for correction requests (a person named in a record may not
+want to post on a public issue tracker) and put it in `content/corrections.md`, replacing "[email address to be added]". Retraction statutes in
+several states limit damages only when a correction follows promptly after a demand, so
+the address should be one that is actually read.
+
 ## Defamation guards (done 2026-09-08)
 
 Attribution on every record; corrections page with a response window (email address
