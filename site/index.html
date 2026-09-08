@@ -47,6 +47,8 @@
   blockquote { margin: 4px 0 6px; padding: 5px 10px; border-left: 3px solid var(--accent-soft); color: var(--muted); font-size: 0.88rem; }
   .pic { background: var(--pic); border-radius: 6px; overflow: hidden; flex: none; display: grid; place-items: center; }
   .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Composites (a mug shot beside a scene still) are wider than tall; cropping them to a portrait frame cuts the face off. Show the whole image instead. */
+  .pic img.wide { object-fit: contain; }
   .pic svg { width: 55%; height: 55%; fill: var(--muted); opacity: 0.5; }
   button { padding: 8px 16px; border: 1px solid var(--hairline); border-radius: 7px; background: var(--card); color: var(--ink); font: inherit; cursor: pointer; }
   button:hover { background: var(--hover); }
@@ -183,7 +185,7 @@ const PAGE = 20;
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'source'; } };
   const SIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-9 2.2-9 5v3h18v-3c0-2.8-4.6-5-9-5z"/></svg>';
   const pic = s => `<div class="pic">${s.mugshot_url
-    ? `<img src="${esc(s.mugshot_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=${JSON.stringify(SIL).replace(/"/g, '&quot;')}">`
+    ? `<img src="${esc(s.mugshot_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="if(this.naturalWidth>this.naturalHeight*1.15)this.classList.add('wide')" onerror="this.outerHTML=${JSON.stringify(SIL).replace(/"/g, '&quot;')}">`
     : SIL}</div>`;
   const where = s => [s.city, s.state].filter(Boolean).join(', ');
   const nameHtml = s => `${esc(s.offender_name || 'Unnamed')}${s.age ? ` <span class="age">${s.age}</span>` : ''}`;
