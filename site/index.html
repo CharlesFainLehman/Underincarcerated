@@ -108,14 +108,15 @@
   .dialog .where { color: var(--muted); margin: 0 0 8px; font-variant-numeric: tabular-nums; }
   .dialog .tags { display: flex; gap: 5px; flex-wrap: wrap; font-size: 0.9rem; }
   .dialog .body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 22px; padding-top: 12px; border-top: 1px solid var(--hairline); }
-  .dialog .body p { margin: 0 0 8px; }
+  .dialog .body > div { min-width: 0; }
+  .dialog .body p, .dialog blockquote { margin: 0 0 8px; overflow-wrap: anywhere; }
   .dialog .summary { font-size: 1.02rem; line-height: 1.5; }
   .dialog .links a { display: block; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dialog .rec { font-size: 0.82rem; color: var(--muted); }
   .dialog .tomb { font-size: 1rem; padding: 8px 0; }
   @media (max-width: 720px) {
     .dialog { padding: 18px 16px; }
-    .dialog .body { grid-template-columns: 1fr; }
+    .dialog .body { grid-template-columns: minmax(0, 1fr); }
     .dialog .pic { width: 96px; height: 120px; }
   }
   .more { margin: 18px 0 0; text-align: center; }
