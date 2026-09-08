@@ -130,4 +130,5 @@ def make_row(story_id: int, cls, candidate: dict) -> dict:
         "source_url": candidate["url"],
         "additional_sources": "",
         "confidence": cls.confidence,
+        "corroboration_checked": "",
     }

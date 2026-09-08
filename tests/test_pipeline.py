@@ -790,3 +790,54 @@ def test_mugshot_identity_rule(monkeypatch):
     sole = '<html><body><img src="/only.jpg" alt="mugshot" width="600"></body></html>'
     monkeypatch.setattr(mugshots, "fetch_html", lambda u: sole)
     assert mugshots.find_mugshot(None, {"source_url": "https://x.com/s", "offender_name": "John Smith"}) == "https://x.com/only.jpg"
+
+
+# ---- second-source search ---------------------------------------------------
+
+def test_corroborate_query_window_and_candidates():
+    import corroborate as co
+    row = {"id": "1", "offender_name": "John  M. Smith", "city": "Springfield", "state": "OH",
+           "incident_date": "2026-09-01", "source_url": "https://www.wxyz.com/2026/09/02/john-smith-arrested/",
+           "additional_sources": ""}
+    assert co.build_query(row) == '"John M. Smith" Springfield'
+    assert co.build_query({**row, "city": ""}) == '"John M. Smith" OH'
+    start, end = co.date_window(row)
+    assert (start.date().isoformat(), end.date().isoformat()) == ("2026-08-25", "2026-10-16")
+    assert co.date_window({**row, "incident_date": "2026"}) == (None, None)
+    hits = [
+        {"url": "https://wxyz.com/2026/09/02/john-smith-arrested/?utm_source=x", "source": "WXYZ"},  # primary itself
+        {"url": "https://www.wxyz.com/other", "source": "WXYZ"},                       # same outlet
+        {"url": "https://www.mugshots.com/john-smith", "source": "Mugshots"},         # blotter aggregator
+        {"url": "https://fox8.com/2026/09/02/john-smith-arrested/", "source": "FOX 8"},  # syndicated copy of primary
+        {"url": "https://nbc4i.com/news/john-smith", "source": "NBC4"},
+        {"url": "https://www.nbc4i.com/news/john-smith-2", "source": "NBC4"},          # second from same outlet
+        {"url": "https://news.google.com/rss/articles/xyz", "source": "Dispatch"},     # undecoded: keep
+    ]
+    out = co.find_candidates(row, hits)
+    assert [h["url"] for h in out] == ["https://nbc4i.com/news/john-smith", "https://news.google.com/rss/articles/xyz"]
+    assert co.needs_check(row) and not co.needs_check({**row, "corroboration_checked": "2026-09-08"})
+    assert not co.needs_check({**row, "additional_sources": "https://nbc4i.com/x"})
+    assert not co.needs_check({**row, "offender_name": ""})
+
+
+def test_corroborate_sweep_adds_confirmed_source(monkeypatch, tmp_path):
+    import corroborate as co
+    import store
+    path = tmp_path / "stories.csv"
+    r1 = make_row(1, _cls(), {"url": "https://wxyz.com/a", "source": "WXYZ"})
+    r2 = make_row(2, _cls(offender_name="Ann Lee"), {"url": "https://wxyz.com/b", "source": "WXYZ"})
+    store.save_stories([r1, r2], path)
+    monkeypatch.setattr(co, "google_news_search", lambda q, s, e: [
+        {"url": "https://nbc4i.com/x", "source": "NBC4", "title": "t", "published": "2026-09-02"},
+        {"url": "https://fox8.com/y", "source": "FOX 8", "title": "t", "published": "2026-09-02"}])
+    monkeypatch.setattr(co, "fetch_article_text", lambda u: "text" if "nbc4i" in u else None)
+    monkeypatch.setattr(co, "confirm", lambda c, row, cand, text:
+                        co.Match(same_person=True, same_incident=row["offender_name"].startswith("John"), reason="r"))
+    log = process.DecisionLog(tmp_path / "log.jsonl")
+    counts = co.sweep(None, path, log=log)
+    rows = {r["id"]: r for r in store.load_stories(path)}
+    assert counts["checked"] == 2 and counts["corroborated"] == 1 and counts["sources_added"] == 1
+    assert rows["1"]["additional_sources"] == "https://nbc4i.com/x"
+    assert rows["2"]["additional_sources"] == "" and rows["2"]["corroboration_checked"]
+    # Second pass does nothing: both rows are stamped.
+    assert co.sweep(None, path, log=log)["checked"] == 0

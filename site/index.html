@@ -145,6 +145,7 @@
       <option value="convictions">Most prior convictions</option>
     </select>
     <label class="chk"><input type="checkbox" id="photo"> With photo</label>
+    <label class="chk"><input type="checkbox" id="multi"> Two or more outlets</label>
     <span class="n" id="count"></span>
   </div>
 
@@ -204,6 +205,7 @@ const PAGE = 20;
   const tags = s => `<span class="badge">${esc(s.new_offense_type || 'other')}</span>` +
     (s.release_status && s.release_status !== 'none stated' ? ` <span class="badge">${esc(s.release_status)}</span>` : '');
   const permalink = s => `${location.origin}${location.pathname}#id=${s.id}`;
+  const outletCount = s => new Set([s.source_url, ...s.additional_sources].map(host)).size;
   const attrib = s => `<p class="attrib">As reported by <a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_name || host(s.source_url))}</a>; recorded ${esc(s.date_added)}. Outcome shown is as of that report and may have changed.</p>`;
   const REPO = 'https://github.com/CharlesFainLehman/Underincarcerated';
   const flagUrl = s => `${REPO}/issues/new?template=flag-error.yml&record-id=${s.id}`;
@@ -292,7 +294,7 @@ const PAGE = 20;
         ${pic(s)}
         <div style="min-width:0">
           <h3 class="name">${nameHtml(s)}</h3>
-          <p class="where">${esc(where(s))}${s.incident_date ? ` · ${esc(s.incident_date)}` : ''}</p>
+          <p class="where">${esc(where(s))}${s.incident_date ? ` · ${esc(s.incident_date)}` : ''}${outletCount(s) > 1 ? ` · ${outletCount(s)} outlets` : ''}</p>
           <div class="tags">${tags(s)}</div>
           ${priorsShort(s) ? `<p class="priors">${priorsShort(s)}</p>` : ''}
         </div>
@@ -387,17 +389,18 @@ const PAGE = 20;
       const q = document.getElementById('q').value.trim().toLowerCase();
       const st = document.getElementById('state').value, rel = document.getElementById('release').value,
             off = document.getElementById('offense').value,
-            photo = document.getElementById('photo').checked, sort = document.getElementById('sort').value;
+            photo = document.getElementById('photo').checked, multi = document.getElementById('multi').checked,
+            sort = document.getElementById('sort').value;
       filtered = stories.filter(s =>
         (!st || s.state === st) && (!rel || s.release_status === rel) && (!off || s.new_offense_type === off) &&
-        (!photo || s.mugshot_url) &&
+        (!photo || s.mugshot_url) && (!multi || outletCount(s) > 1) &&
         (!q || [s.offender_name, s.city, s.summary, s.prior_offenses].join(' ').toLowerCase().includes(q)))
         .sort(sorters[sort]);
     }
     document.getElementById('count').textContent = `${filtered.length.toLocaleString()} of ${stories.length.toLocaleString()} stories`;
     renderCards(true);
   }
-  ['q', 'state', 'release', 'offense', 'sort', 'photo'].forEach(id =>
+  ['q', 'state', 'release', 'offense', 'sort', 'photo', 'multi'].forEach(id =>
     document.getElementById(id).addEventListener('input', () => { pinned = null; history.replaceState(null, '', location.pathname + location.search); apply(); }));
   more.addEventListener('click', () => renderCards(false));
 

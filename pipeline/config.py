@@ -142,6 +142,7 @@ CSV_COLUMNS = [
     "source_url",
     "additional_sources",
     "confidence",
+    "corroboration_checked",  # date the second-source search last ran for this row
 ]
 
 OFFENDER_COLUMNS = [
