@@ -1,8 +1,8 @@
 {
- "updated": "2026-09-16",
- "stories": 488,
- "stories_strict": 488,
- "offenders": 396,
+ "updated": "2026-09-17",
+ "stories": 489,
+ "stories_strict": 489,
+ "offenders": 397,
  "offenders_multiple_incidents": 77,
  "by_state": {
   "NY": 124,
@@ -19,8 +19,8 @@
   "UT": 12,
   "NV": 10,
   "AR": 9,
+  "CT": 9,
   "SC": 9,
-  "CT": 8,
   "VA": 8,
   "LA": 6,
   "VT": 5,
@@ -65,8 +65,8 @@
   "UT": 12,
   "NV": 10,
   "AR": 9,
+  "CT": 9,
   "SC": 9,
-  "CT": 8,
   "VA": 8,
   "LA": 6,
   "VT": 5,
@@ -99,7 +99,7 @@
  "by_release_status": {
   "none stated": 246,
   "parole": 67,
-  "bail/bond": 53,
+  "bail/bond": 54,
   "probation": 38,
   "supervised release": 37,
   "early release": 35,
@@ -109,7 +109,7 @@
  "by_offense_type": {
   "homicide": 100,
   "assault": 83,
-  "drug offense": 44,
+  "drug offense": 45,
   "sexual assault": 43,
   "shooting": 32,
   "other": 27,
@@ -129,7 +129,7 @@
  "by_severity": {
   "violent": 317,
   "property": 71,
-  "drug": 44,
+  "drug": 45,
   "other": 33,
   "weapons": 23
  },
