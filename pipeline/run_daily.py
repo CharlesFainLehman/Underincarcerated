@@ -9,6 +9,7 @@ from build_exports import build_exports
 from daily_adds import record_run
 from fetch import discover_daily, save_query_stats
 from process import default_decision_log, process_candidates
+from config import BACKFILL_STORIES_CSV
 from store import load_seen_urls, load_stories, save_seen_urls, save_stories
 
 
@@ -18,6 +19,7 @@ def main() -> None:
     client = anthropic.Anthropic()
     stories = load_stories()
     seen = load_seen_urls()
+    backfill_rows = load_stories(BACKFILL_STORIES_CSV)   # deduped against, merged into, never appended to
 
     print("Discovering candidates...")
     candidates = discover_daily(days_back=int(os.environ.get("DAYS_BACK", "1")))
@@ -32,10 +34,13 @@ def main() -> None:
     counts = process_candidates(client, candidates, stories, seen,
                                 decision_log=default_decision_log(),
                                 checkpoint=checkpoint,
-                                max_classify=int(os.environ.get("MAX_CLASSIFY", "0")))
+                                max_classify=int(os.environ.get("MAX_CLASSIFY", "0")),
+                                others=backfill_rows)
 
     save_stories(stories)
     save_seen_urls(seen)
+    if counts.get("others_changed"):
+        save_stories(backfill_rows, BACKFILL_STORIES_CSV)
     record_run(counts["new"])
     build_exports()
 

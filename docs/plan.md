@@ -156,6 +156,11 @@ h. **Defamation guards** (2026-09-08). Only people reported arrested, charged, i
    maximum. A mug shot is accepted only when the surname is attached to the image or it is
    the page's sole candidate. Removed rows go to `data/removed.csv` with a reason; their
    ids are reserved and the site shows a tombstone. Policy: `content/corrections.md`.
+j. **Cross-file dedupe** (2026-09-18). The daily run and the backfill each deduplicated only
+   against their own file, so 73 incidents found by both were stored twice. `process_candidates`
+   now takes the other file's rows (`others`) for duplicate checks and same-incident merges;
+   `merge_duplicates.py` merged the existing pairs into the row published first and tombstoned
+   the other as "duplicate: merged into record N".
 i. **Publication rule** (2026-09-08). Two or more distinct outlets, or a primary source on
    `TRUSTED_OUTLETS` (`REQUIRE_CORROBORATION`). 495 single-source rows from other outlets
    were removed after the second-source search found nothing; 455 remain. New rows are held
