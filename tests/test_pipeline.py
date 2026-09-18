@@ -884,3 +884,44 @@ def test_exports_hold_back_single_source_rows(monkeypatch, tmp_path):
     ids = [r["id"] for r in json.loads((site / "stories.json").read_text())]
     assert ids == [2, 3]
     assert json.loads((site / "stats.json").read_text())["stories"] == 2
+
+
+# ---- cross-file dedupe and duplicate merging ---------------------------------
+
+def test_process_dedupes_against_other_file(monkeypatch, tmp_path):
+    other = make_row(1000001, _cls(), {"url": "https://y.com/old", "source": "y.com"})
+    other["date_added"] = "2026-09-06"
+    stories: list[dict] = []
+    cands = [{"url": "https://x.com/a", "title": "t", "source": "x.com"}]
+    monkeypatch.setattr(process, "triage_candidates", lambda c, cands: [True])
+    monkeypatch.setattr(process, "fetch_article_text", lambda url: ARTICLE)
+    monkeypatch.setattr(process, "classify_article", lambda c, cand, t: _cls())
+    monkeypatch.setattr(process, "resolve_candidate", lambda cand: None)
+    seen: set[str] = set()
+    counts = process_candidates(FakeClient(), cands, stories, seen, decision_log=tmp_path / "log.jsonl",
+                                reserved=set(), others=[other])
+    assert counts["duplicates"] == 1 and counts["new"] == 0 and not stories
+    assert counts["others_changed"] == 1
+    assert other["additional_sources"] == "https://x.com/a"
+
+
+def test_merge_duplicates_rule_and_merge():
+    import merge_duplicates as md
+    a = make_row(74, _cls(), {"url": "https://wxyz.com/a", "source": "WXYZ"}); a["date_added"] = "2026-09-05"
+    b = make_row(1002191, _cls(prior_count_arrests=13, age=None, incident_date="2026-09-03"),
+                 {"url": "https://nbc4i.com/b", "source": "NBC4"}); b["date_added"] = "2026-09-07"
+    b["mugshot_url"] = "https://nbc4i.com/m.jpg"
+    c = make_row(3, _cls(incident_date="2026-01-10", new_offense_type="arson", city="Dayton"),
+                 {"url": "https://wxyz.com/c", "source": "WXYZ"}); c["date_added"] = "2026-09-05"
+    d = make_row(4, _cls(incident_date="2026-09-05", new_offense_type="arson", city="Dayton"),
+                 {"url": "https://wxyz.com/d", "source": "WXYZ"}); d["date_added"] = "2026-09-09"
+    assert md.same_incident(a, b)              # same key, 2 days apart, same city
+    assert not md.same_incident(a, c)          # 8 months apart
+    assert not md.same_incident(a, d)          # close in time, but different city and offense
+    assert md._dates_close("2026-01", "2026-08-08") is False and md._dates_close("2026-09", "2026-09-20") is True
+    merges = md.find_merges([b, a, c, d])
+    assert [(k["id"], o["id"]) for k, o in merges] == [("74", "1002191")]   # published first wins
+    md.merge_into(a, b)
+    assert a["additional_sources"] == "https://nbc4i.com/b"
+    assert a["prior_count_arrests"] == "13" and a["mugshot_url"] == "https://nbc4i.com/m.jpg"
+    assert a["corroboration_checked"] == ""

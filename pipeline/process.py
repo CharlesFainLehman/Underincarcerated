@@ -157,7 +157,8 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                        stories: list[dict], seen_urls: set[str],
                        decision_log: Path | None = None,
                        checkpoint=None, max_classify: int = 0, id_base: int = 0,
-                       reserved: set[int] | None = None) -> dict:
+                       reserved: set[int] | None = None,
+                       others: list[dict] | None = None) -> dict:
     """Classify candidates and append qualifying, non-duplicate rows to stories.
 
     Mutates `stories` and `seen_urls` in place. Returns counts for logging.
@@ -168,15 +169,20 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
     """
     counts = {"new": 0, "duplicates": 0, "same_person": 0, "triaged_out": 0,
               "rejected": 0, "no_text": 0, "unresolved": 0, "skipped_seen": 0, "errors": 0,
-              "not_strict": 0}
+              "not_strict": 0, "others_changed": 0}
+    # Rows from the other story file (daily vs backfill). Duplicates are
+    # checked against both; a match there is merged into that row in place,
+    # and the caller saves that file when others_changed is set.
+    others = others or []
+    everything = stories + others
     log = DecisionLog(decision_log)
     if reserved is None:
         reserved = reserved_ids(id_base)
 
-    stored = {canonical_url(s_["source_url"]) for s_ in stories}
-    stored |= {canonical_url(u) for s_ in stories
+    stored = {canonical_url(s_["source_url"]) for s_ in everything}
+    stored |= {canonical_url(u) for s_ in everything
                for u in s_.get("additional_sources", "").split() if u}
-    stored_paths = {p for s_ in stories
+    stored_paths = {p for s_ in everything
                     for u in [s_["source_url"], *s_.get("additional_sources", "").split()]
                     for p in [syndication_path(u)] if p}
 
@@ -338,14 +344,16 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                 row = make_row(next_story_id(stories, id_base, reserved), cls, candidate)
                 log.write(stage="classify", url=url, qualifies=True, row=row)
                 try:
-                    dup = check_duplicate(client, row, stories)
+                    dup = check_duplicate(client, row, everything)
                 except anthropic.APIError as e:
                     print(f"  dedupe call failed ({e}); treating as new")
                     dup = None
 
                 if dup and dup.relation == "same_incident":
-                    for s in stories:
+                    for s in everything:
                         if s["id"] == dup.matching_id:
+                            if any(s is o for o in others):
+                                counts["others_changed"] += 1
                             urls = [u for u in s.get("additional_sources", "").split(" ") if u]
                             if url not in urls and url != s.get("source_url"):
                                 urls.append(url)
@@ -370,7 +378,7 @@ def process_candidates(client: anthropic.Anthropic, candidates: list[dict],
                     continue
 
                 if dup and dup.relation == "same_person_new_incident":
-                    match = next((s for s in stories if s["id"] == dup.matching_id), None)
+                    match = next((s for s in everything if s["id"] == dup.matching_id), None)
                     if match and not ages_consistent(row, match):
                         # Ages rule out one person: keep both rows, do not link.
                         log.write(stage="dedupe", url=url, relation="unrelated",

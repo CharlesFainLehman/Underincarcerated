@@ -91,6 +91,7 @@ def main() -> None:
     sys.stdout.reconfigure(line_buffering=True)
     client = anthropic.Anthropic()
     stories = load_stories(BACKFILL_STORIES_CSV)
+    daily_rows = load_stories()   # deduped against, merged into, never appended to
     seen = load_seen_urls(BACKFILL_SEEN_URLS_JSON)
     done = load_done_weeks()
     log = DECISIONS_DIR / f"backfill-{args.start}-{args.end}.jsonl"
@@ -143,7 +144,9 @@ def main() -> None:
             try:
                 counts = process_candidates(client, fresh, stories, seen, decision_log=log,
                                             checkpoint=checkpoint, id_base=BACKFILL_ID_BASE,
-                                            max_classify=args.max_per_week)
+                                            max_classify=args.max_per_week, others=daily_rows)
+                if counts.get("others_changed"):
+                    save_stories(daily_rows)
             except ResolutionThrottled as e:
                 throttled = True
                 print(f"  {e}")
