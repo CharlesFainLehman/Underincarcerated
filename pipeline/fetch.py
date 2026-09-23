@@ -291,8 +291,11 @@ def resolve_candidate(candidate: dict) -> None:
     if "news.google.com" not in url:
         return
     try:
-        res = gnewsdecoder(url, interval=1)
-        decoded = res.get("decoded_url") if res.get("status") else None
+        res = gnewsdecoder(url, interval=1) or {}
+        # googlenewsdecoder 0.1.x reports {"status": True, "decoded_url": ...};
+        # 0.2.x renamed the flag to "success". Trust decoded_url itself, so a
+        # future rename cannot turn every decode into a silent failure again.
+        decoded = res.get("decoded_url") if res.get("status", res.get("success", True)) else None
         if decoded and "news.google.com" not in decoded:
             candidate["google_url"] = url
             candidate["url"] = decoded.strip()

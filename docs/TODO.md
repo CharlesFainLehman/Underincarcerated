@@ -109,3 +109,12 @@ prior counts verified against the article (`check_counts` at ingest, `verify_cou
 for the existing rows); tighter merges and age-checked person links; photo identity rule;
 juveniles and un-arrested subjects excluded. Not done: periodic re-audit of outcomes and
 dead links, hand-picked hero, media liability insurance.
+
+## Incident: three empty daily runs, 2026-09-21 to 09-23
+
+googlenewsdecoder 0.2.1 (released 2026-09-20) renamed the result flag from `status` to
+`success`; `resolve_candidate` read the old key and treated every decode as a failure, so
+the run waited out two throttle retries and raised. Fixed 2026-09-23 by trusting
+`decoded_url` whatever the flag is called, with a test over both shapes. Unresolved URLs
+were never marked seen, so the missed days are picked up by a manual run with
+`days_back=4`.
