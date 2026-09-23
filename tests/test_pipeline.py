@@ -851,8 +851,9 @@ def test_corroborate_sweep_adds_confirmed_source(monkeypatch, tmp_path):
 
 def test_publishable_and_pending():
     import corroborate as co
-    one = {"source_url": "https://wxyz.com/a", "additional_sources": "", "corroboration_checked": ""}
+    one = {"source_url": "https://wxyz.com/a", "additional_sources": "", "corroboration_checked": "", "offender_name": "A B"}
     assert not co.publishable(one) and co.pending(one)
+    assert not co.pending({**one, "offender_name": ""})   # unsearchable: not pending, so it gets removed
     checked = {**one, "corroboration_checked": "2026-09-08"}
     assert not co.publishable(checked) and not co.pending(checked)
     two = {**one, "additional_sources": "https://nbc4i.com/x"}
@@ -925,3 +926,22 @@ def test_merge_duplicates_rule_and_merge():
     assert a["additional_sources"] == "https://nbc4i.com/b"
     assert a["prior_count_arrests"] == "13" and a["mugshot_url"] == "https://nbc4i.com/m.jpg"
     assert a["corroboration_checked"] == ""
+
+
+def test_resolve_candidate_accepts_both_decoder_result_shapes(monkeypatch):
+    import fetch
+    shapes = [
+        {"status": True, "decoded_url": "https://x.com/a"},          # googlenewsdecoder 0.1.x
+        {"success": True, "decoded_url": "https://x.com/a"},         # 0.2.x renamed the flag
+        {"decoded_url": "https://x.com/a"},                          # a future release with no flag
+    ]
+    for res in shapes:
+        monkeypatch.setattr(fetch, "gnewsdecoder", lambda url, interval=1, _r=res: _r)
+        c = {"url": "https://news.google.com/rss/articles/abc"}
+        fetch.resolve_candidate(c)
+        assert c["url"] == "https://x.com/a" and c["google_url"].startswith("https://news.google.com"), res
+    for res in [{"status": False, "message": "m"}, {"success": False, "message": "m"}, {}]:
+        monkeypatch.setattr(fetch, "gnewsdecoder", lambda url, interval=1, _r=res: _r)
+        c = {"url": "https://news.google.com/rss/articles/abc"}
+        fetch.resolve_candidate(c)
+        assert c["url"].startswith("https://news.google.com"), res

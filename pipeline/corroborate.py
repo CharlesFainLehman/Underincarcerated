@@ -68,8 +68,11 @@ def publishable(row: dict) -> bool:
 
 
 def pending(row: dict) -> bool:
-    """Not yet publishable, but the second-source search has not run on it."""
-    return not publishable(row) and not row.get("corroboration_checked")
+    """Not yet publishable, but the second-source search has not run on it.
+    A row with no offender name cannot be searched, so it is never pending;
+    enforce_sources removes it."""
+    return (not publishable(row) and not row.get("corroboration_checked")
+            and bool(row.get("offender_name")))
 
 
 def needs_check(row: dict, recheck: bool = False, include_trusted: bool = False) -> bool:
