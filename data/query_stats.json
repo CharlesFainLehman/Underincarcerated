@@ -2213,7 +2213,7 @@
   "\"arrests\" \"criminal history\" charged": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 87
+   "gnews": 88
   },
   "\"career criminal\" arrested": {
    "gdelt": 0,
@@ -2223,7 +2223,7 @@
   "\"cashless bail\" arrested": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 65
+   "gnews": 64
   },
   "\"charges dropped\" arrested again": {
    "gdelt": 0,
