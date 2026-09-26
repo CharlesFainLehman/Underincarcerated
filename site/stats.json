@@ -1,11 +1,11 @@
 {
- "updated": "2026-09-25",
- "stories": 420,
- "stories_strict": 420,
- "offenders": 401,
+ "updated": "2026-09-26",
+ "stories": 422,
+ "stories_strict": 422,
+ "offenders": 403,
  "offenders_multiple_incidents": 8,
  "by_state": {
-  "NY": 106,
+  "NY": 107,
   "FL": 40,
   "CA": 29,
   "TX": 20,
@@ -14,7 +14,7 @@
   "WA": 18,
   "NC": 16,
   "MA": 12,
-  "GA": 10,
+  "GA": 11,
   "OH": 10,
   "UT": 10,
   "AR": 8,
@@ -51,7 +51,7 @@
   "MO": 1
  },
  "by_state_strict": {
-  "NY": 106,
+  "NY": 107,
   "FL": 40,
   "CA": 29,
   "TX": 20,
@@ -60,7 +60,7 @@
   "WA": 18,
   "NC": 16,
   "MA": 12,
-  "GA": 10,
+  "GA": 11,
   "OH": 10,
   "UT": 10,
   "AR": 8,
@@ -99,18 +99,18 @@
  "by_release_status": {
   "none stated": 210,
   "parole": 58,
-  "bail/bond": 47,
+  "bail/bond": 48,
   "probation": 33,
   "early release": 31,
   "supervised release": 31,
-  "pretrial release": 9,
+  "pretrial release": 10,
   "charges dropped": 1
  },
  "by_offense_type": {
-  "homicide": 80,
+  "homicide": 81,
   "assault": 68,
   "drug offense": 41,
-  "sexual assault": 39,
+  "sexual assault": 40,
   "shooting": 27,
   "burglary": 25,
   "theft/larceny": 23,
@@ -127,7 +127,7 @@
   "carjacking": 2
  },
  "by_severity": {
-  "violent": 268,
+  "violent": 270,
   "property": 65,
   "drug": 41,
   "other": 27,
@@ -171,7 +171,7 @@
   "2024-08": 2,
   "2024-09": 3,
   "2024-10": 3,
-  "2024-11": 4,
+  "2024-11": 5,
   "2024-12": 8,
   "2025-01": 12,
   "2025-02": 11,
@@ -192,7 +192,7 @@
   "2026-05": 21,
   "2026-06": 13,
   "2026-07": 25,
-  "2026-08": 23,
+  "2026-08": 24,
   "2026-09": 3
  }
 }
