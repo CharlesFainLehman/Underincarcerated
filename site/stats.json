@@ -1,12 +1,12 @@
 {
- "updated": "2026-09-26",
- "stories": 422,
- "stories_strict": 422,
- "offenders": 403,
+ "updated": "2026-09-27",
+ "stories": 423,
+ "stories_strict": 423,
+ "offenders": 404,
  "offenders_multiple_incidents": 8,
  "by_state": {
   "NY": 107,
-  "FL": 40,
+  "FL": 41,
   "CA": 29,
   "TX": 20,
   "MI": 19,
@@ -52,7 +52,7 @@
  },
  "by_state_strict": {
   "NY": 107,
-  "FL": 40,
+  "FL": 41,
   "CA": 29,
   "TX": 20,
   "MI": 19,
@@ -97,7 +97,7 @@
   "MO": 1
  },
  "by_release_status": {
-  "none stated": 210,
+  "none stated": 211,
   "parole": 58,
   "bail/bond": 48,
   "probation": 33,
@@ -107,7 +107,7 @@
   "charges dropped": 1
  },
  "by_offense_type": {
-  "homicide": 81,
+  "homicide": 82,
   "assault": 68,
   "drug offense": 41,
   "sexual assault": 40,
@@ -127,7 +127,7 @@
   "carjacking": 2
  },
  "by_severity": {
-  "violent": 270,
+  "violent": 271,
   "property": 65,
   "drug": 41,
   "other": 27,
