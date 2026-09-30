@@ -1,11 +1,11 @@
 {
- "updated": "2026-09-29",
- "stories": 423,
- "stories_strict": 423,
- "offenders": 404,
+ "updated": "2026-09-30",
+ "stories": 425,
+ "stories_strict": 425,
+ "offenders": 406,
  "offenders_multiple_incidents": 8,
  "by_state": {
-  "NY": 107,
+  "NY": 108,
   "FL": 41,
   "CA": 29,
   "TX": 20,
@@ -35,12 +35,12 @@
   "MD": 3,
   "NH": 3,
   "IN": 3,
+  "KY": 3,
   "HI": 3,
   "KS": 2,
   "OK": 2,
   "TN": 2,
   "AZ": 2,
-  "KY": 2,
   "AL": 1,
   "WV": 1,
   "RI": 1,
@@ -51,7 +51,7 @@
   "MO": 1
  },
  "by_state_strict": {
-  "NY": 107,
+  "NY": 108,
   "FL": 41,
   "CA": 29,
   "TX": 20,
@@ -81,12 +81,12 @@
   "MD": 3,
   "NH": 3,
   "IN": 3,
+  "KY": 3,
   "HI": 3,
   "KS": 2,
   "OK": 2,
   "TN": 2,
   "AZ": 2,
-  "KY": 2,
   "AL": 1,
   "WV": 1,
   "RI": 1,
@@ -99,16 +99,16 @@
  "by_release_status": {
   "none stated": 211,
   "parole": 58,
-  "bail/bond": 48,
-  "probation": 33,
+  "bail/bond": 49,
+  "probation": 34,
   "early release": 31,
   "supervised release": 31,
   "pretrial release": 10,
   "charges dropped": 1
  },
  "by_offense_type": {
-  "homicide": 82,
-  "assault": 68,
+  "homicide": 83,
+  "assault": 69,
   "drug offense": 41,
   "sexual assault": 40,
   "shooting": 27,
@@ -127,7 +127,7 @@
   "carjacking": 2
  },
  "by_severity": {
-  "violent": 271,
+  "violent": 273,
   "property": 65,
   "drug": 41,
   "other": 27,
@@ -156,7 +156,7 @@
   "2022-02": 1,
   "2022-06": 1,
   "2022-12": 1,
-  "2023-01": 2,
+  "2023-01": 3,
   "2023-02": 2,
   "2023-07": 3,
   "2023-08": 1,
@@ -193,6 +193,6 @@
   "2026-06": 13,
   "2026-07": 25,
   "2026-08": 24,
-  "2026-09": 3
+  "2026-09": 4
  }
 }
