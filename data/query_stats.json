@@ -3972,12 +3972,12 @@
   "\"arrested\" \"times before\"": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 62
+   "gnews": 64
   },
   "\"arrests\" \"criminal history\" charged": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 85
+   "gnews": 84
   },
   "\"career criminal\" arrested": {
    "gdelt": 0,
@@ -3987,7 +3987,7 @@
   "\"cashless bail\" arrested": {
    "gdelt": 0,
    "gdelt_capped": false,
-   "gnews": 60
+   "gnews": 61
   },
   "\"charges dropped\" arrested again": {
    "gdelt": 0,
