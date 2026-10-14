@@ -1,8 +1,8 @@
 {
- "updated": "2026-10-13",
- "stories": 433,
- "stories_strict": 433,
- "offenders": 414,
+ "updated": "2026-10-14",
+ "stories": 434,
+ "stories_strict": 434,
+ "offenders": 415,
  "offenders_multiple_incidents": 8,
  "by_state": {
   "NY": 109,
@@ -15,7 +15,7 @@
   "NC": 16,
   "MA": 12,
   "GA": 12,
-  "OH": 10,
+  "OH": 11,
   "UT": 10,
   "AR": 8,
   "SC": 8,
@@ -62,7 +62,7 @@
   "NC": 16,
   "MA": 12,
   "GA": 12,
-  "OH": 10,
+  "OH": 11,
   "UT": 10,
   "AR": 8,
   "SC": 8,
@@ -99,7 +99,7 @@
   "MO": 1
  },
  "by_release_status": {
-  "none stated": 215,
+  "none stated": 216,
   "parole": 59,
   "bail/bond": 51,
   "probation": 34,
@@ -124,12 +124,12 @@
   "fraud": 9,
   "vehicle theft": 8,
   "arson": 6,
-  "kidnapping": 5,
+  "kidnapping": 6,
   "domestic violence": 4,
   "carjacking": 2
  },
  "by_severity": {
-  "violent": 279,
+  "violent": 280,
   "property": 66,
   "drug": 41,
   "other": 28,
@@ -147,6 +147,7 @@
   "2017-05": 1,
   "2017-06": 1,
   "2018-05": 1,
+  "2018-10": 1,
   "2020-05": 1,
   "2020-08": 1,
   "2020-12": 1,
